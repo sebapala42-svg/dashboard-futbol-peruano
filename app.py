@@ -1,13 +1,20 @@
 import streamlit as st
 import pandas as pd
 
-# 1. CONFIGURACIÓN Y ESTADO INICIAL (Entra a 2026 por defecto)
+# 1. CONFIGURACIÓN Y ESTADO INICIAL
 st.set_page_config(page_title="Liga 1 Te Apuesto", page_icon="🏆", layout="wide")
 
 if 'temporada' not in st.session_state:
     st.session_state['temporada'] = "2026"
+if 'alerta_viaje' not in st.session_state:
+    st.session_state['alerta_viaje'] = None
 
 temporada = st.session_state['temporada']
+
+# --- ALERTA VISUAL DE VIAJE EN EL TIEMPO ---
+if st.session_state['alerta_viaje']:
+    st.success(st.session_state['alerta_viaje'], icon="⏳")
+    st.session_state['alerta_viaje'] = None # Limpiamos la alerta para que no salga siempre
 
 # 2. INYECCIÓN DE CSS EXTREMO (TU DISEÑO ORIGINAL PROMIEDOS)
 st.markdown("""
@@ -58,7 +65,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# --- 3. DICCIONARIO DE LOGOS (OFICIALES TRANSFERMARKT) ---
+# --- 3. DICCIONARIO DE LOGOS OFICIAL (TRANSFERMARKT Y OTROS) ---
 logos_equipos = {
     'Alianza Lima': 'https://tmssl.akamaized.net//images/wappen/head/184.png?lm=1755275805',
     'Universitario': 'https://tmssl.akamaized.net//images/wappen/head/6593.png',
@@ -93,7 +100,7 @@ logos_equipos = {
 equipo_A = ['Sporting Cristal', 'Sport Rosario', 'UTC', 'U. San Martin', 'Alianza Lima', 'Comerciantes Unidos', 'Ayacucho FC', 'Universitario']
 equipo_B = ['Sport Huancayo', 'FBC Melgar', 'Cantolao', 'Dep. Municipal', 'Sport Boys', 'Cusco (Garcilaso)', 'Binacional', 'Union Comercio']
 
-# --- 4. CARGADORES DE DATOS ---
+# --- 4. CARGADORES DE DATOS Y EQUIPOS DEL AÑO ---
 @st.cache_data
 def cargar_datos_2018():
     df_p = pd.read_excel('torneo_2018.xlsx', sheet_name='BaseDatos')
@@ -101,27 +108,25 @@ def cargar_datos_2018():
     return df_p, df_g
 
 def cargar_datos_2026():
-    # FIXTURE OFICIAL 2026 TRANSCRITO EXACTAMENTE DE TUS IMÁGENES
     data_26 = [
         # FECHA 1
-        [1, 'Sport Huancayo', 'Alianza Lima', 1, 2], [1, 'UTC', 'Atlético Grau', 2, 0], [1, 'Comerciantes Unidos', 'CD Moquegua', 1, 0], [1, 'Sport Boys', 'Los Chankas', 1, 1], [1, 'Juan Pablo II', 'FC Cajamarca', 3, 3], [1, 'FBC Melgar', 'Cienciano', 2, 0], [1, 'Deportivo Garcilaso', 'Sporting Cristal', 1, 1], [1, 'Alianza Atlético', 'Cusco FC', 1, 0], [1, 'Universitario', 'ADT', 2, 0], 
+        [1, 'Juan Pablo II', 'FC Cajamarca', 3, 3], [1, 'Alianza Atlético', 'Cusco FC', 1, 0], [1, 'FBC Melgar', 'Cienciano', 2, 1], [1, 'UTC', 'Atlético Grau', 2, 0], [1, 'Deportivo Garcilaso', 'Sporting Cristal', 1, 1], [1, 'Sport Huancayo', 'Alianza Lima', 0, 2], [1, 'Universitario', 'ADT', 2, 0], [1, 'Sport Boys', 'Los Chankas', 1, 2], [1, 'Comerciantes Unidos', 'CD Moquegua', 2, 0],
         # FECHA 2
-        [2, 'CD Moquegua', 'UTC', 2, 3], [2, 'ADT', 'Sport Boys', 1, 0], [2, 'Atlético Grau', 'Sport Huancayo', 0, 0], [2, 'Cusco FC', 'Universitario', 1, 1], [2, 'Sporting Cristal', 'FBC Melgar', 1, 2], [2, 'Los Chankas', 'Alianza Atlético', 1, 0], [2, 'Cienciano', 'Juan Pablo II', 6, 1], [2, 'Alianza Lima', 'Comerciantes Unidos', 2, 1], [2, 'FC Cajamarca', 'Deportivo Garcilaso', 1, 1],
+        [2, 'Cusco FC', 'Universitario', 0, 1], [2, 'ADT', 'Sport Boys', 1, 1], [2, 'Alianza Lima', 'Comerciantes Unidos', 2, 0], [2, 'Cienciano', 'Juan Pablo II', 4, 1], [2, 'Atlético Grau', 'Sport Huancayo', 0, 0], [2, 'Sporting Cristal', 'FBC Melgar', 3, 1], [2, 'FC Cajamarca', 'Deportivo Garcilaso', 1, 1], [2, 'Los Chankas', 'Alianza Atlético', 1, 0], [2, 'CD Moquegua', 'UTC', 0, 1],
         # FECHA 3
-        [3, 'UTC', 'Cusco FC', 1, 0], [3, 'Universitario', 'Cienciano', 2, 1], [3, 'Deportivo Garcilaso', 'ADT', 1, 0], [3, 'Juan Pablo II', 'Sporting Cristal', 0, 2], [3, 'Sport Boys', 'Atlético Grau', 1, 0], [3, 'Alianza Atlético', 'Alianza Lima', 0, 0], [3, 'Sport Huancayo', 'FC Cajamarca', 2, 0], [3, 'Comerciantes Unidos', 'Los Chankas', 1, 1], [3, 'FBC Melgar', 'CD Moquegua', 4, 0],
+        [3, 'Juan Pablo II', 'Sporting Cristal', 0, 2], [3, 'Alianza Atlético', 'Alianza Lima', 0, 0], [3, 'FBC Melgar', 'CD Moquegua', 4, 0], [3, 'UTC', 'Cusco FC', 1, 0], [3, 'Deportivo Garcilaso', 'ADT', 1, 0], [3, 'Sport Huancayo', 'FC Cajamarca', 2, 0], [3, 'Universitario', 'Cienciano', 2, 1], [3, 'Sport Boys', 'Atlético Grau', 1, 0], [3, 'Comerciantes Unidos', 'Los Chankas', 1, 1],
         # FECHA 4
-        [4, 'Alianza Lima', 'Sport Boys', 1, 0], [4, 'FC Cajamarca', 'FBC Melgar', 3, 1], [4, 'Sporting Cristal', 'Universitario', 2, 2], [4, 'Cienciano', 'Alianza Atlético', 1, 1], [4, 'ADT', 'UTC', 2, 2], [4, 'Los Chankas', 'Sport Huancayo', 3, 2], [4, 'Atlético Grau', 'Juan Pablo II', 1, 2], [4, 'Cusco FC', 'Comerciantes Unidos', 3, 1], [4, 'CD Moquegua', 'Deportivo Garcilaso', 1, 0],
+        [4, 'Cusco FC', 'Comerciantes Unidos', 3, 1], [4, 'ADT', 'UTC', 2, 2], [4, 'Alianza Lima', 'Sport Boys', 1, 0], [4, 'Cienciano', 'Alianza Atlético', 1, 1], [4, 'Atlético Grau', 'Juan Pablo II', 1, 2], [4, 'Sporting Cristal', 'Universitario', 2, 2], [4, 'FC Cajamarca', 'FBC Melgar', 3, 1], [4, 'Los Chankas', 'Sport Huancayo', 3, 2], [4, 'CD Moquegua', 'Deportivo Garcilaso', 1, 0],
         # FECHA 5
-        [5, 'Alianza Atlético', 'ADT', 0, 0], [5, 'FBC Melgar', 'Los Chankas', 1, 2], [5, 'Deportivo Garcilaso', 'Cienciano', 2, 3], [5, 'Sport Huancayo', 'Sporting Cristal', 2, 1], [5, 'UTC', 'Alianza Lima', 0, 1], [5, 'Sport Boys', 'CD Moquegua', 0, 0], [5, 'Comerciantes Unidos', 'Atlético Grau', 3, 1], [5, 'Juan Pablo II', 'Cusco FC', 2, 1], [5, 'Universitario', 'FC Cajamarca', 1, 0],
+        [5, 'Juan Pablo II', 'Cusco FC', 2, 1], [5, 'Alianza Atlético', 'ADT', 0, 0], [5, 'FBC Melgar', 'Los Chankas', 1, 2], [5, 'UTC', 'Alianza Lima', 1, 2], [5, 'Deportivo Garcilaso', 'Cienciano', 1, 2], [5, 'Sport Huancayo', 'Sporting Cristal', 1, 2], [5, 'Universitario', 'FC Cajamarca', 3, 0], [5, 'Sport Boys', 'CD Moquegua', 0, 1], [5, 'Comerciantes Unidos', 'Atlético Grau', 2, 0],
         # FECHA 6
-        [6, 'Atlético Grau', 'FC Cajamarca', 1, 0], [6, 'CD Moquegua', 'Sport Huancayo', 2, 1], [6, 'Comerciantes Unidos', 'UTC', 1, 2], [6, 'Sporting Cristal', 'Alianza Atlético', 3, 1], [6, 'Cusco FC', 'Deportivo Garcilaso', 1, 0], [6, 'ADT', 'Juan Pablo II', 2, 3], [6, 'Los Chankas', 'Universitario', 3, 1], [6, 'Cienciano', 'Sport Boys', 3, 1], [6, 'Alianza Lima', 'FBC Melgar', 3, 1],
+        [6, 'Cusco FC', 'Deportivo Garcilaso', 1, 1], [6, 'ADT', 'Juan Pablo II', 1, 2], [6, 'Alianza Lima', 'FBC Melgar', 1, 1], [6, 'Cienciano', 'Sport Boys', 2, 0], [6, 'Atlético Grau', 'FC Cajamarca', 1, 0], [6, 'Sporting Cristal', 'Alianza Atlético', 3, 1], [6, 'Los Chankas', 'Universitario', 3, 1], [6, 'CD Moquegua', 'Sport Huancayo', 1, 2], [6, 'Comerciantes Unidos', 'UTC', 1, 2],
         # FECHA 7
-        [7, 'FC Cajamarca', 'Comerciantes Unidos', 3, 4], [7, 'Sport Huancayo', 'ADT', 0, 1], [7, 'Juan Pablo II', 'Los Chankas', 2, 3], [7, 'Deportivo Garcilaso', 'Alianza Lima', 1, 1], [7, 'Universitario', 'UTC', 2, 0], [7, 'Sporting Cristal', 'Sport Boys', 3, 0], [7, 'FBC Melgar', 'Atlético Grau', 0, 0], [7, 'Alianza Atlético', 'CD Moquegua', 3, 0], [7, 'Cusco FC', 'Cienciano', 1, 2],
-        # FECHA 8 (ACTUALIDAD)
-        [8, 'ADT', 'FBC Melgar', 1, 1], [8, 'Cienciano', 'FC Cajamarca', 3, 0], [8, 'CD Moquegua', 'Cusco FC', 1, 2], [8, 'Comerciantes Unidos', 'Universitario', 0, 0], [8, 'Los Chankas', 'Sporting Cristal', 3, 2], [8, 'Alianza Lima', 'Juan Pablo II', 2, 0], [8, 'UTC', 'Alianza Atlético', 1, 1], [8, 'Atlético Grau', 'Deportivo Garcilaso', 0, 0], [8, 'Sport Boys', 'Sport Huancayo', 3, 0],
-        
-        # FECHAS PENDIENTES 2026 (Para el selector dinámico)
-        [9, 'Juan Pablo II', 'UTC', None, None], [9, 'Alianza Atlético', 'Atlético Grau', None, None], [9, 'FBC Melgar', 'Cusco FC', None, None], [9, 'Cienciano', 'ADT', None, None], [9, 'Deportivo Garcilaso', 'Sporting Cristal', None, None], [9, 'Sport Huancayo', 'Comerciantes Unidos', None, None], [9, 'Sport Boys', 'CD Moquegua', None, None], [9, 'Universitario', 'Alianza Lima', None, None], [9, 'FC Cajamarca', 'Los Chankas', None, None],
+        [7, 'Cusco FC', 'Cienciano', 1, 3], [7, 'Juan Pablo II', 'Los Chankas', 2, 3], [7, 'Alianza Atlético', 'CD Moquegua', 1, 1], [7, 'FBC Melgar', 'Atlético Grau', 1, 0], [7, 'Deportivo Garcilaso', 'Alianza Lima', 1, 1], [7, 'Sport Huancayo', 'ADT', 0, 1], [7, 'Sporting Cristal', 'Sport Boys', 3, 0], [7, 'Universitario', 'UTC', 2, 0], [7, 'FC Cajamarca', 'Comerciantes Unidos', 3, 4],
+        # FECHA 8 
+        [8, 'ADT', 'FBC Melgar', 1, 1], [8, 'UTC', 'Alianza Atlético', 1, 1], [8, 'Alianza Lima', 'Juan Pablo II', 2, 0], [8, 'Cienciano', 'FC Cajamarca', 3, 0], [8, 'Atlético Grau', 'Deportivo Garcilaso', 0, 0], [8, 'Los Chankas', 'Sporting Cristal', 3, 2], [8, 'Sport Boys', 'Sport Huancayo', 3, 0], [8, 'CD Moquegua', 'Cusco FC', 1, 2], [8, 'Comerciantes Unidos', 'Universitario', 0, 0],
+        # FECHAS PENDIENTES 
+        [9, 'Juan Pablo II', 'UTC', None, None], [9, 'Alianza Atlético', 'Atlético Grau', None, None], [9, 'FBC Melgar', 'Cusco FC', None, None], [9, 'Cienciano', 'ADT', None, None], [9, 'Deportivo Garcilaso', 'Sport Boys', None, None], [9, 'Sport Huancayo', 'Comerciantes Unidos', None, None], [9, 'Sporting Cristal', 'CD Moquegua', None, None], [9, 'Universitario', 'Alianza Lima', None, None], [9, 'FC Cajamarca', 'Los Chankas', None, None],
         [10, 'Cusco FC', 'FC Cajamarca', None, None], [10, 'ADT', 'Alianza Lima', None, None], [10, 'UTC', 'Sport Huancayo', None, None], [10, 'Atlético Grau', 'Sporting Cristal', None, None], [10, 'Universitario', 'Deportivo Garcilaso', None, None], [10, 'Los Chankas', 'Cienciano', None, None], [10, 'Sport Boys', 'FBC Melgar', None, None], [10, 'CD Moquegua', 'Juan Pablo II', None, None], [10, 'Comerciantes Unidos', 'Alianza Atlético', None, None],
         [11, 'Juan Pablo II', 'Comerciantes Unidos', None, None], [11, 'Alianza Atlético', 'Sport Boys', None, None], [11, 'FBC Melgar', 'Universitario', None, None], [11, 'Alianza Lima', 'Cusco FC', None, None], [11, 'Cienciano', 'CD Moquegua', None, None], [11, 'Sport Huancayo', 'Deportivo Garcilaso', None, None], [11, 'Sporting Cristal', 'UTC', None, None], [11, 'FC Cajamarca', 'ADT', None, None], [11, 'Los Chankas', 'Atlético Grau', None, None],
         [12, 'Cusco FC', 'Sport Huancayo', None, None], [12, 'ADT', 'Los Chankas', None, None], [12, 'UTC', 'Cienciano', None, None], [12, 'Deportivo Garcilaso', 'FBC Melgar', None, None], [12, 'Atlético Grau', 'Alianza Lima', None, None], [12, 'Universitario', 'Alianza Atlético', None, None], [12, 'Sport Boys', 'Juan Pablo II', None, None], [12, 'CD Moquegua', 'FC Cajamarca', None, None], [12, 'Comerciantes Unidos', 'Sporting Cristal', None, None],
@@ -135,10 +140,21 @@ def cargar_datos_2026():
     df['Torneo'] = 'Apertura'
     return df
 
-# --- 5. MOTOR UNIVERSAL CREADOR DE TABLAS ---
+# Carga condicional y Lista de Equipos EXACTA del año
+if temporada == "2018":
+    try:
+        df_partidos, df_goles = cargar_datos_2018()
+        equipos_temporada_actual = sorted(list(df_partidos['Local'].dropna().unique()))
+    except Exception:
+        st.error("🚨 Error: Sube 'torneo_2018.xlsx' a GitHub.")
+        st.stop()
+else:
+    df_partidos = cargar_datos_2026()
+    equipos_temporada_actual = sorted(list(df_partidos['Local'].dropna().unique()))
+
+# --- MOTOR UNIVERSAL DE TABLAS ---
 def generar_html_tabla(df_filtro, lista_equipos, titulo_panel, es_acumulado=False, zona="", f_sel=44):
     tabla_datos = []
-    # Filtrar solo partidos ya jugados
     df_valid = df_filtro.dropna(subset=['GL', 'GV'])
     
     for equipo in lista_equipos:
@@ -153,7 +169,6 @@ def generar_html_tabla(df_filtro, lista_equipos, titulo_panel, es_acumulado=Fals
         pts = (g * 3) + e
         
         pts_total = pts
-        # Las sanciones solo se aplican si la base de datos es 2018
         if es_acumulado and temporada == "2018":
             bon = 2 if equipo == 'Sporting Cristal' and f_sel >= 44 else 0
             sanc_dict = {'Universitario': 1, 'Dep. Municipal': 2, 'UTC': 2, 'Cantolao': 2, 'Sport Rosario': 7}
@@ -182,7 +197,6 @@ def generar_html_tabla(df_filtro, lista_equipos, titulo_panel, es_acumulado=Fals
         logo = logos_equipos.get(row['Equipo'], '')
         borde = "transparent"
         
-        # Lógica visual de Clasificación
         if temporada == "2018" and es_acumulado:
             if pos <= 4: borde = "#3db4dc" 
             elif pos <= 8: borde = "#e1c340" 
@@ -210,18 +224,9 @@ tab_fixture, tab_estadisticas, tab_campeones = st.tabs(["FIXTURE Y TABLAS", "EQU
 
 with tab_fixture:
     if temporada == "2018":
-        try:
-            df_partidos, df_goles = cargar_datos_2018()
-        except Exception:
-            st.error("🚨 Error: Sube 'torneo_2018.xlsx' a GitHub.")
-            st.stop()
-            
-        todos_eq = sorted(list(df_partidos['Local'].dropna().unique()))
         fechas_disponibles = [f"FECHA {i}" for i in range(1, 45)]
         idx_defecto = 29
     else:
-        df_partidos = cargar_datos_2026()
-        todos_eq = sorted(list(df_partidos['Local'].dropna().unique()))
         fechas_disponibles = [f"FECHA {i}" for i in range(1, 18)]
         idx_defecto = 7 # Fecha 8 por defecto
 
@@ -232,7 +237,6 @@ with tab_fixture:
         fecha_texto = st.selectbox("Selecciona Fecha", fechas_disponibles, index=idx_defecto) 
         fecha_seleccionada = int(fecha_texto.replace("FECHA ", ""))
         
-        # MOSTRAR PARTIDOS
         st.markdown("<div class='panel-verde' style='padding: 0;'><div class='contenedor-partidos'>", unsafe_allow_html=True)
         partidos_fecha = df_partidos[df_partidos['Fecha_Global'] == fecha_seleccionada]
         if not partidos_fecha.empty:
@@ -241,7 +245,6 @@ with tab_fixture:
                 loc, vis = row['Local'], row['Visitante']
                 l_logo, v_logo = logos_equipos.get(loc, ''), logos_equipos.get(vis, '')
                 
-                # Diferenciar partidos jugados y por jugar
                 if pd.isna(row['GL']):
                     gl, gv, div_est = "-", "-", "<span style='color:#87b897; font-size:10px;'>Por jugar</span>"
                 else:
@@ -253,7 +256,6 @@ with tab_fixture:
             st.markdown("<p style='text-align:center; font-size:12px; padding: 15px;'>No hay partidos registrados.</p>", unsafe_allow_html=True)
         st.markdown("</div></div>", unsafe_allow_html=True)
 
-        # GOLEADORES (Solo se muestra en 2018)
         if temporada == "2018":
             st.markdown("<div class='panel-verde'><div class='titulo-panel'>GOLEADORES</div>", unsafe_allow_html=True)
             df_g = df_goles.dropna(subset=['Fecha_Global', 'Jugador'])
@@ -265,13 +267,10 @@ with tab_fixture:
                     html_g += f"<tr><td style='text-align:left; color:#ffffff;'><img src='{logos_equipos.get(row['Equipo'], '')}' width='15' height='15' style='object-fit:contain; vertical-align:middle; margin-right:5px;' onerror=\"this.style.display='none'\"> {row['Jugador']}</td><td style='font-weight:bold; color:#ffffff;'>{row['Goles']}</td></tr>"
                 html_g += "</tbody></table>"
                 st.markdown(html_g, unsafe_allow_html=True)
-            else:
-                st.markdown("<p style='text-align:center; font-size:12px;'>Aún no hay goles registrados.</p>", unsafe_allow_html=True)
             st.markdown("</div>", unsafe_allow_html=True)
 
     with col_izq:
         if temporada == "2018":
-            # TU LÓGICA DE TABLAS 2018 INTACTA
             if fecha_seleccionada <= 14:
                 st.markdown("<div class='titulo-panel'>TORNEO DE VERANO</div>", unsafe_allow_html=True)
                 df_verano = df_partidos[(df_partidos['Fecha_Global'] <= fecha_seleccionada) & (df_partidos['Torneo'] == 'Verano')]
@@ -279,30 +278,30 @@ with tab_fixture:
                 st.markdown(generar_html_tabla(df_verano, equipo_B, "", zona="ZONA B", f_sel=fecha_seleccionada), unsafe_allow_html=True)
             elif fecha_seleccionada <= 29:
                 df_apertura = df_partidos[(df_partidos['Fecha_Global'] >= 15) & (df_partidos['Fecha_Global'] <= fecha_seleccionada) & (df_partidos['Torneo'] == 'Apertura')]
-                st.markdown(generar_html_tabla(df_apertura, todos_eq, "TORNEO APERTURA", zona="ZONA ÚNICA", f_sel=fecha_seleccionada), unsafe_allow_html=True)
+                st.markdown(generar_html_tabla(df_apertura, equipos_temporada_actual, "TORNEO APERTURA", zona="ZONA ÚNICA", f_sel=fecha_seleccionada), unsafe_allow_html=True)
             else:
                 df_clausura = df_partidos[(df_partidos['Fecha_Global'] >= 30) & (df_partidos['Fecha_Global'] <= min(fecha_seleccionada, 44)) & (df_partidos['Torneo'] == 'Clausura')]
-                st.markdown(generar_html_tabla(df_clausura, todos_eq, "TORNEO CLAUSURA", zona="ZONA ÚNICA", f_sel=fecha_seleccionada), unsafe_allow_html=True)
+                st.markdown(generar_html_tabla(df_clausura, equipos_temporada_actual, "TORNEO CLAUSURA", zona="ZONA ÚNICA", f_sel=fecha_seleccionada), unsafe_allow_html=True)
 
             df_acu = df_partidos[df_partidos['Fecha_Global'] <= min(fecha_seleccionada, 44)]
-            st.markdown(generar_html_tabla(df_acu, todos_eq, f"TABLA ACUMULADA (HASTA LA FECHA {fecha_seleccionada})", es_acumulado=True, f_sel=fecha_seleccionada), unsafe_allow_html=True)
+            st.markdown(generar_html_tabla(df_acu, equipos_temporada_actual, f"TABLA ACUMULADA (HASTA LA FECHA {fecha_seleccionada})", es_acumulado=True, f_sel=fecha_seleccionada), unsafe_allow_html=True)
         
         else:
-            # 2026 CALCULADO DINÁMICAMENTE POR EL MOTOR HASTA LA FECHA SELECCIONADA
             df_acu = df_partidos[df_partidos['Fecha_Global'] <= fecha_seleccionada]
-            st.markdown(generar_html_tabla(df_acu, todos_eq, f"LIGA 1 APERTURA 2026 (FECHA {fecha_seleccionada})", es_acumulado=True, f_sel=fecha_seleccionada), unsafe_allow_html=True)
+            st.markdown(generar_html_tabla(df_acu, equipos_temporada_actual, f"LIGA 1 APERTURA 2026 (FECHA {fecha_seleccionada})", es_acumulado=True, f_sel=fecha_seleccionada), unsafe_allow_html=True)
 
 # =====================================================================
-# --- TAB 2: EQUIPOS Y ESTADÍSTICAS (LIMPIA, SOLO ESCUDOS) ---
+# --- TAB 2: EQUIPOS Y ESTADÍSTICAS (FILTRADOS POR AÑO) ---
 # =====================================================================
 with tab_estadisticas:
-    st.markdown("<h3 style='text-align: center; color: white; margin-bottom: 5px;'>EQUIPOS LIGA 1</h3>", unsafe_allow_html=True)
+    st.markdown(f"<h3 style='text-align: center; color: white; margin-bottom: 5px;'>EQUIPOS LIGA 1 - {temporada}</h3>", unsafe_allow_html=True)
     st.markdown("<p style='text-align: center; color: #87b897; font-size: 11px; margin-bottom: 15px;'>Haz clic en un equipo para ver su historial y palmarés (Próximamente)</p>", unsafe_allow_html=True)
 
     tit_h = {'Universitario': 29, 'Alianza Lima': 25, 'Sporting Cristal': 20, 'Sport Boys': 6, 'Dep. Municipal': 4, 'U. San Martin': 3, 'FBC Melgar': 2, 'Binacional': 1}
     
     html_grid = "<div class='eq-grid'>"
-    for equipo in sorted(list(logos_equipos.keys())):
+    # SOLO iteramos por los equipos de la temporada actual, NO por todo el diccionario
+    for equipo in equipos_temporada_actual:
         logo = logos_equipos.get(equipo, '')
         copas = tit_h.get(equipo, 0)
         insignia = f"<div class='eq-badge'>🏆{copas}</div>" if copas > 0 else ""
@@ -353,7 +352,7 @@ with tab_campeones:
         html_r += "</tbody></table></div>"
         st.markdown(html_r, unsafe_allow_html=True)
 
-    # --- MÁQUINA DEL TIEMPO ---
+    # --- MÁQUINA DEL TIEMPO CON ALERTA ---
     st.markdown("<br><hr style='border-color: #1a4a2e;'><h3 style='text-align: center; color: white;'>MÁQUINA DEL TIEMPO</h3>", unsafe_allow_html=True)
     st.markdown("<p style='text-align: center; color: #87b897; font-size: 13px;'>Explora la base de datos de los torneos pasados.</p>", unsafe_allow_html=True)
     
@@ -362,8 +361,10 @@ with tab_campeones:
         if temporada == "2026":
             if st.button("⏪ Viajar al Torneo 2018", use_container_width=True):
                 st.session_state['temporada'] = "2018"
+                st.session_state['alerta_viaje'] = "¡Viaje exitoso al 2018! Revisa la pestaña FIXTURE Y TABLAS para ver los torneos de esa época."
                 st.rerun()
         else:
             if st.button("🏠 Volver al Presente (2026)", use_container_width=True):
                 st.session_state['temporada'] = "2026"
+                st.session_state['alerta_viaje'] = "¡De vuelta al 2026! Revisa cómo va el Apertura."
                 st.rerun()
