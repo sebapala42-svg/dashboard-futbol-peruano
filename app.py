@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 
-# 1. CONFIGURACIÓN Y ESTADO INICIAL (Entra a 2026 por defecto)
+# 1. CONFIGURACIÓN Y ESTADO INICIAL
 st.set_page_config(page_title="Liga 1 Te Apuesto", page_icon="🏆", layout="wide")
 
 if 'temporada' not in st.session_state:
@@ -11,12 +11,11 @@ if 'alerta_viaje' not in st.session_state:
 
 temporada = st.session_state['temporada']
 
-# --- ALERTA VISUAL DE VIAJE EN EL TIEMPO ---
 if st.session_state['alerta_viaje']:
     st.success(st.session_state['alerta_viaje'], icon="⏳")
     st.session_state['alerta_viaje'] = None 
 
-# 2. INYECCIÓN DE CSS EXTREMO (DISEÑO PROMIEDOS)
+# 2. INYECCIÓN DE CSS EXTREMO (TU DISEÑO ORIGINAL PROMIEDOS + NUEVAS FICHAS)
 st.markdown("""
 <style>
     .stApp { background-color: #0b4026; color: #ffffff; }
@@ -62,10 +61,15 @@ st.markdown("""
     .eq-logo { width: 45px; height: 45px; object-fit: contain; margin-bottom: 8px; }
     .eq-nom { color: #ffffff; font-weight: bold; font-size: 10px; text-transform: uppercase; display: block; }
     .eq-badge { position: absolute; top: 5px; right: 5px; color: #ffffff; font-size: 9px; font-weight: bold; display: flex; align-items: center; gap: 2px; }
+    
+    /* CSS NUEVO PARA LA FICHA DEL EQUIPO ESTILO PROMIEDOS */
+    .ficha-info-box { background-color: #0d2418; border: 1px solid #1a4a2e; border-radius: 4px; padding: 10px; margin-bottom: 10px; display: flex; justify-content: space-between; font-size: 13px;}
+    .ficha-info-lbl { color: #a1b5a8; font-weight: bold; }
+    .ficha-info-val { color: #ffffff; text-align: right; font-weight: bold; }
 </style>
 """, unsafe_allow_html=True)
 
-# --- 3. DICCIONARIO DE LOGOS (EL TUYO, ACTUALIZADO Y DEFINITIVO) ---
+# --- 3. DICCIONARIO DE LOGOS OFICIAL ---
 logos_equipos = {
     'Alianza Lima': 'https://tmssl.akamaized.net//images/wappen/head/184.png?lm=1755275805',
     'Universitario': 'https://tmssl.akamaized.net//images/wappen/head/6593.png',
@@ -86,8 +90,6 @@ logos_equipos = {
     'CD Moquegua': 'https://tmssl.akamaized.net//images/wappen/head/114625.png?lm=1735173037',
     'Juan Pablo II': 'https://tmssl.akamaized.net//images/wappen/head/99517.png?lm=1712524979',
     'FC Cajamarca': 'https://tmssl.akamaized.net//images/wappen/head/120792.png?lm=1767023947',
-    
-    # Antiguos de 2018 
     'Dep. Municipal': 'https://tmssl.akamaized.net//images/wappen/head/17974.png',
     'Cantolao': 'https://tmssl.akamaized.net//images/wappen/head/11247.png',
     'Sport Rosario': 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/18441.png',
@@ -95,6 +97,16 @@ logos_equipos = {
     'Union Comercio': 'https://tmssl.akamaized.net//images/wappen/head/31337.png',
     'Ayacucho FC': 'https://tmssl.akamaized.net//images/wappen/head/21178.png',
     'Binacional': 'https://tmssl.akamaized.net//images/wappen/head/41054.png'
+}
+
+# --- BASE DE DATOS DE INFO DE EQUIPOS (PARA LAS FICHAS) ---
+info_clubes = {
+    'Universitario': {'Apodo': 'Cremas', 'Fundación': '1924', 'Estadio': 'Monumental U Marathon'},
+    'Alianza Lima': {'Apodo': 'Íntimos', 'Fundación': '1901', 'Estadio': 'Alejandro Villanueva (Matute)'},
+    'Sporting Cristal': {'Apodo': 'Celestes', 'Fundación': '1955', 'Estadio': 'Alberto Gallardo'},
+    'FBC Melgar': {'Apodo': 'Rojinegros', 'Fundación': '1915', 'Estadio': 'Monumental de la UNSA'},
+    'Cienciano': {'Apodo': 'El Papá', 'Fundación': '1901', 'Estadio': 'Inca Garcilaso de la Vega'},
+    'Sport Boys': {'Apodo': 'La Misilera', 'Fundación': '1927', 'Estadio': 'Miguel Grau'},
 }
 
 equipo_A = ['Sporting Cristal', 'Sport Rosario', 'UTC', 'U. San Martin', 'Alianza Lima', 'Comerciantes Unidos', 'Ayacucho FC', 'Universitario']
@@ -107,43 +119,33 @@ def cargar_datos_2018():
     df_g = pd.read_excel('torneo_2018.xlsx', sheet_name='Registro_Goles')
     return df_p, df_g
 
+@st.cache_data
 def cargar_datos_2026():
-    # DATOS TRANCRITOS EXACTAMENTE DE TUS CAPTURAS SOFASCORE 
     data_26 = [
-        # FECHA 1
         [1, 'Sport Huancayo', 'Alianza Lima', 1, 2], [1, 'UTC', 'Atlético Grau', 2, 0], [1, 'Comerciantes Unidos', 'CD Moquegua', 1, 0],
         [1, 'Sport Boys', 'Los Chankas', 1, 1], [1, 'Juan Pablo II', 'FC Cajamarca', 3, 3], [1, 'FBC Melgar', 'Cienciano', 2, 0],
         [1, 'Deportivo Garcilaso', 'Sporting Cristal', 1, 1], [1, 'Alianza Atlético', 'Cusco FC', 1, 0], [1, 'Universitario', 'ADT', 2, 0],
-        # FECHA 2
         [2, 'CD Moquegua', 'UTC', 2, 3], [2, 'ADT', 'Sport Boys', 1, 0], [2, 'Atlético Grau', 'Sport Huancayo', 0, 0],
         [2, 'Cusco FC', 'Universitario', 1, 1], [2, 'Sporting Cristal', 'FBC Melgar', 1, 2], [2, 'Los Chankas', 'Alianza Atlético', 1, 0],
         [2, 'Cienciano', 'Juan Pablo II', 6, 1], [2, 'Alianza Lima', 'Comerciantes Unidos', 2, 1], [2, 'FC Cajamarca', 'Deportivo Garcilaso', 1, 1],
-        # FECHA 3
         [3, 'UTC', 'Cusco FC', 1, 0], [3, 'Universitario', 'Cienciano', 2, 1], [3, 'Deportivo Garcilaso', 'ADT', 1, 0],
         [3, 'Juan Pablo II', 'Sporting Cristal', 0, 2], [3, 'Sport Boys', 'Atlético Grau', 1, 0], [3, 'Alianza Atlético', 'Alianza Lima', 0, 0],
         [3, 'Sport Huancayo', 'FC Cajamarca', 2, 0], [3, 'Comerciantes Unidos', 'Los Chankas', 1, 1], [3, 'FBC Melgar', 'CD Moquegua', 4, 0],
-        # FECHA 4
         [4, 'Alianza Lima', 'Sport Boys', 1, 0], [4, 'FC Cajamarca', 'FBC Melgar', 3, 1], [4, 'Sporting Cristal', 'Universitario', 2, 2],
         [4, 'Cienciano', 'Alianza Atlético', 1, 1], [4, 'ADT', 'UTC', 2, 2], [4, 'Los Chankas', 'Sport Huancayo', 3, 2],
         [4, 'Atlético Grau', 'Juan Pablo II', 1, 2], [4, 'Cusco FC', 'Comerciantes Unidos', 3, 1], [4, 'CD Moquegua', 'Deportivo Garcilaso', 1, 0],
-        # FECHA 5
         [5, 'Alianza Atlético', 'ADT', 0, 0], [5, 'FBC Melgar', 'Los Chankas', 1, 2], [5, 'Deportivo Garcilaso', 'Cienciano', 2, 3],
         [5, 'Sport Huancayo', 'Sporting Cristal', 2, 1], [5, 'UTC', 'Alianza Lima', 0, 1], [5, 'Sport Boys', 'CD Moquegua', 0, 0],
         [5, 'Comerciantes Unidos', 'Atlético Grau', 3, 1], [5, 'Juan Pablo II', 'Cusco FC', 2, 1], [5, 'Universitario', 'FC Cajamarca', 1, 0],
-        # FECHA 6
         [6, 'Atlético Grau', 'FC Cajamarca', 1, 0], [6, 'CD Moquegua', 'Sport Huancayo', 2, 1], [6, 'Comerciantes Unidos', 'UTC', 1, 2],
         [6, 'Sporting Cristal', 'Alianza Atlético', 3, 1], [6, 'Cusco FC', 'Deportivo Garcilaso', 1, 0], [6, 'ADT', 'Juan Pablo II', 2, 3],
         [6, 'Los Chankas', 'Universitario', 3, 1], [6, 'Cienciano', 'Sport Boys', 3, 1], [6, 'Alianza Lima', 'FBC Melgar', 3, 1],
-        # FECHA 7
         [7, 'FC Cajamarca', 'Comerciantes Unidos', 3, 4], [7, 'Sport Huancayo', 'ADT', 0, 1], [7, 'Juan Pablo II', 'Los Chankas', 2, 3],
         [7, 'Deportivo Garcilaso', 'Alianza Lima', 1, 1], [7, 'Universitario', 'UTC', 2, 0], [7, 'Sporting Cristal', 'Sport Boys', 3, 0],
         [7, 'FBC Melgar', 'Atlético Grau', 0, 0], [7, 'Alianza Atlético', 'CD Moquegua', 3, 0], [7, 'Cusco FC', 'Cienciano', 1, 2],
-        # FECHA 8 
         [8, 'ADT', 'FBC Melgar', 1, 1], [8, 'Cienciano', 'FC Cajamarca', 3, 0], [8, 'CD Moquegua', 'Cusco FC', 1, 2],
         [8, 'Comerciantes Unidos', 'Universitario', 0, 0], [8, 'Los Chankas', 'Sporting Cristal', 3, 2], [8, 'Alianza Lima', 'Juan Pablo II', 2, 0],
         [8, 'UTC', 'Alianza Atlético', 1, 1], [8, 'Atlético Grau', 'Deportivo Garcilaso', 0, 0], [8, 'Sport Boys', 'Sport Huancayo', 3, 0],
-        
-        # FECHAS PENDIENTES (DEL 9 AL 17)
         [9, 'Juan Pablo II', 'UTC', None, None], [9, 'Alianza Atlético', 'Atlético Grau', None, None], [9, 'FBC Melgar', 'Cusco FC', None, None], [9, 'Cienciano', 'ADT', None, None], [9, 'Deportivo Garcilaso', 'Sporting Cristal', None, None], [9, 'Sport Huancayo', 'Comerciantes Unidos', None, None], [9, 'Sport Boys', 'CD Moquegua', None, None], [9, 'Universitario', 'Alianza Lima', None, None], [9, 'FC Cajamarca', 'Los Chankas', None, None],
         [10, 'Cusco FC', 'FC Cajamarca', None, None], [10, 'ADT', 'Alianza Lima', None, None], [10, 'UTC', 'Sport Huancayo', None, None], [10, 'Atlético Grau', 'Sporting Cristal', None, None], [10, 'Universitario', 'Deportivo Garcilaso', None, None], [10, 'Los Chankas', 'Cienciano', None, None], [10, 'Sport Boys', 'FBC Melgar', None, None], [10, 'CD Moquegua', 'Juan Pablo II', None, None], [10, 'Comerciantes Unidos', 'Alianza Atlético', None, None],
         [11, 'Juan Pablo II', 'Comerciantes Unidos', None, None], [11, 'Alianza Atlético', 'Sport Boys', None, None], [11, 'FBC Melgar', 'Universitario', None, None], [11, 'Alianza Lima', 'Cusco FC', None, None], [11, 'Cienciano', 'CD Moquegua', None, None], [11, 'Sport Huancayo', 'Deportivo Garcilaso', None, None], [11, 'Sporting Cristal', 'UTC', None, None], [11, 'FC Cajamarca', 'ADT', None, None], [11, 'Los Chankas', 'Atlético Grau', None, None],
@@ -158,7 +160,7 @@ def cargar_datos_2026():
     df['Torneo'] = 'Apertura'
     return df
 
-# Carga condicional y Lista de Equipos
+# Lógica de Datos Condicional
 if temporada == "2018":
     try:
         df_partidos, df_goles = cargar_datos_2018()
@@ -169,6 +171,23 @@ if temporada == "2018":
 else:
     df_partidos = cargar_datos_2026()
     equipos_temporada_actual = sorted(list(df_partidos['Local'].dropna().unique()))
+
+# --- FUNCION EXTRA: CALCULAR PUNTOS DE EVOLUCION ---
+def calcular_evolucion(df, equipo, max_fecha):
+    puntos_acumulados = 0
+    historial = {0: 0} # Arrancan en 0
+    df_valid = df.dropna(subset=['GL', 'GV'])
+    for f in range(1, max_fecha + 1):
+        partido = df_valid[(df_valid['Fecha_Global'] == f) & ((df_valid['Local'] == equipo) | (df_valid['Visitante'] == equipo))]
+        if not partido.empty:
+            r = partido.iloc[0]
+            if r['Local'] == equipo:
+                pts = 3 if r['GL'] > r['GV'] else 1 if r['GL'] == r['GV'] else 0
+            else:
+                pts = 3 if r['GV'] > r['GL'] else 1 if r['GV'] == r['GL'] else 0
+            puntos_acumulados += pts
+        historial[f] = puntos_acumulados
+    return historial
 
 # --- MOTOR UNIVERSAL DE TABLAS ---
 def generar_html_tabla(df_filtro, lista_equipos, titulo_panel, es_acumulado=False, zona="", f_sel=44):
@@ -308,23 +327,93 @@ with tab_fixture:
             df_acu = df_partidos[df_partidos['Fecha_Global'] <= fecha_seleccionada]
             st.markdown(generar_html_tabla(df_acu, equipos_temporada_actual, f"LIGA 1 APERTURA 2026 (HASTA FECHA {fecha_seleccionada})", es_acumulado=True, f_sel=fecha_seleccionada), unsafe_allow_html=True)
 
+    # --- NUEVO: GRÁFICA DE EVOLUCIÓN (Al fondo de Fixture y Tablas) ---
+    with st.expander("📈 VER GRÁFICA DE EVOLUCIÓN DE PUNTOS"):
+        eq_grafico = st.multiselect("Selecciona equipos para comparar:", equipos_temporada_actual, default=["Universitario", "Alianza Lima", "Sporting Cristal"] if temporada == "2026" else [])
+        if eq_grafico:
+            data_grafico = pd.DataFrame(index=range(0, fecha_seleccionada + 1))
+            for eq in eq_grafico:
+                data_grafico[eq] = pd.Series(calcular_evolucion(df_partidos, eq, fecha_seleccionada))
+            st.line_chart(data_grafico)
+
 # =====================================================================
-# --- TAB 2: EQUIPOS Y ESTADÍSTICAS (LIMPIA, SOLO ESCUDOS) ---
+# --- TAB 2: EQUIPOS Y ESTADÍSTICAS (FICHA PROMIEDOS O GRID) ---
 # =====================================================================
 with tab_estadisticas:
-    st.markdown(f"<h3 style='text-align: center; color: white; margin-bottom: 5px;'>EQUIPOS LIGA 1 - {temporada}</h3>", unsafe_allow_html=True)
-    st.markdown("<p style='text-align: center; color: #87b897; font-size: 11px; margin-bottom: 15px;'>Haz clic en un equipo para ver su historial y palmarés (Próximamente)</p>", unsafe_allow_html=True)
-
-    tit_h = {'Universitario': 29, 'Alianza Lima': 25, 'Sporting Cristal': 20, 'Sport Boys': 6, 'Dep. Municipal': 4, 'U. San Martin': 3, 'FBC Melgar': 2, 'Binacional': 1}
+    equipo_sel = st.selectbox("🔍 Buscar Ficha de Equipo:", ["Ver Cuadrícula General"] + equipos_temporada_actual)
     
-    html_grid = "<div class='eq-grid'>"
-    for equipo in equipos_temporada_actual:
-        logo = logos_equipos.get(equipo, '')
-        copas = tit_h.get(equipo, 0)
-        insignia = f"<div class='eq-badge'>🏆{copas}</div>" if copas > 0 else ""
-        html_grid += f"<div class='eq-card'>{insignia}<img src='{logo}' class='eq-logo' onerror=\"this.style.display='none'\"><span class='eq-nom'>{equipo}</span></div>"
-    html_grid += "</div>"
-    st.markdown(html_grid, unsafe_allow_html=True)
+    if equipo_sel == "Ver Cuadrícula General":
+        st.markdown(f"<h3 style='text-align: center; color: white; margin-bottom: 15px;'>EQUIPOS LIGA 1 - {temporada}</h3>", unsafe_allow_html=True)
+        tit_h = {'Universitario': 29, 'Alianza Lima': 25, 'Sporting Cristal': 20, 'Sport Boys': 6, 'Dep. Municipal': 4, 'U. San Martin': 3, 'FBC Melgar': 2, 'Binacional': 1}
+        html_grid = "<div class='eq-grid'>"
+        for equipo in equipos_temporada_actual:
+            logo = logos_equipos.get(equipo, '')
+            copas = tit_h.get(equipo, 0)
+            insignia = f"<div class='eq-badge'>🏆{copas}</div>" if copas > 0 else ""
+            html_grid += f"<div class='eq-card'>{insignia}<img src='{logo}' class='eq-logo' onerror=\"this.style.display='none'\"><span class='eq-nom'>{equipo}</span></div>"
+        html_grid += "</div>"
+        st.markdown(html_grid, unsafe_allow_html=True)
+    
+    else:
+        # --- FICHA DE EQUIPO ESTILO PROMIEDOS ---
+        st.markdown(f"<div style='text-align:center; margin-bottom:20px;'><img src='{logos_equipos.get(equipo_sel, '')}' width='50' style='vertical-align:middle; margin-right:10px;'><span style='font-size:24px; font-weight:bold; color:white; text-transform:uppercase;'>{equipo_sel}</span></div>", unsafe_allow_html=True)
+        
+        c_perfil1, c_perfil2 = st.columns([1.5, 1])
+        
+        with c_perfil2:
+            st.markdown("<div class='titulo-panel'>INFO DEL CLUB</div>", unsafe_allow_html=True)
+            info = info_clubes.get(equipo_sel, {'Apodo': '-', 'Fundación': '-', 'Estadio': '-'})
+            html_info = f"""
+            <div class='ficha-info-box'><span class='ficha-info-lbl'>Apodo</span><span class='ficha-info-val'>{info['Apodo']}</span></div>
+            <div class='ficha-info-box'><span class='ficha-info-lbl'>Fundación</span><span class='ficha-info-val'>{info['Fundación']}</span></div>
+            <div class='ficha-info-box'><span class='ficha-info-lbl'>Estadio</span><span class='ficha-info-val'>{info['Estadio']}</span></div>
+            """
+            st.markdown(html_info, unsafe_allow_html=True)
+            
+            # Historial Rápido de Local
+            st.markdown("<div class='titulo-panel' style='margin-top:20px;'>HISTORIAL DE LOCAL</div>", unsafe_allow_html=True)
+            df_local = df_partidos[(df_partidos['Local'] == equipo_sel)].dropna(subset=['GL', 'GV'])
+            v_loc = (df_local['GL'] > df_local['GV']).sum()
+            e_loc = (df_local['GL'] == df_local['GV']).sum()
+            d_loc = (df_local['GL'] < df_local['GV']).sum()
+            html_hist = f"""
+            <div style='display:flex; justify-content:space-around; background-color:#0d2418; padding:10px; border:1px solid #1a4a2e; border-radius:4px;'>
+                <div style='text-align:center;'><div style='color:#8cc63f; font-weight:bold; font-size:18px;'>{v_loc}</div><div style='font-size:10px; color:#a1b5a8;'>GANADOS</div></div>
+                <div style='text-align:center;'><div style='color:#e1c340; font-weight:bold; font-size:18px;'>{e_loc}</div><div style='font-size:10px; color:#a1b5a8;'>EMPATADOS</div></div>
+                <div style='text-align:center;'><div style='color:#d32f2f; font-weight:bold; font-size:18px;'>{d_loc}</div><div style='font-size:10px; color:#a1b5a8;'>PERDIDOS</div></div>
+            </div>
+            """
+            st.markdown(html_hist, unsafe_allow_html=True)
+
+        with c_perfil1:
+            st.markdown("<div class='panel-verde' style='padding:0;'>", unsafe_allow_html=True)
+            st.markdown("<div class='titulo-panel' style='padding-top:10px;'>ÚLTIMOS RESULTADOS</div>", unsafe_allow_html=True)
+            df_jugados = df_partidos[(df_partidos['Local'] == equipo_sel) | (df_partidos['Visitante'] == equipo_sel)].dropna(subset=['GL', 'GV']).sort_values('Fecha_Global', ascending=False).head(5)
+            
+            if not df_jugados.empty:
+                html_res = ""
+                for _, r in df_jugados.iterrows():
+                    l_logo, v_logo = logos_equipos.get(r['Local'], ''), logos_equipos.get(r['Visitante'], '')
+                    if r['Local'] == equipo_sel: res_color = "#8cc63f" if r['GL'] > r['GV'] else "#e1c340" if r['GL'] == r['GV'] else "#d32f2f"
+                    else: res_color = "#8cc63f" if r['GV'] > r['GL'] else "#e1c340" if r['GV'] == r['GL'] else "#d32f2f"
+                    
+                    html_res += f"<div class='fila-partido'><span style='color:#a1b5a8; font-size:10px;'>F{r['Fecha_Global']}</span><div style='display:flex; align-items:center; width: 75%; justify-content: center;'><span style='text-align:right; width:40%; font-size:12px; color:#ffffff;'>{r['Local']}</span><img src='{l_logo}' width='15' height='15' style='margin: 0 5px;'><div style='font-weight:bold; color:{res_color}; width:30px; text-align:center;'>{int(r['GL'])}-{int(r['GV'])}</div><img src='{v_logo}' width='15' height='15' style='margin: 0 5px;'><span style='text-align:left; width:40%; font-size:12px; color:#ffffff;'>{r['Visitante']}</span></div></div>"
+                st.markdown(html_res, unsafe_allow_html=True)
+            else:
+                st.markdown("<p style='text-align:center; font-size:12px; padding:10px;'>Sin partidos registrados.</p>", unsafe_allow_html=True)
+            
+            st.markdown("<div class='titulo-panel' style='padding-top:15px; border-top:1px solid #1a4a2e;'>PRÓXIMOS PARTIDOS</div>", unsafe_allow_html=True)
+            df_porjugar = df_partidos[((df_partidos['Local'] == equipo_sel) | (df_partidos['Visitante'] == equipo_sel)) & (df_partidos['GL'].isna())].sort_values('Fecha_Global').head(3)
+            
+            if not df_porjugar.empty:
+                html_prox = ""
+                for _, r in df_porjugar.iterrows():
+                    l_logo, v_logo = logos_equipos.get(r['Local'], ''), logos_equipos.get(r['Visitante'], '')
+                    html_prox += f"<div class='fila-partido'><span style='color:#a1b5a8; font-size:10px;'>F{r['Fecha_Global']}</span><div style='display:flex; align-items:center; width: 75%; justify-content: center;'><span style='text-align:right; width:40%; font-size:12px; color:#ffffff;'>{r['Local']}</span><img src='{l_logo}' width='15' height='15' style='margin: 0 5px;'><span style='color:#87b897; font-size:10px; margin:0 5px;'>vs</span><img src='{v_logo}' width='15' height='15' style='margin: 0 5px;'><span style='text-align:left; width:40%; font-size:12px; color:#ffffff;'>{r['Visitante']}</span></div></div>"
+                st.markdown(html_prox, unsafe_allow_html=True)
+            else:
+                st.markdown("<p style='text-align:center; font-size:12px; padding:10px;'>No hay partidos programados.</p>", unsafe_allow_html=True)
+            st.markdown("</div>", unsafe_allow_html=True)
 
 # =====================================================================
 # --- TAB 3: CAMPEONES Y MÁQUINA DEL TIEMPO ---
@@ -369,7 +458,7 @@ with tab_campeones:
         html_r += "</tbody></table></div>"
         st.markdown(html_r, unsafe_allow_html=True)
 
-    # --- MÁQUINA DEL TIEMPO CON ALERTA ---
+    # --- MÁQUINA DEL TIEMPO ---
     st.markdown("<br><hr style='border-color: #1a4a2e;'><h3 style='text-align: center; color: white;'>MÁQUINA DEL TIEMPO</h3>", unsafe_allow_html=True)
     st.markdown("<p style='text-align: center; color: #87b897; font-size: 13px;'>Explora la base de datos de los torneos pasados.</p>", unsafe_allow_html=True)
     
