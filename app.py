@@ -9,7 +9,7 @@ if 'temporada' not in st.session_state:
 
 temporada = st.session_state['temporada']
 
-# 2. INYECCIÓN DE CSS EXTREMO (TU DISEÑO ORIGINAL)
+# 2. INYECCIÓN DE CSS EXTREMO (TU DISEÑO ORIGINAL PROMIEDOS)
 st.markdown("""
 <style>
     .stApp { background-color: #0b4026; color: #ffffff; }
@@ -58,18 +58,19 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# --- LINKS OFICIALES AMPLIADOS (TRANSFERMARKT) ---
+# --- 3. DICCIONARIO DE LOGOS (OFICIALES TRANSFERMARKT) ---
 logos_equipos = {
     'Alianza Lima': 'https://tmssl.akamaized.net//images/wappen/head/656.png',
     'Universitario': 'https://tmssl.akamaized.net//images/wappen/head/6593.png',
     'Sporting Cristal': 'https://tmssl.akamaized.net//images/wappen/head/21157.png',
     'FBC Melgar': 'https://tmssl.akamaized.net//images/wappen/head/2734.png',
     'Cienciano': 'https://tmssl.akamaized.net//images/wappen/head/2733.png',
+    'Cusco FC': 'https://tmssl.akamaized.net//images/wappen/head/28999.png',
     'Cusco (Garcilaso)': 'https://tmssl.akamaized.net//images/wappen/head/28999.png',
     'Sport Boys': 'https://tmssl.akamaized.net//images/wappen/head/2730.png',
     'UTC': 'https://tmssl.akamaized.net//images/wappen/head/21170.png',
     'Sport Huancayo': 'https://tmssl.akamaized.net//images/wappen/head/21655.png',
-    'ADT': 'https://tmssl.akamaized.net//images/wappen/head/35588.png?lm=1705855304',
+    'ADT': 'https://tmssl.akamaized.net//images/wappen/head/31201.png',
     'Alianza Atlético': 'https://tmssl.akamaized.net//images/wappen/head/6561.png',
     'Atlético Grau': 'https://tmssl.akamaized.net//images/wappen/head/31200.png',
     'Comerciantes Unidos': 'https://tmssl.akamaized.net//images/wappen/head/47107.png',
@@ -79,7 +80,7 @@ logos_equipos = {
     'Juan Pablo II': 'https://tmssl.akamaized.net//images/wappen/head/102878.png',
     'FC Cajamarca': 'https://tmssl.akamaized.net//images/wappen/head/2733.png',
     
-    # Antiguos de 2018 para que tu Excel no se rompa
+    # Antiguos de 2018 
     'Dep. Municipal': 'https://tmssl.akamaized.net//images/wappen/head/17974.png',
     'Cantolao': 'https://tmssl.akamaized.net//images/wappen/head/11247.png',
     'Sport Rosario': 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/18441.png',
@@ -92,7 +93,7 @@ logos_equipos = {
 equipo_A = ['Sporting Cristal', 'Sport Rosario', 'UTC', 'U. San Martin', 'Alianza Lima', 'Comerciantes Unidos', 'Ayacucho FC', 'Universitario']
 equipo_B = ['Sport Huancayo', 'FBC Melgar', 'Cantolao', 'Dep. Municipal', 'Sport Boys', 'Cusco (Garcilaso)', 'Binacional', 'Union Comercio']
 
-# --- CARGADORES DE DATOS ---
+# --- 4. CARGADORES DE DATOS ---
 @st.cache_data
 def cargar_datos_2018():
     df_p = pd.read_excel('torneo_2018.xlsx', sheet_name='BaseDatos')
@@ -100,27 +101,27 @@ def cargar_datos_2018():
     return df_p, df_g
 
 def cargar_datos_2026():
-    # FIXTURE OFICIAL 2026 CON RESULTADOS HASTA LA FECHA 8
+    # FIXTURE OFICIAL 2026 TRANSCRITO EXACTAMENTE DE TUS IMÁGENES
     data_26 = [
         # FECHA 1
-        [1, 'Juan Pablo II', 'FC Cajamarca', 3, 3], [1, 'Alianza Atlético', 'Cusco FC', 1, 0], [1, 'FBC Melgar', 'Cienciano', 2, 1], [1, 'UTC', 'Atlético Grau', 2, 0], [1, 'Deportivo Garcilaso', 'Sporting Cristal', 1, 1], [1, 'Sport Huancayo', 'Alianza Lima', 0, 2], [1, 'Universitario', 'ADT', 2, 0], [1, 'Sport Boys', 'Los Chankas', 1, 2], [1, 'Comerciantes Unidos', 'CD Moquegua', 2, 0],
+        [1, 'Sport Huancayo', 'Alianza Lima', 1, 2], [1, 'UTC', 'Atlético Grau', 2, 0], [1, 'Comerciantes Unidos', 'CD Moquegua', 1, 0], [1, 'Sport Boys', 'Los Chankas', 1, 1], [1, 'Juan Pablo II', 'FC Cajamarca', 3, 3], [1, 'FBC Melgar', 'Cienciano', 2, 0], [1, 'Deportivo Garcilaso', 'Sporting Cristal', 1, 1], [1, 'Alianza Atlético', 'Cusco FC', 1, 0], [1, 'Universitario', 'ADT', 2, 0], 
         # FECHA 2
-        [2, 'Cusco FC', 'Universitario', 1, 1], [2, 'ADT', 'Sport Boys', 1, 1], [2, 'Alianza Lima', 'Comerciantes Unidos', 2, 1], [2, 'Cienciano', 'Juan Pablo II', 4, 1], [2, 'Atlético Grau', 'Sport Huancayo', 0, 0], [2, 'Sporting Cristal', 'FBC Melgar', 1, 2], [2, 'FC Cajamarca', 'Deportivo Garcilaso', 1, 1], [2, 'Los Chankas', 'Alianza Atlético', 2, 1], [2, 'CD Moquegua', 'UTC', 0, 1],
+        [2, 'CD Moquegua', 'UTC', 2, 3], [2, 'ADT', 'Sport Boys', 1, 0], [2, 'Atlético Grau', 'Sport Huancayo', 0, 0], [2, 'Cusco FC', 'Universitario', 1, 1], [2, 'Sporting Cristal', 'FBC Melgar', 1, 2], [2, 'Los Chankas', 'Alianza Atlético', 1, 0], [2, 'Cienciano', 'Juan Pablo II', 6, 1], [2, 'Alianza Lima', 'Comerciantes Unidos', 2, 1], [2, 'FC Cajamarca', 'Deportivo Garcilaso', 1, 1],
         # FECHA 3
-        [3, 'Juan Pablo II', 'Sporting Cristal', 0, 2], [3, 'Alianza Atlético', 'Alianza Lima', 0, 0], [3, 'FBC Melgar', 'CD Moquegua', 4, 0], [3, 'UTC', 'Cusco FC', 1, 0], [3, 'Deportivo Garcilaso', 'ADT', 1, 0], [3, 'Sport Huancayo', 'FC Cajamarca', 2, 0], [3, 'Universitario', 'Cienciano', 2, 1], [3, 'Sport Boys', 'Atlético Grau', 1, 0], [3, 'Comerciantes Unidos', 'Los Chankas', 1, 1],
+        [3, 'UTC', 'Cusco FC', 1, 0], [3, 'Universitario', 'Cienciano', 2, 1], [3, 'Deportivo Garcilaso', 'ADT', 1, 0], [3, 'Juan Pablo II', 'Sporting Cristal', 0, 2], [3, 'Sport Boys', 'Atlético Grau', 1, 0], [3, 'Alianza Atlético', 'Alianza Lima', 0, 0], [3, 'Sport Huancayo', 'FC Cajamarca', 2, 0], [3, 'Comerciantes Unidos', 'Los Chankas', 1, 1], [3, 'FBC Melgar', 'CD Moquegua', 4, 0],
         # FECHA 4
-        [4, 'Cusco FC', 'Comerciantes Unidos', 3, 1], [4, 'ADT', 'UTC', 2, 2], [4, 'Alianza Lima', 'Sport Boys', 1, 0], [4, 'Cienciano', 'Alianza Atlético', 1, 1], [4, 'Atlético Grau', 'Juan Pablo II', 1, 2], [4, 'Sporting Cristal', 'Universitario', 2, 2], [4, 'FC Cajamarca', 'FBC Melgar', 3, 1], [4, 'Los Chankas', 'Sport Huancayo', 3, 2], [4, 'CD Moquegua', 'Deportivo Garcilaso', 1, 0],
+        [4, 'Alianza Lima', 'Sport Boys', 1, 0], [4, 'FC Cajamarca', 'FBC Melgar', 3, 1], [4, 'Sporting Cristal', 'Universitario', 2, 2], [4, 'Cienciano', 'Alianza Atlético', 1, 1], [4, 'ADT', 'UTC', 2, 2], [4, 'Los Chankas', 'Sport Huancayo', 3, 2], [4, 'Atlético Grau', 'Juan Pablo II', 1, 2], [4, 'Cusco FC', 'Comerciantes Unidos', 3, 1], [4, 'CD Moquegua', 'Deportivo Garcilaso', 1, 0],
         # FECHA 5
-        [5, 'Juan Pablo II', 'Cusco FC', 2, 1], [5, 'Alianza Atlético', 'ADT', 0, 0], [5, 'FBC Melgar', 'Los Chankas', 1, 2], [5, 'UTC', 'Alianza Lima', 1, 2], [5, 'Deportivo Garcilaso', 'Cienciano', 1, 2], [5, 'Sport Huancayo', 'Sporting Cristal', 1, 2], [5, 'Universitario', 'FC Cajamarca', 3, 0], [5, 'Sport Boys', 'CD Moquegua', 0, 1], [5, 'Comerciantes Unidos', 'Atlético Grau', 2, 0],
+        [5, 'Alianza Atlético', 'ADT', 0, 0], [5, 'FBC Melgar', 'Los Chankas', 1, 2], [5, 'Deportivo Garcilaso', 'Cienciano', 2, 3], [5, 'Sport Huancayo', 'Sporting Cristal', 2, 1], [5, 'UTC', 'Alianza Lima', 0, 1], [5, 'Sport Boys', 'CD Moquegua', 0, 0], [5, 'Comerciantes Unidos', 'Atlético Grau', 3, 1], [5, 'Juan Pablo II', 'Cusco FC', 2, 1], [5, 'Universitario', 'FC Cajamarca', 1, 0],
         # FECHA 6
-        [6, 'Cusco FC', 'Deportivo Garcilaso', 1, 1], [6, 'ADT', 'Juan Pablo II', 1, 2], [6, 'Alianza Lima', 'FBC Melgar', 1, 1], [6, 'Cienciano', 'Sport Boys', 2, 0], [6, 'Atlético Grau', 'FC Cajamarca', 1, 0], [6, 'Sporting Cristal', 'Alianza Atlético', 1, 2], [6, 'Los Chankas', 'Universitario', 3, 1], [6, 'CD Moquegua', 'Sport Huancayo', 1, 2], [6, 'Comerciantes Unidos', 'UTC', 1, 2],
+        [6, 'Atlético Grau', 'FC Cajamarca', 1, 0], [6, 'CD Moquegua', 'Sport Huancayo', 2, 1], [6, 'Comerciantes Unidos', 'UTC', 1, 2], [6, 'Sporting Cristal', 'Alianza Atlético', 3, 1], [6, 'Cusco FC', 'Deportivo Garcilaso', 1, 0], [6, 'ADT', 'Juan Pablo II', 2, 3], [6, 'Los Chankas', 'Universitario', 3, 1], [6, 'Cienciano', 'Sport Boys', 3, 1], [6, 'Alianza Lima', 'FBC Melgar', 3, 1],
         # FECHA 7
-        [7, 'Cusco FC', 'Cienciano', 1, 3], [7, 'Juan Pablo II', 'Los Chankas', 2, 3], [7, 'Alianza Atlético', 'CD Moquegua', 1, 1], [7, 'FBC Melgar', 'Atlético Grau', 1, 0], [7, 'Deportivo Garcilaso', 'Alianza Lima', 1, 1], [7, 'Sport Huancayo', 'ADT', 0, 1], [7, 'Sporting Cristal', 'Sport Boys', 2, 0], [7, 'Universitario', 'UTC', 2, 0], [7, 'FC Cajamarca', 'Comerciantes Unidos', 3, 4],
-        # FECHA 8
-        [8, 'ADT', 'FBC Melgar', 1, 1], [8, 'UTC', 'Alianza Atlético', 1, 1], [8, 'Alianza Lima', 'Juan Pablo II', 2, 0], [8, 'Cienciano', 'FC Cajamarca', 3, 0], [8, 'Atlético Grau', 'Deportivo Garcilaso', 0, 0], [8, 'Los Chankas', 'Sporting Cristal', 3, 2], [8, 'Sport Boys', 'Sport Huancayo', 3, 0], [8, 'CD Moquegua', 'Cusco FC', 1, 2], [8, 'Comerciantes Unidos', 'Universitario', 0, 0],
+        [7, 'FC Cajamarca', 'Comerciantes Unidos', 3, 4], [7, 'Sport Huancayo', 'ADT', 0, 1], [7, 'Juan Pablo II', 'Los Chankas', 2, 3], [7, 'Deportivo Garcilaso', 'Alianza Lima', 1, 1], [7, 'Universitario', 'UTC', 2, 0], [7, 'Sporting Cristal', 'Sport Boys', 3, 0], [7, 'FBC Melgar', 'Atlético Grau', 0, 0], [7, 'Alianza Atlético', 'CD Moquegua', 3, 0], [7, 'Cusco FC', 'Cienciano', 1, 2],
+        # FECHA 8 (ACTUALIDAD)
+        [8, 'ADT', 'FBC Melgar', 1, 1], [8, 'Cienciano', 'FC Cajamarca', 3, 0], [8, 'CD Moquegua', 'Cusco FC', 1, 2], [8, 'Comerciantes Unidos', 'Universitario', 0, 0], [8, 'Los Chankas', 'Sporting Cristal', 3, 2], [8, 'Alianza Lima', 'Juan Pablo II', 2, 0], [8, 'UTC', 'Alianza Atlético', 1, 1], [8, 'Atlético Grau', 'Deportivo Garcilaso', 0, 0], [8, 'Sport Boys', 'Sport Huancayo', 3, 0],
         
-        # FECHAS PENDIENTES (9 a 17)
-        [9, 'Juan Pablo II', 'UTC', None, None], [9, 'Alianza Atlético', 'Atlético Grau', None, None], [9, 'FBC Melgar', 'Cusco FC', None, None], [9, 'Cienciano', 'ADT', None, None], [9, 'Deportivo Garcilaso', 'Sport Boys', None, None], [9, 'Sport Huancayo', 'Comerciantes Unidos', None, None], [9, 'Sporting Cristal', 'CD Moquegua', None, None], [9, 'Universitario', 'Alianza Lima', None, None], [9, 'FC Cajamarca', 'Los Chankas', None, None],
+        # FECHAS PENDIENTES 2026 (Para el selector dinámico)
+        [9, 'Juan Pablo II', 'UTC', None, None], [9, 'Alianza Atlético', 'Atlético Grau', None, None], [9, 'FBC Melgar', 'Cusco FC', None, None], [9, 'Cienciano', 'ADT', None, None], [9, 'Deportivo Garcilaso', 'Sporting Cristal', None, None], [9, 'Sport Huancayo', 'Comerciantes Unidos', None, None], [9, 'Sport Boys', 'CD Moquegua', None, None], [9, 'Universitario', 'Alianza Lima', None, None], [9, 'FC Cajamarca', 'Los Chankas', None, None],
         [10, 'Cusco FC', 'FC Cajamarca', None, None], [10, 'ADT', 'Alianza Lima', None, None], [10, 'UTC', 'Sport Huancayo', None, None], [10, 'Atlético Grau', 'Sporting Cristal', None, None], [10, 'Universitario', 'Deportivo Garcilaso', None, None], [10, 'Los Chankas', 'Cienciano', None, None], [10, 'Sport Boys', 'FBC Melgar', None, None], [10, 'CD Moquegua', 'Juan Pablo II', None, None], [10, 'Comerciantes Unidos', 'Alianza Atlético', None, None],
         [11, 'Juan Pablo II', 'Comerciantes Unidos', None, None], [11, 'Alianza Atlético', 'Sport Boys', None, None], [11, 'FBC Melgar', 'Universitario', None, None], [11, 'Alianza Lima', 'Cusco FC', None, None], [11, 'Cienciano', 'CD Moquegua', None, None], [11, 'Sport Huancayo', 'Deportivo Garcilaso', None, None], [11, 'Sporting Cristal', 'UTC', None, None], [11, 'FC Cajamarca', 'ADT', None, None], [11, 'Los Chankas', 'Atlético Grau', None, None],
         [12, 'Cusco FC', 'Sport Huancayo', None, None], [12, 'ADT', 'Los Chankas', None, None], [12, 'UTC', 'Cienciano', None, None], [12, 'Deportivo Garcilaso', 'FBC Melgar', None, None], [12, 'Atlético Grau', 'Alianza Lima', None, None], [12, 'Universitario', 'Alianza Atlético', None, None], [12, 'Sport Boys', 'Juan Pablo II', None, None], [12, 'CD Moquegua', 'FC Cajamarca', None, None], [12, 'Comerciantes Unidos', 'Sporting Cristal', None, None],
@@ -134,10 +135,10 @@ def cargar_datos_2026():
     df['Torneo'] = 'Apertura'
     return df
 
-# --- MOTOR CREADOR DE TABLAS ---
+# --- 5. MOTOR UNIVERSAL CREADOR DE TABLAS ---
 def generar_html_tabla(df_filtro, lista_equipos, titulo_panel, es_acumulado=False, zona="", f_sel=44):
     tabla_datos = []
-    # Ignorar partidos sin resultados (Fechas 9 en adelante)
+    # Filtrar solo partidos ya jugados
     df_valid = df_filtro.dropna(subset=['GL', 'GV'])
     
     for equipo in lista_equipos:
@@ -152,7 +153,7 @@ def generar_html_tabla(df_filtro, lista_equipos, titulo_panel, es_acumulado=Fals
         pts = (g * 3) + e
         
         pts_total = pts
-        # Sanciones solo para el 2018
+        # Las sanciones solo se aplican si la base de datos es 2018
         if es_acumulado and temporada == "2018":
             bon = 2 if equipo == 'Sporting Cristal' and f_sel >= 44 else 0
             sanc_dict = {'Universitario': 1, 'Dep. Municipal': 2, 'UTC': 2, 'Cantolao': 2, 'Sport Rosario': 7}
@@ -181,6 +182,7 @@ def generar_html_tabla(df_filtro, lista_equipos, titulo_panel, es_acumulado=Fals
         logo = logos_equipos.get(row['Equipo'], '')
         borde = "transparent"
         
+        # Lógica visual de Clasificación
         if temporada == "2018" and es_acumulado:
             if pos <= 4: borde = "#3db4dc" 
             elif pos <= 8: borde = "#e1c340" 
@@ -195,7 +197,7 @@ def generar_html_tabla(df_filtro, lista_equipos, titulo_panel, es_acumulado=Fals
     html += "</tbody></table>"
     
     if es_acumulado and temporada == "2018":
-        html += "<div class='nota-asterisco'>* Nota: Resoluciones de la FPF aplicadas en esta tabla Acumulada: Sanciones a Sport Rosario (-7 pts), Dep. Municipal (-2 pts), UTC (-2 pts), Cantolao (-2 pts) y Universitario (-1 pt). Sporting Cristal (+2 pts) por Campeón de Reservas.</div>"
+        html += "<div class='nota-asterisco'>* Nota: Resoluciones FPF aplicadas en Acumulada 2018: Rosario (-7), Muni (-2), UTC (-2), Cantolao (-2), U (-1). Cristal (+2) por Reservas.</div>"
         
     html += "</div>"
     return html
@@ -211,7 +213,7 @@ with tab_fixture:
         try:
             df_partidos, df_goles = cargar_datos_2018()
         except Exception:
-            st.error("🚨 Error: No se encontró 'torneo_2018.xlsx' en tu GitHub.")
+            st.error("🚨 Error: Sube 'torneo_2018.xlsx' a GitHub.")
             st.stop()
             
         todos_eq = sorted(list(df_partidos['Local'].dropna().unique()))
@@ -221,7 +223,7 @@ with tab_fixture:
         df_partidos = cargar_datos_2026()
         todos_eq = sorted(list(df_partidos['Local'].dropna().unique()))
         fechas_disponibles = [f"FECHA {i}" for i in range(1, 18)]
-        idx_defecto = 7 # Fecha 8 por defecto (es el index 7)
+        idx_defecto = 7 # Fecha 8 por defecto
 
     col_izq, col_der = st.columns([2.2, 1.0]) 
     
@@ -230,6 +232,7 @@ with tab_fixture:
         fecha_texto = st.selectbox("Selecciona Fecha", fechas_disponibles, index=idx_defecto) 
         fecha_seleccionada = int(fecha_texto.replace("FECHA ", ""))
         
+        # MOSTRAR PARTIDOS
         st.markdown("<div class='panel-verde' style='padding: 0;'><div class='contenedor-partidos'>", unsafe_allow_html=True)
         partidos_fecha = df_partidos[df_partidos['Fecha_Global'] == fecha_seleccionada]
         if not partidos_fecha.empty:
@@ -238,18 +241,19 @@ with tab_fixture:
                 loc, vis = row['Local'], row['Visitante']
                 l_logo, v_logo = logos_equipos.get(loc, ''), logos_equipos.get(vis, '')
                 
-                # Si el partido no se ha jugado (None), mostramos el horario
+                # Diferenciar partidos jugados y por jugar
                 if pd.isna(row['GL']):
-                    gl, gv, div_estado = "-", "-", "<span style='color:#87b897; font-size:10px;'>Por jugar</span>"
+                    gl, gv, div_est = "-", "-", "<span style='color:#87b897; font-size:10px;'>Por jugar</span>"
                 else:
-                    gl, gv, div_estado = int(row['GL']), int(row['GV']), "<span style='color:white; font-size:10px; font-weight:bold;'>Final</span>"
+                    gl, gv, div_est = int(row['GL']), int(row['GV']), "<span style='color:white; font-size:10px; font-weight:bold;'>Final</span>"
                     
-                html_p += f"<div class='fila-partido'>{div_estado}<div style='display:flex; align-items:center; width: 85%; justify-content: center;'><span style='text-align:right; width:40%; font-size:12px; color:#ffffff; font-weight:bold;'>{loc}</span><img src='{l_logo}' width='18' height='18' style='object-fit:contain; margin: 0 5px;' onerror=\"this.style.display='none'\"><div class='marcador-contenedor'><div class='gol-cajita'>{gl}</div><div class='separador-guion'>-</div><div class='gol-cajita'>{gv}</div></div><img src='{v_logo}' width='18' height='18' style='object-fit:contain; margin: 0 5px;' onerror=\"this.style.display='none'\"><span style='text-align:left; width:40%; font-size:12px; color:#ffffff; font-weight:bold;'>{vis}</span></div></div>"
+                html_p += f"<div class='fila-partido'>{div_est}<div style='display:flex; align-items:center; width: 85%; justify-content: center;'><span style='text-align:right; width:40%; font-size:12px; color:#ffffff; font-weight:bold;'>{loc}</span><img src='{l_logo}' width='18' height='18' style='object-fit:contain; margin: 0 5px;' onerror=\"this.style.display='none'\"><div class='marcador-contenedor'><div class='gol-cajita'>{gl}</div><div class='separador-guion'>-</div><div class='gol-cajita'>{gv}</div></div><img src='{v_logo}' width='18' height='18' style='object-fit:contain; margin: 0 5px;' onerror=\"this.style.display='none'\"><span style='text-align:left; width:40%; font-size:12px; color:#ffffff; font-weight:bold;'>{vis}</span></div></div>"
             st.markdown(html_p, unsafe_allow_html=True)
         else:
             st.markdown("<p style='text-align:center; font-size:12px; padding: 15px;'>No hay partidos registrados.</p>", unsafe_allow_html=True)
         st.markdown("</div></div>", unsafe_allow_html=True)
 
+        # GOLEADORES (Solo se muestra en 2018)
         if temporada == "2018":
             st.markdown("<div class='panel-verde'><div class='titulo-panel'>GOLEADORES</div>", unsafe_allow_html=True)
             df_g = df_goles.dropna(subset=['Fecha_Global', 'Jugador'])
@@ -267,6 +271,7 @@ with tab_fixture:
 
     with col_izq:
         if temporada == "2018":
+            # TU LÓGICA DE TABLAS 2018 INTACTA
             if fecha_seleccionada <= 14:
                 st.markdown("<div class='titulo-panel'>TORNEO DE VERANO</div>", unsafe_allow_html=True)
                 df_verano = df_partidos[(df_partidos['Fecha_Global'] <= fecha_seleccionada) & (df_partidos['Torneo'] == 'Verano')]
@@ -283,7 +288,7 @@ with tab_fixture:
             st.markdown(generar_html_tabla(df_acu, todos_eq, f"TABLA ACUMULADA (HASTA LA FECHA {fecha_seleccionada})", es_acumulado=True, f_sel=fecha_seleccionada), unsafe_allow_html=True)
         
         else:
-            # 2026 CALCULADO DINÁMICAMENTE POR EL MOTOR
+            # 2026 CALCULADO DINÁMICAMENTE POR EL MOTOR HASTA LA FECHA SELECCIONADA
             df_acu = df_partidos[df_partidos['Fecha_Global'] <= fecha_seleccionada]
             st.markdown(generar_html_tabla(df_acu, todos_eq, f"LIGA 1 APERTURA 2026 (FECHA {fecha_seleccionada})", es_acumulado=True, f_sel=fecha_seleccionada), unsafe_allow_html=True)
 
