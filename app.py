@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 
-# 1. CONFIGURACIÓN Y ESTADO INICIAL
+# 1. CONFIGURACIÓN Y ESTADO INICIAL (Entra a 2026 por defecto)
 st.set_page_config(page_title="Liga 1 Te Apuesto", page_icon="🏆", layout="wide")
 
 if 'temporada' not in st.session_state:
@@ -14,9 +14,9 @@ temporada = st.session_state['temporada']
 # --- ALERTA VISUAL DE VIAJE EN EL TIEMPO ---
 if st.session_state['alerta_viaje']:
     st.success(st.session_state['alerta_viaje'], icon="⏳")
-    st.session_state['alerta_viaje'] = None # Limpiamos la alerta para que no salga siempre
+    st.session_state['alerta_viaje'] = None 
 
-# 2. INYECCIÓN DE CSS EXTREMO (TU DISEÑO ORIGINAL PROMIEDOS)
+# 2. INYECCIÓN DE CSS EXTREMO (DISEÑO PROMIEDOS)
 st.markdown("""
 <style>
     .stApp { background-color: #0b4026; color: #ffffff; }
@@ -65,7 +65,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# --- 3. DICCIONARIO DE LOGOS OFICIAL (TRANSFERMARKT Y OTROS) ---
+# --- 3. DICCIONARIO DE LOGOS (EL TUYO, ACTUALIZADO Y DEFINITIVO) ---
 logos_equipos = {
     'Alianza Lima': 'https://tmssl.akamaized.net//images/wappen/head/184.png?lm=1755275805',
     'Universitario': 'https://tmssl.akamaized.net//images/wappen/head/6593.png',
@@ -100,7 +100,7 @@ logos_equipos = {
 equipo_A = ['Sporting Cristal', 'Sport Rosario', 'UTC', 'U. San Martin', 'Alianza Lima', 'Comerciantes Unidos', 'Ayacucho FC', 'Universitario']
 equipo_B = ['Sport Huancayo', 'FBC Melgar', 'Cantolao', 'Dep. Municipal', 'Sport Boys', 'Cusco (Garcilaso)', 'Binacional', 'Union Comercio']
 
-# --- 4. CARGADORES DE DATOS Y EQUIPOS DEL AÑO ---
+# --- 4. CARGADORES DE DATOS ---
 @st.cache_data
 def cargar_datos_2018():
     df_p = pd.read_excel('torneo_2018.xlsx', sheet_name='BaseDatos')
@@ -108,25 +108,43 @@ def cargar_datos_2018():
     return df_p, df_g
 
 def cargar_datos_2026():
+    # DATOS TRANCRITOS EXACTAMENTE DE TUS CAPTURAS SOFASCORE 
     data_26 = [
         # FECHA 1
-        [1, 'Juan Pablo II', 'FC Cajamarca', 3, 3], [1, 'Alianza Atlético', 'Cusco FC', 1, 0], [1, 'FBC Melgar', 'Cienciano', 2, 1], [1, 'UTC', 'Atlético Grau', 2, 0], [1, 'Deportivo Garcilaso', 'Sporting Cristal', 1, 1], [1, 'Sport Huancayo', 'Alianza Lima', 0, 2], [1, 'Universitario', 'ADT', 2, 0], [1, 'Sport Boys', 'Los Chankas', 1, 2], [1, 'Comerciantes Unidos', 'CD Moquegua', 2, 0],
+        [1, 'Sport Huancayo', 'Alianza Lima', 1, 2], [1, 'UTC', 'Atlético Grau', 2, 0], [1, 'Comerciantes Unidos', 'CD Moquegua', 1, 0],
+        [1, 'Sport Boys', 'Los Chankas', 1, 1], [1, 'Juan Pablo II', 'FC Cajamarca', 3, 3], [1, 'FBC Melgar', 'Cienciano', 2, 0],
+        [1, 'Deportivo Garcilaso', 'Sporting Cristal', 1, 1], [1, 'Alianza Atlético', 'Cusco FC', 1, 0], [1, 'Universitario', 'ADT', 2, 0],
         # FECHA 2
-        [2, 'Cusco FC', 'Universitario', 0, 1], [2, 'ADT', 'Sport Boys', 1, 1], [2, 'Alianza Lima', 'Comerciantes Unidos', 2, 0], [2, 'Cienciano', 'Juan Pablo II', 4, 1], [2, 'Atlético Grau', 'Sport Huancayo', 0, 0], [2, 'Sporting Cristal', 'FBC Melgar', 3, 1], [2, 'FC Cajamarca', 'Deportivo Garcilaso', 1, 1], [2, 'Los Chankas', 'Alianza Atlético', 1, 0], [2, 'CD Moquegua', 'UTC', 0, 1],
+        [2, 'CD Moquegua', 'UTC', 2, 3], [2, 'ADT', 'Sport Boys', 1, 0], [2, 'Atlético Grau', 'Sport Huancayo', 0, 0],
+        [2, 'Cusco FC', 'Universitario', 1, 1], [2, 'Sporting Cristal', 'FBC Melgar', 1, 2], [2, 'Los Chankas', 'Alianza Atlético', 1, 0],
+        [2, 'Cienciano', 'Juan Pablo II', 6, 1], [2, 'Alianza Lima', 'Comerciantes Unidos', 2, 1], [2, 'FC Cajamarca', 'Deportivo Garcilaso', 1, 1],
         # FECHA 3
-        [3, 'Juan Pablo II', 'Sporting Cristal', 0, 2], [3, 'Alianza Atlético', 'Alianza Lima', 0, 0], [3, 'FBC Melgar', 'CD Moquegua', 4, 0], [3, 'UTC', 'Cusco FC', 1, 0], [3, 'Deportivo Garcilaso', 'ADT', 1, 0], [3, 'Sport Huancayo', 'FC Cajamarca', 2, 0], [3, 'Universitario', 'Cienciano', 2, 1], [3, 'Sport Boys', 'Atlético Grau', 1, 0], [3, 'Comerciantes Unidos', 'Los Chankas', 1, 1],
+        [3, 'UTC', 'Cusco FC', 1, 0], [3, 'Universitario', 'Cienciano', 2, 1], [3, 'Deportivo Garcilaso', 'ADT', 1, 0],
+        [3, 'Juan Pablo II', 'Sporting Cristal', 0, 2], [3, 'Sport Boys', 'Atlético Grau', 1, 0], [3, 'Alianza Atlético', 'Alianza Lima', 0, 0],
+        [3, 'Sport Huancayo', 'FC Cajamarca', 2, 0], [3, 'Comerciantes Unidos', 'Los Chankas', 1, 1], [3, 'FBC Melgar', 'CD Moquegua', 4, 0],
         # FECHA 4
-        [4, 'Cusco FC', 'Comerciantes Unidos', 3, 1], [4, 'ADT', 'UTC', 2, 2], [4, 'Alianza Lima', 'Sport Boys', 1, 0], [4, 'Cienciano', 'Alianza Atlético', 1, 1], [4, 'Atlético Grau', 'Juan Pablo II', 1, 2], [4, 'Sporting Cristal', 'Universitario', 2, 2], [4, 'FC Cajamarca', 'FBC Melgar', 3, 1], [4, 'Los Chankas', 'Sport Huancayo', 3, 2], [4, 'CD Moquegua', 'Deportivo Garcilaso', 1, 0],
+        [4, 'Alianza Lima', 'Sport Boys', 1, 0], [4, 'FC Cajamarca', 'FBC Melgar', 3, 1], [4, 'Sporting Cristal', 'Universitario', 2, 2],
+        [4, 'Cienciano', 'Alianza Atlético', 1, 1], [4, 'ADT', 'UTC', 2, 2], [4, 'Los Chankas', 'Sport Huancayo', 3, 2],
+        [4, 'Atlético Grau', 'Juan Pablo II', 1, 2], [4, 'Cusco FC', 'Comerciantes Unidos', 3, 1], [4, 'CD Moquegua', 'Deportivo Garcilaso', 1, 0],
         # FECHA 5
-        [5, 'Juan Pablo II', 'Cusco FC', 2, 1], [5, 'Alianza Atlético', 'ADT', 0, 0], [5, 'FBC Melgar', 'Los Chankas', 1, 2], [5, 'UTC', 'Alianza Lima', 1, 2], [5, 'Deportivo Garcilaso', 'Cienciano', 1, 2], [5, 'Sport Huancayo', 'Sporting Cristal', 1, 2], [5, 'Universitario', 'FC Cajamarca', 3, 0], [5, 'Sport Boys', 'CD Moquegua', 0, 1], [5, 'Comerciantes Unidos', 'Atlético Grau', 2, 0],
+        [5, 'Alianza Atlético', 'ADT', 0, 0], [5, 'FBC Melgar', 'Los Chankas', 1, 2], [5, 'Deportivo Garcilaso', 'Cienciano', 2, 3],
+        [5, 'Sport Huancayo', 'Sporting Cristal', 2, 1], [5, 'UTC', 'Alianza Lima', 0, 1], [5, 'Sport Boys', 'CD Moquegua', 0, 0],
+        [5, 'Comerciantes Unidos', 'Atlético Grau', 3, 1], [5, 'Juan Pablo II', 'Cusco FC', 2, 1], [5, 'Universitario', 'FC Cajamarca', 1, 0],
         # FECHA 6
-        [6, 'Cusco FC', 'Deportivo Garcilaso', 1, 1], [6, 'ADT', 'Juan Pablo II', 1, 2], [6, 'Alianza Lima', 'FBC Melgar', 1, 1], [6, 'Cienciano', 'Sport Boys', 2, 0], [6, 'Atlético Grau', 'FC Cajamarca', 1, 0], [6, 'Sporting Cristal', 'Alianza Atlético', 3, 1], [6, 'Los Chankas', 'Universitario', 3, 1], [6, 'CD Moquegua', 'Sport Huancayo', 1, 2], [6, 'Comerciantes Unidos', 'UTC', 1, 2],
+        [6, 'Atlético Grau', 'FC Cajamarca', 1, 0], [6, 'CD Moquegua', 'Sport Huancayo', 2, 1], [6, 'Comerciantes Unidos', 'UTC', 1, 2],
+        [6, 'Sporting Cristal', 'Alianza Atlético', 3, 1], [6, 'Cusco FC', 'Deportivo Garcilaso', 1, 0], [6, 'ADT', 'Juan Pablo II', 2, 3],
+        [6, 'Los Chankas', 'Universitario', 3, 1], [6, 'Cienciano', 'Sport Boys', 3, 1], [6, 'Alianza Lima', 'FBC Melgar', 3, 1],
         # FECHA 7
-        [7, 'Cusco FC', 'Cienciano', 1, 3], [7, 'Juan Pablo II', 'Los Chankas', 2, 3], [7, 'Alianza Atlético', 'CD Moquegua', 1, 1], [7, 'FBC Melgar', 'Atlético Grau', 1, 0], [7, 'Deportivo Garcilaso', 'Alianza Lima', 1, 1], [7, 'Sport Huancayo', 'ADT', 0, 1], [7, 'Sporting Cristal', 'Sport Boys', 3, 0], [7, 'Universitario', 'UTC', 2, 0], [7, 'FC Cajamarca', 'Comerciantes Unidos', 3, 4],
+        [7, 'FC Cajamarca', 'Comerciantes Unidos', 3, 4], [7, 'Sport Huancayo', 'ADT', 0, 1], [7, 'Juan Pablo II', 'Los Chankas', 2, 3],
+        [7, 'Deportivo Garcilaso', 'Alianza Lima', 1, 1], [7, 'Universitario', 'UTC', 2, 0], [7, 'Sporting Cristal', 'Sport Boys', 3, 0],
+        [7, 'FBC Melgar', 'Atlético Grau', 0, 0], [7, 'Alianza Atlético', 'CD Moquegua', 3, 0], [7, 'Cusco FC', 'Cienciano', 1, 2],
         # FECHA 8 
-        [8, 'ADT', 'FBC Melgar', 1, 1], [8, 'UTC', 'Alianza Atlético', 1, 1], [8, 'Alianza Lima', 'Juan Pablo II', 2, 0], [8, 'Cienciano', 'FC Cajamarca', 3, 0], [8, 'Atlético Grau', 'Deportivo Garcilaso', 0, 0], [8, 'Los Chankas', 'Sporting Cristal', 3, 2], [8, 'Sport Boys', 'Sport Huancayo', 3, 0], [8, 'CD Moquegua', 'Cusco FC', 1, 2], [8, 'Comerciantes Unidos', 'Universitario', 0, 0],
-        # FECHAS PENDIENTES 
-        [9, 'Juan Pablo II', 'UTC', None, None], [9, 'Alianza Atlético', 'Atlético Grau', None, None], [9, 'FBC Melgar', 'Cusco FC', None, None], [9, 'Cienciano', 'ADT', None, None], [9, 'Deportivo Garcilaso', 'Sport Boys', None, None], [9, 'Sport Huancayo', 'Comerciantes Unidos', None, None], [9, 'Sporting Cristal', 'CD Moquegua', None, None], [9, 'Universitario', 'Alianza Lima', None, None], [9, 'FC Cajamarca', 'Los Chankas', None, None],
+        [8, 'ADT', 'FBC Melgar', 1, 1], [8, 'Cienciano', 'FC Cajamarca', 3, 0], [8, 'CD Moquegua', 'Cusco FC', 1, 2],
+        [8, 'Comerciantes Unidos', 'Universitario', 0, 0], [8, 'Los Chankas', 'Sporting Cristal', 3, 2], [8, 'Alianza Lima', 'Juan Pablo II', 2, 0],
+        [8, 'UTC', 'Alianza Atlético', 1, 1], [8, 'Atlético Grau', 'Deportivo Garcilaso', 0, 0], [8, 'Sport Boys', 'Sport Huancayo', 3, 0],
+        
+        # FECHAS PENDIENTES (DEL 9 AL 17)
+        [9, 'Juan Pablo II', 'UTC', None, None], [9, 'Alianza Atlético', 'Atlético Grau', None, None], [9, 'FBC Melgar', 'Cusco FC', None, None], [9, 'Cienciano', 'ADT', None, None], [9, 'Deportivo Garcilaso', 'Sporting Cristal', None, None], [9, 'Sport Huancayo', 'Comerciantes Unidos', None, None], [9, 'Sport Boys', 'CD Moquegua', None, None], [9, 'Universitario', 'Alianza Lima', None, None], [9, 'FC Cajamarca', 'Los Chankas', None, None],
         [10, 'Cusco FC', 'FC Cajamarca', None, None], [10, 'ADT', 'Alianza Lima', None, None], [10, 'UTC', 'Sport Huancayo', None, None], [10, 'Atlético Grau', 'Sporting Cristal', None, None], [10, 'Universitario', 'Deportivo Garcilaso', None, None], [10, 'Los Chankas', 'Cienciano', None, None], [10, 'Sport Boys', 'FBC Melgar', None, None], [10, 'CD Moquegua', 'Juan Pablo II', None, None], [10, 'Comerciantes Unidos', 'Alianza Atlético', None, None],
         [11, 'Juan Pablo II', 'Comerciantes Unidos', None, None], [11, 'Alianza Atlético', 'Sport Boys', None, None], [11, 'FBC Melgar', 'Universitario', None, None], [11, 'Alianza Lima', 'Cusco FC', None, None], [11, 'Cienciano', 'CD Moquegua', None, None], [11, 'Sport Huancayo', 'Deportivo Garcilaso', None, None], [11, 'Sporting Cristal', 'UTC', None, None], [11, 'FC Cajamarca', 'ADT', None, None], [11, 'Los Chankas', 'Atlético Grau', None, None],
         [12, 'Cusco FC', 'Sport Huancayo', None, None], [12, 'ADT', 'Los Chankas', None, None], [12, 'UTC', 'Cienciano', None, None], [12, 'Deportivo Garcilaso', 'FBC Melgar', None, None], [12, 'Atlético Grau', 'Alianza Lima', None, None], [12, 'Universitario', 'Alianza Atlético', None, None], [12, 'Sport Boys', 'Juan Pablo II', None, None], [12, 'CD Moquegua', 'FC Cajamarca', None, None], [12, 'Comerciantes Unidos', 'Sporting Cristal', None, None],
@@ -140,7 +158,7 @@ def cargar_datos_2026():
     df['Torneo'] = 'Apertura'
     return df
 
-# Carga condicional y Lista de Equipos EXACTA del año
+# Carga condicional y Lista de Equipos
 if temporada == "2018":
     try:
         df_partidos, df_goles = cargar_datos_2018()
@@ -288,10 +306,10 @@ with tab_fixture:
         
         else:
             df_acu = df_partidos[df_partidos['Fecha_Global'] <= fecha_seleccionada]
-            st.markdown(generar_html_tabla(df_acu, equipos_temporada_actual, f"LIGA 1 APERTURA 2026 (FECHA {fecha_seleccionada})", es_acumulado=True, f_sel=fecha_seleccionada), unsafe_allow_html=True)
+            st.markdown(generar_html_tabla(df_acu, equipos_temporada_actual, f"LIGA 1 APERTURA 2026 (HASTA FECHA {fecha_seleccionada})", es_acumulado=True, f_sel=fecha_seleccionada), unsafe_allow_html=True)
 
 # =====================================================================
-# --- TAB 2: EQUIPOS Y ESTADÍSTICAS (FILTRADOS POR AÑO) ---
+# --- TAB 2: EQUIPOS Y ESTADÍSTICAS (LIMPIA, SOLO ESCUDOS) ---
 # =====================================================================
 with tab_estadisticas:
     st.markdown(f"<h3 style='text-align: center; color: white; margin-bottom: 5px;'>EQUIPOS LIGA 1 - {temporada}</h3>", unsafe_allow_html=True)
@@ -300,7 +318,6 @@ with tab_estadisticas:
     tit_h = {'Universitario': 29, 'Alianza Lima': 25, 'Sporting Cristal': 20, 'Sport Boys': 6, 'Dep. Municipal': 4, 'U. San Martin': 3, 'FBC Melgar': 2, 'Binacional': 1}
     
     html_grid = "<div class='eq-grid'>"
-    # SOLO iteramos por los equipos de la temporada actual, NO por todo el diccionario
     for equipo in equipos_temporada_actual:
         logo = logos_equipos.get(equipo, '')
         copas = tit_h.get(equipo, 0)
@@ -361,7 +378,7 @@ with tab_campeones:
         if temporada == "2026":
             if st.button("⏪ Viajar al Torneo 2018", use_container_width=True):
                 st.session_state['temporada'] = "2018"
-                st.session_state['alerta_viaje'] = "¡Viaje exitoso al 2018! Revisa la pestaña FIXTURE Y TABLAS para ver los torneos de esa época."
+                st.session_state['alerta_viaje'] = "¡Viaje exitoso al 2018! Revisa la pestaña FIXTURE Y TABLAS."
                 st.rerun()
         else:
             if st.button("🏠 Volver al Presente (2026)", use_container_width=True):
