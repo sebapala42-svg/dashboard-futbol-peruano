@@ -209,3 +209,81 @@ with tab_fixture:
         # TABLA ACUMULADA (Siempre Visible y con la nota al final)
         df_acu = df_partidos[df_partidos['Fecha_Global'] <= min(fecha_seleccionada, 44)]
         st.markdown(generar_html_tabla(df_acu, todos_equipos, f"TABLA ACUMULADA (HASTA LA FECHA {fecha_seleccionada})", es_acumulado=True), unsafe_allow_html=True)
+        # =====================================================================
+# --- PESTAÑA 3: CAMPEONES (BASE DE DATOS HISTÓRICA INYECTADA POR IA) ---
+# =====================================================================
+with tab_campeones:
+    # 1. Base de datos del Historial (Últimos 25 años para no hacerla infinita)
+    historial_datos = [
+        {"Año": "2025", "Campeón": "Universitario"},
+        {"Año": "2024", "Campeón": "Universitario"},
+        {"Año": "2023", "Campeón": "Universitario"},
+        {"Año": "2022", "Campeón": "Alianza Lima"},
+        {"Año": "2021", "Campeón": "Alianza Lima"},
+        {"Año": "2020", "Campeón": "Sporting Cristal"},
+        {"Año": "2019", "Campeón": "Binacional"},
+        {"Año": "2018", "Campeón": "Sporting Cristal"},
+        {"Año": "2017", "Campeón": "Alianza Lima"},
+        {"Año": "2016", "Campeón": "Sporting Cristal"},
+        {"Año": "2015", "Campeón": "FBC Melgar"},
+        {"Año": "2014", "Campeón": "Sporting Cristal"},
+        {"Año": "2013", "Campeón": "Universitario"},
+        {"Año": "2012", "Campeón": "Sporting Cristal"},
+        {"Año": "2011", "Campeón": "Juan Aurich"}, # Nota: Faltaría el logo de Aurich, usaremos uno por defecto si no está
+        {"Año": "2010", "Campeón": "U. San Martin"},
+        {"Año": "2009", "Campeón": "Universitario"},
+        {"Año": "2008", "Campeón": "U. San Martin"},
+        {"Año": "2007", "Campeón": "U. San Martin"},
+        {"Año": "2006", "Campeón": "Alianza Lima"},
+        {"Año": "2005", "Campeón": "Sporting Cristal"},
+        {"Año": "2004", "Campeón": "Alianza Lima"},
+        {"Año": "2003", "Campeón": "Alianza Lima"},
+        {"Año": "2002", "Campeón": "Sporting Cristal"},
+        {"Año": "2001", "Campeón": "Alianza Lima"},
+        {"Año": "2000", "Campeón": "Universitario"}
+    ]
+    df_historial = pd.DataFrame(historial_datos)
+
+    # 2. Base de datos del Ranking Total (Los más ganadores de la historia peruana)
+    ranking_datos = [
+        {"Equipo": "Universitario", "Títulos": 29},
+        {"Equipo": "Alianza Lima", "Títulos": 25},
+        {"Equipo": "Sporting Cristal", "Títulos": 20},
+        {"Equipo": "Sport Boys", "Títulos": 6},
+        {"Equipo": "Dep. Municipal", "Títulos": 4},
+        {"Equipo": "U. San Martin", "Títulos": 3},
+        {"Equipo": "FBC Melgar", "Títulos": 2},
+        {"Equipo": "Unión Huaral", "Títulos": 2}, # Histórico
+        {"Equipo": "Atlético Chalaco", "Títulos": 2}, # Histórico
+        {"Equipo": "Sport José Gálvez", "Títulos": 2}, # Histórico amateur
+        {"Equipo": "Binacional", "Títulos": 1},
+        {"Equipo": "Juan Aurich", "Títulos": 1},
+        {"Equipo": "Defensor Lima", "Títulos": 1}, # Histórico
+        {"Equipo": "San Agustín", "Títulos": 1} # Histórico
+    ]
+    df_ranking = pd.DataFrame(ranking_datos)
+
+    # 3. Interfaz de dos columnas (Como la captura que me pasaste)
+    col_hist, col_rank = st.columns([1.5, 1])
+
+    with col_hist:
+        st.markdown("<div class='panel-verde' style='padding:0;'><div class='titulo-panel' style='padding-top:10px;'>HISTORIAL</div>", unsafe_allow_html=True)
+        
+        html_h = "<table class='tabla-pro' style='margin:0;'><thead><tr><th>Torneo</th><th style='text-align:left;'>Historia</th></tr></thead><tbody>"
+        for idx, row in df_historial.iterrows():
+            logo = logos_equipos.get(row['Campeón'], 'https://cdn-icons-png.flaticon.com/128/33/33736.png') # Escudo por defecto si es muy antiguo
+            html_h += f"<tr><td style='font-weight:bold; color:#ffffff;'>{row['Año']}</td><td style='text-align:left;'><img src='{logo}' width='15' height='15' style='object-fit:contain; vertical-align:middle; margin-right:6px;' onerror=\"this.style.display='none'\"> <span style='color:#ffffff; font-weight:bold;'>{row['Campeón']}</span></td></tr>"
+        html_h += "</tbody></table></div>"
+        
+        st.markdown(html_h, unsafe_allow_html=True)
+
+    with col_rank:
+        st.markdown("<div class='panel-verde' style='padding:0;'><div class='titulo-panel' style='padding-top:10px;'>RANKING LIGAS</div>", unsafe_allow_html=True)
+        
+        html_r = "<table class='tabla-pro' style='margin:0;'><thead><tr><th style='text-align:left;'>Equipos</th><th>Títulos</th></tr></thead><tbody>"
+        for idx, row in df_ranking.iterrows():
+            logo = logos_equipos.get(row['Equipo'], 'https://cdn-icons-png.flaticon.com/128/33/33736.png')
+            html_r += f"<tr><td style='text-align:left;'><img src='{logo}' width='15' height='15' style='object-fit:contain; vertical-align:middle; margin-right:6px;' onerror=\"this.style.display='none'\"> <span style='color:#ffffff; font-weight:bold;'>{row['Equipo']}</span></td><td style='font-weight:bold; color:#ffffff; font-size:13px;'>{row['Títulos']}</td></tr>"
+        html_r += "</tbody></table></div>"
+        
+        st.markdown(html_r, unsafe_allow_html=True)
