@@ -57,7 +57,8 @@ for equipo in equipos:
     
     pts_total = pts_cancha + bon - sanc
     
-    tabla.append([equipo, pj, g, e, p, pts_cancha, bon, sanc, Total, gf, gc, dif])
+    # ¡AQUÍ ESTÁ LA CORRECCIÓN! Cambié 'Total' por 'pts_total'
+    tabla.append([equipo, pj, g, e, p, pts_cancha, bon, sanc, pts_total, gf, gc, dif])
 
 # Convertir a DataFrame y ordenar
 df_tabla = pd.DataFrame(tabla, columns=['Equipo', 'PJ', 'G', 'E', 'P', 'Pts Cancha', 'Bon', 'Sanc', 'Total', 'GF', 'GC', 'DIF'])
