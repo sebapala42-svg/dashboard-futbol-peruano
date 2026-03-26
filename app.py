@@ -5,7 +5,12 @@ import pandas as pd
 st.set_page_config(page_title="Dashboard Descentralizado 2018", page_icon="⚽", layout="wide")
 
 st.title("🏆 Dashboard Interactivo - Descentralizado 2018")
-st.markdown("Bienvenido a la central de estadísticas. Cambia la fecha en el deslizador para viajar en el tiempo y ver cómo se movía la tabla y los goleadores.")
+st.markdown("Bienvenido a la central de estadísticas. Cambia la fecha en el deslizador para viajar en el tiempo.")
+
+# Equipos y Grupos
+equipo_A = ['Sporting Cristal', 'Sport Rosario', 'UTC', 'U. San Martin', 'Alianza Lima', 'Comerciantes Unidos', 'Ayacucho FC', 'Universitario']
+equipo_B = ['Sport Huancayo', 'FBC Melgar', 'Cantolao', 'Dep. Municipal', 'Sport Boys', 'Cusco (Garcilaso)', 'Binacional', 'Union Comercio']
+todos_equipos = sorted(equipo_A + equipo_B)
 
 # Cargar los datos desde tu Excel
 @st.cache_data
@@ -17,76 +22,98 @@ def cargar_datos():
 try:
     df_partidos, df_goles = cargar_datos()
 except Exception as e:
-    st.error("⚠️ No se encontró el archivo 'torneo_2018.xlsx'. Asegúrate de que el archivo de Excel esté subido a GitHub y se llame exactamente así.")
+    st.error("⚠️ No se encontró el archivo 'torneo_2018.xlsx'.")
     st.stop()
 
 # --- BUSCADOR DE FECHA ---
 fecha_maxima = int(df_partidos['Fecha_Global'].max()) if not df_partidos.empty else 50
 fecha_seleccionada = st.slider("▶ Desliza para cambiar la Fecha Global:", 1, fecha_maxima, 44)
 
-# Filtramos la data para la tabla acumulada (Solo suma puntos hasta la fecha 44)
-limite_acumulado = min(fecha_seleccionada, 44)
-df_filtro_tabla = df_partidos[(df_partidos['Fecha_Global'] <= limite_acumulado) & (df_partidos['Torneo'].isin(['Verano', 'Apertura', 'Clausura']))]
+# --- MOTOR DE CÁLCULO DE TABLAS ---
+def calcular_tabla(df_filtrado, lista_equipos, es_acumulada=False):
+    tabla = []
+    for equipo in lista_equipos:
+        loc = df_filtrado[df_filtrado['Local'] == equipo]
+        vis = df_filtrado[df_filtrado['Visitante'] == equipo]
+        
+        g = (loc['GL'] > loc['GV']).sum() + (vis['GV'] > vis['GL']).sum()
+        e = (loc['GL'] == loc['GV']).sum() + (vis['GV'] == vis['GL']).sum()
+        p = (loc['GL'] < loc['GV']).sum() + (vis['GV'] < vis['GL']).sum()
+        gf = loc['GL'].sum() + vis['GV'].sum()
+        gc = loc['GV'].sum() + vis['GL'].sum()
+        dif = gf - gc
+        pj = g + e + p
+        pts = (g * 3) + e
+        
+        if es_acumulada:
+            bon = 2 if equipo == 'Sporting Cristal' and fecha_seleccionada >= 44 else 0
+            sanc_dict = {'Universitario': 1, 'Dep. Municipal': 2, 'UTC': 2, 'Cantolao': 2, 'Sport Rosario': 7}
+            sanc = sanc_dict.get(equipo, 0) if fecha_seleccionada >= 44 else 0
+            pts_total = pts + bon - sanc
+            tabla.append([equipo, pj, g, e, p, pts, bon, sanc, pts_total, gf, gc, dif])
+        else:
+            tabla.append([equipo, pj, g, e, p, pts, gf, gc, dif])
+            
+    if es_acumulada:
+        cols = ['Equipo', 'PJ', 'G', 'E', 'P', 'Pts Cancha', 'Bon', 'Sanc', 'Total', 'GF', 'GC', 'DIF']
+        sort_cols = ['Total', 'DIF', 'GF']
+    else:
+        cols = ['Equipo', 'PJ', 'G', 'E', 'P', 'Pts', 'GF', 'GC', 'DIF']
+        sort_cols = ['Pts', 'DIF', 'GF']
+        
+    df_t = pd.DataFrame(tabla, columns=cols)
+    df_t = df_t.sort_values(by=sort_cols, ascending=[False, False, False]).reset_index(drop=True)
+    df_t.index = df_t.index + 1
+    return df_t
 
-# --- LÓGICA DE LA TABLA ACUMULADA ---
-equipos = sorted(list(set(df_partidos['Local'].dropna().unique()) - {'', 0}))
-tabla = []
+# --- COLORES PARA LA ACUMULADA ---
+def colorear_filas(row):
+    if row.name <= 4: return ['background-color: #d4edda; color: #155724'] * len(row) # Verde Libertadores
+    elif row.name <= 8: return ['background-color: #fff3cd; color: #856404'] * len(row) # Amarillo Sudamericana
+    elif row.name >= 15: return ['background-color: #f8d7da; color: #721c24'] * len(row) # Rojo Descenso
+    return [''] * len(row)
 
-for equipo in equipos:
-    # Filtramos partidos locales y visitantes
-    loc = df_filtro_tabla[df_filtro_tabla['Local'] == equipo]
-    vis = df_filtro_tabla[df_filtro_tabla['Visitante'] == equipo]
-    
-    # Victorias, Empates, Derrotas
-    g = (loc['GL'] > loc['GV']).sum() + (vis['GV'] > vis['GL']).sum()
-    e = (loc['GL'] == loc['GV']).sum() + (vis['GV'] == vis['GL']).sum()
-    p = (loc['GL'] < loc['GV']).sum() + (vis['GV'] < vis['GL']).sum()
-    
-    # Goles
-    gf = loc['GL'].sum() + vis['GV'].sum()
-    gc = loc['GV'].sum() + vis['GL'].sum()
-    dif = gf - gc
-    
-    pj = g + e + p
-    pts_cancha = (g * 3) + e
-    
-    # Puntos de mesa (Solo aplican al final del campeonato, fecha >= 44)
-    bon = 2 if equipo == 'Sporting Cristal' and fecha_seleccionada >= 44 else 0
-    sanc_dict = {'Universitario': 1, 'Dep. Municipal': 2, 'UTC': 2, 'Cantolao': 2, 'Sport Rosario': 7}
-    sanc = sanc_dict.get(equipo, 0) if fecha_seleccionada >= 44 else 0
-    
-    pts_total = pts_cancha + bon - sanc
-    
-    # ¡AQUÍ ESTÁ LA CORRECCIÓN! Cambié 'Total' por 'pts_total'
-    tabla.append([equipo, pj, g, e, p, pts_cancha, bon, sanc, pts_total, gf, gc, dif])
-
-# Convertir a DataFrame y ordenar
-df_tabla = pd.DataFrame(tabla, columns=['Equipo', 'PJ', 'G', 'E', 'P', 'Pts Cancha', 'Bon', 'Sanc', 'Total', 'GF', 'GC', 'DIF'])
-df_tabla = df_tabla.sort_values(by=['Total', 'DIF', 'GF'], ascending=[False, False, False]).reset_index(drop=True)
-df_tabla.index = df_tabla.index + 1 # Que la tabla empiece en el puesto 1
-
-# --- INTERFAZ VISUAL EN COLUMNAS ---
-col1, col2 = st.columns([2, 1]) # La columna izquierda es más ancha
+# --- INTERFAZ VISUAL ---
+col1, col2 = st.columns([2, 1]) 
 
 with col1:
-    st.subheader("📊 Tabla Acumulada")
-    st.dataframe(df_tabla, use_container_width=True)
+    tab1, tab2 = st.tabs(["🏆 Tabla Acumulada", "🔥 Torneo Corto Activo"])
     
+    with tab1:
+        limite_acumulado = min(fecha_seleccionada, 44)
+        df_filtro_acu = df_partidos[(df_partidos['Fecha_Global'] <= limite_acumulado) & (df_partidos['Torneo'].isin(['Verano', 'Apertura', 'Clausura']))]
+        df_acumulada = calcular_tabla(df_filtro_acu, todos_equipos, es_acumulada=True)
+        st.dataframe(df_acumulada.style.apply(colorear_filas, axis=1), use_container_width=True)
+        
+    with tab2:
+        if fecha_seleccionada <= 14:
+            st.subheader("☀️ Torneo de Verano - Grupo A")
+            df_va = calcular_tabla(df_partidos[(df_partidos['Fecha_Global'] <= fecha_seleccionada) & (df_partidos['Torneo'] == 'Verano')], equipo_A)
+            st.dataframe(df_va, use_container_width=True)
+            
+            st.subheader("☀️ Torneo de Verano - Grupo B")
+            df_vb = calcular_tabla(df_partidos[(df_partidos['Fecha_Global'] <= fecha_seleccionada) & (df_partidos['Torneo'] == 'Verano')], equipo_B)
+            st.dataframe(df_vb, use_container_width=True)
+            
+        elif fecha_seleccionada <= 29:
+            st.subheader("🍂 Torneo Apertura")
+            df_ap = calcular_tabla(df_partidos[(df_partidos['Fecha_Global'] >= 15) & (df_partidos['Fecha_Global'] <= fecha_seleccionada) & (df_partidos['Torneo'] == 'Apertura')], todos_equipos)
+            st.dataframe(df_ap, use_container_width=True)
+            
+        else:
+            st.subheader("🔥 Torneo Clausura")
+            df_cl = calcular_tabla(df_partidos[(df_partidos['Fecha_Global'] >= 30) & (df_partidos['Fecha_Global'] <= min(fecha_seleccionada, 44)) & (df_partidos['Torneo'] == 'Clausura')], todos_equipos)
+            st.dataframe(df_cl, use_container_width=True)
+
     st.subheader(f"📅 Partidos de la Fecha {fecha_seleccionada}")
     partidos_fecha = df_partidos[df_partidos['Fecha_Global'] == fecha_seleccionada][['Torneo', 'Local', 'GL', 'GV', 'Visitante', 'Link_Video']]
     if not partidos_fecha.empty:
-        # Configurar para que el link sea clickeable
-        st.dataframe(
-            partidos_fecha,
-            column_config={"Link_Video": st.column_config.LinkColumn("Video Resumen")},
-            use_container_width=True
-        )
+        st.dataframe(partidos_fecha, column_config={"Link_Video": st.column_config.LinkColumn("Video Resumen")}, use_container_width=True)
     else:
-        st.info("No hay partidos programados para esta fecha.")
+        st.info("No hay partidos de fase regular en esta fecha (posibles Playoffs).")
 
 with col2:
     st.subheader("⚽ Goleadores en Tiempo Real")
-    # Ignorar celdas vacías del Excel
     df_goles_limpio = df_goles.dropna(subset=['Fecha_Global', 'Jugador'])
     df_goles_filtro = df_goles_limpio[df_goles_limpio['Fecha_Global'] <= fecha_seleccionada]
     
