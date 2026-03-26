@@ -97,8 +97,6 @@ logos_equipos = {
     'CD Moquegua': 'https://tmssl.akamaized.net//images/wappen/head/114625.png?lm=1735173037',
     'Juan Pablo II': 'https://tmssl.akamaized.net//images/wappen/head/99517.png?lm=1712524979',
     'FC Cajamarca': 'https://tmssl.akamaized.net//images/wappen/head/120792.png?lm=1767023947',
-    
-    # Antiguos de 2018 
     'Dep. Municipal': 'https://tmssl.akamaized.net//images/wappen/head/17974.png',
     'Cantolao': 'https://tmssl.akamaized.net//images/wappen/head/11247.png',
     'Sport Rosario': 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/18441.png',
@@ -121,8 +119,10 @@ info_clubes = {
 detalles_partidos = {
     ('Universitario', 'ADT'): {
         'torneo': 'Liga 1 Apertura 2026 - Fecha 1',
+        'gl': 2,  # CORRECCIÓN: Agregado gol local
+        'gv': 0,  # CORRECCIÓN: Agregado gol visitante
         'goles': "⚽ Universitario: Alex Valera 55', Martín Pérez Guedes 57'",
-        'dt_l': 'Fabián Bustos (J. Rabanal)', # Manteniendo tu dato pero ajustando al contexto técnico
+        'dt_l': 'Fabián Bustos (J. Rabanal)', 
         'dt_v': 'P. Trobbiani',
         'titulares_l': 'Romero; Corzo, Fara, Inga, Carabalí; Castillo, Pérez Guedes, Concha, Polo; Flores y Valera.',
         'titulares_v': 'Valencia; Soto, Narváez, Gómez, Gutiérrez, Pérez, Ojeda, Cabello, Arakaki, Rodríguez y Bauman.',
@@ -281,12 +281,11 @@ with tab_fixture:
         idx_defecto = 29
     else:
         fechas_disponibles = [f"FECHA {i}" for i in range(1, 18)]
-        idx_defecto = 0 # FECHA 1 por defecto para que pruebes la ficha
+        idx_defecto = 0 # FECHA 1 por defecto para probar la ficha
 
     col_izq, col_der = st.columns([2.2, 1.0]) 
     
     with col_der:
-        # LÓGICA DE INTERCAMBIO: FIXTURE NORMAL O DASHBOARD DE PARTIDO
         if st.session_state['partido_detalle']:
             p_loc, p_vis = st.session_state['partido_detalle']
             det = detalles_partidos[(p_loc, p_vis)]
@@ -295,7 +294,6 @@ with tab_fixture:
                 st.session_state['partido_detalle'] = None
                 st.rerun()
                 
-            # DASHBOARD DE PARTIDO (ESTILO PROMIEDOS)
             html_dash = f"""
             <div style='background-color:#112d1e; padding:15px; border-radius:8px; border:1px solid #1a4a2e; margin-top:5px; margin-bottom:15px;'>
                 <div style='text-align:center; color:#a1b5a8; font-size:10px; font-weight:bold; margin-bottom:15px; text-transform:uppercase;'>{det['torneo']}</div>
@@ -331,7 +329,6 @@ with tab_fixture:
             st.markdown(html_dash, unsafe_allow_html=True)
             
         else:
-            # FIXTURE NORMAL
             st.markdown(f"<div class='titulo-panel' style='color:#8cc63f; margin-bottom: 5px;'>TORNEO {temporada}</div>", unsafe_allow_html=True)
             fecha_texto = st.selectbox("Selecciona Fecha", fechas_disponibles, index=idx_defecto) 
             fecha_seleccionada = int(fecha_texto.replace("FECHA ", ""))
@@ -353,7 +350,6 @@ with tab_fixture:
                 st.markdown("<p style='text-align:center; font-size:12px; padding: 15px;'>No hay partidos registrados.</p>", unsafe_allow_html=True)
             st.markdown("</div></div>", unsafe_allow_html=True)
             
-            # --- DETECCIÓN AUTOMÁTICA DE FICHAS DISPONIBLES EN ESTA FECHA ---
             partidos_con_detalle = [p for p in detalles_partidos.keys() if p in zip(partidos_fecha['Local'], partidos_fecha['Visitante'])]
             if partidos_con_detalle:
                 st.markdown("<div style='margin-top:10px; margin-bottom:5px; text-align:center;'><span style='color:#8cc63f; font-weight:bold; font-size:11px; text-transform:uppercase;'>📋 Fichas de Partidos Disponibles:</span></div>", unsafe_allow_html=True)
@@ -362,7 +358,6 @@ with tab_fixture:
                         st.session_state['partido_detalle'] = (p_loc, p_vis)
                         st.rerun()
 
-            # GOLEADORES EN 2018
             if temporada == "2018":
                 st.markdown("<div class='panel-verde' style='margin-top:15px;'><div class='titulo-panel'>GOLEADORES</div>", unsafe_allow_html=True)
                 df_g = df_goles.dropna(subset=['Fecha_Global', 'Jugador'])
