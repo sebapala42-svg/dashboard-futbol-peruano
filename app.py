@@ -346,4 +346,4 @@ with tab_campeones:
             html_r += f"<tr><td style='text-align:left;'><img src='{logo}' width='15' height='15' style='object-fit:contain; vertical-align:middle; margin-right:6px;' onerror=\"this.style.display='none'\"> <span style='color:#ffffff; font-weight:bold;'>{row['Equipo']}</span></td><td style='font-weight:bold; color:#ffffff; font-size:13px;'>{row['Títulos']}</td></tr>"
         html_r += "</tbody></table></div>"
         
-        st.markdown(html_r, unsafe_allow_html=True)ml=True)
+        st.markdown(html_r, unsafe_allow_html=True)
