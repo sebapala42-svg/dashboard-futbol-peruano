@@ -29,7 +29,7 @@ st.markdown("""
 # Busca la imagen en Google -> Clic derecho -> Copiar dirección de la imagen -> Pégalo entre las comillas
 logos_equipos = {
     'Alianza Lima': 'LINK_AQUI',
-    'Ayacucho FC': 'LINK_AQUI',
+    'Ayacucho FC': 'https://tmssl.akamaized.net//images/wappen/head/21178.png?lm=1420973967',
     'Binacional': 'LINK_AQUI',
     'Cantolao': 'LINK_AQUI',
     'Comerciantes Unidos': 'LINK_AQUI',
