@@ -65,7 +65,6 @@ logos_equipos = {
     'Sporting Cristal': 'https://tmssl.akamaized.net//images/wappen/head/21157.png',
     'FBC Melgar': 'https://tmssl.akamaized.net//images/wappen/head/2734.png',
     'Cienciano': 'https://tmssl.akamaized.net//images/wappen/head/2733.png',
-    'Cusco FC': 'https://tmssl.akamaized.net//images/wappen/head/28999.png',
     'Cusco (Garcilaso)': 'https://tmssl.akamaized.net//images/wappen/head/28999.png',
     'Sport Boys': 'https://tmssl.akamaized.net//images/wappen/head/2730.png',
     'UTC': 'https://tmssl.akamaized.net//images/wappen/head/21170.png',
@@ -106,7 +105,7 @@ def cargar_datos_2026():
         # FECHA 1
         [1, 'Juan Pablo II', 'FC Cajamarca', 3, 3], [1, 'Alianza Atlético', 'Cusco FC', 1, 0], [1, 'FBC Melgar', 'Cienciano', 2, 1], [1, 'UTC', 'Atlético Grau', 2, 0], [1, 'Deportivo Garcilaso', 'Sporting Cristal', 1, 1], [1, 'Sport Huancayo', 'Alianza Lima', 0, 2], [1, 'Universitario', 'ADT', 2, 0], [1, 'Sport Boys', 'Los Chankas', 1, 2], [1, 'Comerciantes Unidos', 'CD Moquegua', 2, 0],
         # FECHA 2
-        [2, 'Cusco FC', 'Universitario', 0, 1], [2, 'ADT', 'Sport Boys', 1, 1], [2, 'Alianza Lima', 'Comerciantes Unidos', 2, 0], [2, 'Cienciano', 'Juan Pablo II', 4, 1], [2, 'Atlético Grau', 'Sport Huancayo', 0, 0], [2, 'Sporting Cristal', 'FBC Melgar', 3, 1], [2, 'FC Cajamarca', 'Deportivo Garcilaso', 1, 1], [2, 'Los Chankas', 'Alianza Atlético', 2, 1], [2, 'CD Moquegua', 'UTC', 0, 1],
+        [2, 'Cusco FC', 'Universitario', 1, 1], [2, 'ADT', 'Sport Boys', 1, 1], [2, 'Alianza Lima', 'Comerciantes Unidos', 2, 1], [2, 'Cienciano', 'Juan Pablo II', 4, 1], [2, 'Atlético Grau', 'Sport Huancayo', 0, 0], [2, 'Sporting Cristal', 'FBC Melgar', 1, 2], [2, 'FC Cajamarca', 'Deportivo Garcilaso', 1, 1], [2, 'Los Chankas', 'Alianza Atlético', 2, 1], [2, 'CD Moquegua', 'UTC', 0, 1],
         # FECHA 3
         [3, 'Juan Pablo II', 'Sporting Cristal', 0, 2], [3, 'Alianza Atlético', 'Alianza Lima', 0, 0], [3, 'FBC Melgar', 'CD Moquegua', 4, 0], [3, 'UTC', 'Cusco FC', 1, 0], [3, 'Deportivo Garcilaso', 'ADT', 1, 0], [3, 'Sport Huancayo', 'FC Cajamarca', 2, 0], [3, 'Universitario', 'Cienciano', 2, 1], [3, 'Sport Boys', 'Atlético Grau', 1, 0], [3, 'Comerciantes Unidos', 'Los Chankas', 1, 1],
         # FECHA 4
