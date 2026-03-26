@@ -81,7 +81,7 @@ export default function Home() {
   };
 
   const TablaComponent = ({ titulo, zona, datos, esAcumulado }) => (
-    <div className="bg-[#112d1e] border border-[#1a4a2e] rounded-[8px] overflow-hidden">
+    <div className="bg-[#112d1e] border border-[#1a4a2e] rounded-[8px] overflow-hidden shadow-lg">
       <div className="text-center text-white font-bold text-[14px] uppercase py-[10px]">
         {titulo}
       </div>
@@ -158,7 +158,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-[#0b4026] text-white font-sans selection:bg-[#8cc63f] selection:text-black">
-      {/* Título y Tabs (Exactamente igual) */}
+      {/* Título y Tabs */}
       <div className="pt-6 pb-4">
         <h2 className="text-center text-white text-[24px] font-bold m-0 mb-[15px]">LIGA PROFESIONAL PERUANA 2018</h2>
         <div className="flex justify-center border-b border-[#1a4a2e] gap-0">
@@ -168,11 +168,19 @@ export default function Home() {
         </div>
       </div>
 
-      {/* CONTENEDOR PRINCIPAL: Aquí está el truco de las 2 columnas aseguradas */}
-      <main className="max-w-[1250px] mx-auto pt-4 pb-8 px-4 flex flex-col md:flex-row gap-6 items-start">
+      {/* AQUÍ ESTÁ EL TRUCO BLINDADO: CSS Grid puro y duro en línea */}
+      <main style={{ 
+        display: 'grid', 
+        gridTemplateColumns: '64% 34%', 
+        gap: '2%', 
+        maxWidth: '1250px', 
+        margin: '0 auto', 
+        padding: '20px',
+        alignItems: 'start' 
+      }}>
         
-        {/* COLUMNA IZQUIERDA (Tablas - 65%) */}
-        <div className="w-full md:w-[63%] flex flex-col gap-6">
+        {/* COLUMNA IZQUIERDA (64%) */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           {fecha <= 14 && (
             <>
               <TablaComponent titulo="TORNEO DE VERANO" zona="ZONA A" datos={generarTabla(partidosValidos.filter(p => p.Torneo === 'Verano'), equipo_A)} />
@@ -189,10 +197,9 @@ export default function Home() {
           <TablaComponent titulo={`TABLA ACUMULADA (HASTA LA FECHA ${fecha})`} datos={generarTabla(partidosValidos, null, true)} esAcumulado={true} />
         </div>
 
-        {/* COLUMNA DERECHA (Fixture y Goles - 35%) */}
-        <div className="w-full md:w-[37%] flex flex-col gap-6">
+        {/* COLUMNA DERECHA (34%) */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           
-          {/* Bloque Fixture */}
           <div className="flex flex-col gap-[10px]">
             <div className="text-center text-[#8cc63f] font-bold text-[14px] uppercase mb-[-5px]">TEMPORADA 2018</div>
             
@@ -208,7 +215,7 @@ export default function Home() {
               </select>
             </div>
 
-            <div className="bg-[#112d1e] border border-[#1a4a2e] rounded-lg overflow-hidden">
+            <div className="bg-[#112d1e] border border-[#1a4a2e] rounded-[8px] overflow-hidden shadow-lg">
               <div className="flex flex-col max-h-[550px] overflow-y-auto custom-scrollbar">
                 {listaPartidos.filter(p => p.Fecha_Global === fecha).map((p, idx) => (
                   <div key={idx} className={`flex justify-between items-center py-[8px] px-[10px] border-b border-[#1a4a2e] hover:bg-[#1c4531] transition-colors ${idx % 2 === 0 ? 'bg-[#112d1e]' : 'bg-[#153625]'}`}>
@@ -242,8 +249,7 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Bloque Goleadores */}
-          <div className="bg-[#112d1e] border border-[#1a4a2e] rounded-[8px] p-[10px] px-[15px]">
+          <div className="bg-[#112d1e] border border-[#1a4a2e] rounded-[8px] p-[10px] px-[15px] shadow-lg">
              <div className="text-center text-white font-bold text-[14px] uppercase mb-[10px]">GOLEADORES</div>
              <table className="w-full text-[12px] text-white font-sans border-collapse mt-[5px]">
                <thead>
