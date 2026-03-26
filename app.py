@@ -304,16 +304,18 @@ with tab_estadisticas:
     # Aquí reutilizamos el código de Goleadores que ya tenías pero más expandido
     col_goles, col_asist = st.columns(2)
     
-    with col_goles:
+   with col_goles:
         st.markdown("<div class='panel-verde'><div class='titulo-panel'>MÁXIMOS GOLEADORES</div>", unsafe_allow_html=True)
-        # Lógica de goleadores (misma que ya tenemos en la home pero como tabla principal)
+        # Lógica de goleadores 
         df_g = df_goles.dropna(subset=['Jugador']).groupby(['Jugador', 'Equipo'])['Goles'].sum().reset_index().sort_values(by='Goles', ascending=False).head(15)
         html_g = "<table class='tabla-pro'><thead><tr><th>#</th><th>Jugador</th><th>Equipo</th><th>Goles</th></tr></thead><tbody>"
         for idx, row in df_g.iterrows():
             pos = idx + 1
             logo = logos_equipos.get(row['Equipo'], '')
             html_g += f"<tr><td>{pos}</td><td style='text-align:left;'>{row['Jugador']}</td><td><img src='{logo}' width='15'></td><td style='font-weight:bold;'>{row['Goles']}</td></tr>"
-        html_g += "</tbody></table></div>", unsafe_allow_html=True)
+        
+        # AQUÍ ESTABA EL ERROR, YA ESTÁ CORREGIDO:
+        html_g += "</tbody></table></div>"
         st.markdown(html_g, unsafe_allow_html=True)
         # =====================================================================
 # --- PESTAÑA 3: CAMPEONES (BASE DE DATOS HISTÓRICA INYECTADA POR IA) ---
