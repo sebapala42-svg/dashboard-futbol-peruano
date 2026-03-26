@@ -4,58 +4,6 @@ import pandas as pd
 # 1. CONFIGURACIÓN DE PÁGINA Y TEMA ROBUSTO
 st.set_page_config(page_title="Dashboard Descentralizado 2018 - Modo Pro", page_icon="⚽", layout="wide")
 
-# INYECCIÓN DE CSS AVANZADO: Fondo Verde Oscuro de la referencia, texto blanco y acentos
-st.markdown("""
-<style>
-    /* 1. Fondo principal verde oscuro como la imagen de referencia */
-    .stApp { background-color: #0c211b; color: #ffffff; }
-
-    /* 2. Títulos Principales en blanco neón */
-    h1, h2, h3, h4, .stHeader { color: #ffffff !important; font-family: 'Segoe UI', sans-serif; font-weight: bold;}
-    
-    /* 3. Estilo para las Tabs (Pestañas) - Fondo oscuro, texto blanco, acento verde al seleccionar */
-    .stTabs [data-baseweb="tab-list"] { gap: 8px; background-color: #0c211b; border-bottom: 2px solid #2e333b; }
-    .stTabs [data-baseweb="tab"] {
-        background-color: transparent;
-        color: #ffffff;
-        padding: 10px 20px;
-        font-weight: normal;
-    }
-    .stTabs [aria-selected="true"] {
-        background-color: transparent !important;
-        color: #3ddc84 !important; /* Verde Neón de acento al seleccionar */
-        font-weight: bold;
-        border-bottom: 2px solid #3ddc84 !important;
-    }
-
-    /* 4. Estilo de Dataframes (Tablas) - Fondo muy oscuro, borde verde */
-    .dataframe {
-        border: 1px solid #3ddc84;
-        background-color: #0c1613 !important;
-    }
-    .dataframe thead th {
-        background-color: #0c1613 !important;
-        color: #3ddc84 !important; /* Cabeceras verdes */
-        font-weight: bold;
-        text-align: center;
-        border-bottom: 2px solid #3ddc84;
-    }
-    .dataframe tbody td { text-align: center; color: #ffffff; background-color: #0c1613 !important; border: 1px solid #1a1d24;}
-
-    /* 5. Colores específicos para la Acumulada (Sutiles en modo oscuro) */
-    .Libertadores-f { background-color: #1e4620 !important; color: #ffffff !important; } /* Verde Oscuro */
-    .Sudamericana-f { background-color: #5e4a1c !important; color: #ffffff !important; } /* Amarillo Oscuro */
-    .Descenso-f { background-color: #581e23 !important; color: #ffffff !important; } /* Rojo Oscuro */
-
-    /* 6. Deslizador de Fecha - Color verde */
-    .stSlider [data-baseweb="slider-track"] > div > div { background: #3ddc84 !important; }
-    .stSlider [data-baseweb="slider-handle"] { background: #3ddc84 !important; }
-
-</style>
-""", unsafe_allow_html=True)
-
-st.title("⚽ Dashboard Interactivo - Descentralizado 2018")
-st.markdown("Bienvenido a la central de estadísticas. Cambia la fecha en el deslizador para viajar en el tiempo.")
 
 # --- BASE DE DATOS DE ESCUDOS 2018 (Enlaces Directos y Robustos) ---
 logos_equipos = {
