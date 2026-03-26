@@ -103,7 +103,7 @@ def cargar_datos():
     df_g = pd.read_excel('torneo_2018.xlsx', sheet_name='Registro_Goles')
     return df_p, df_g
 
-# --- DATOS REALES 2026 (TABLA FECHA 8 APERTURA SOFASCORE/DEPOR) ---
+# --- DATOS REALES 2026 (TABLA FECHA 8 APERTURA SOFASCORE) ---
 def obtener_datos_2026():
     data = [
         ['Alianza Lima', 20, 8, 6, 2, 0, 12, 4, 8, 'V E V V V'],
@@ -199,63 +199,70 @@ tab_fixture, tab_estadisticas, tab_campeones = st.tabs(["FIXTURE Y TABLAS", "EQU
 # --- TAB 1: FIXTURE Y TABLAS (LÓGICA DEPENDIENDO DEL AÑO) ---
 # =====================================================================
 if temporada == "2018":
+    # Quitamos el envoltorio try-except del renderizado para ver posibles errores reales.
+    # Solo atraparemos los errores fatales si el archivo derechamente no existe.
     try:
         df_partidos, df_goles = cargar_datos()
-        todos_equipos_2018 = sorted(list(df_partidos['Local'].unique()))
-        
-        with tab_fixture:
-            col_izq, col_der = st.columns([2.2, 1.0]) 
-            
-            with col_der:
-                st.markdown("<div class='titulo-panel' style='color:#8cc63f; margin-bottom: 5px;'>TEMPORADA 2018</div>", unsafe_allow_html=True)
-                fechas_disponibles = [f"FECHA {i}" for i in range(1, 45)]
-                fecha_texto = st.selectbox("Selecciona Fecha", fechas_disponibles, index=29) 
-                fecha_seleccionada = int(fecha_texto.replace("FECHA ", ""))
-                
-                st.markdown("<div class='panel-verde' style='padding: 0;'><div class='contenedor-partidos'>", unsafe_allow_html=True)
-                partidos_fecha = df_partidos[df_partidos['Fecha_Global'] == fecha_seleccionada]
-                if not partidos_fecha.empty:
-                    html_p = ""
-                    for _, row in partidos_fecha.iterrows():
-                        loc, vis, gl, gv = row['Local'], row['Visitante'], row['GL'], row['GV']
-                        l_logo, v_logo = logos_equipos.get(loc, ''), logos_equipos.get(vis, '')
-                        html_p += f"<div class='fila-partido'><span style='color:white; font-size:10px; font-weight:bold;'>Final</span><div style='display:flex; align-items:center; width: 85%; justify-content: center;'><span style='text-align:right; width:40%; font-size:12px; color:#ffffff; font-weight:bold;'>{loc}</span><img src='{l_logo}' width='18' height='18' style='object-fit:contain; margin: 0 5px;' onerror=\"this.style.display='none'\"><div class='marcador-contenedor'><div class='gol-cajita'>{gl}</div><div class='separador-guion'>-</div><div class='gol-cajita'>{gv}</div></div><img src='{v_logo}' width='18' height='18' style='object-fit:contain; margin: 0 5px;' onerror=\"this.style.display='none'\"><span style='text-align:left; width:40%; font-size:12px; color:#ffffff; font-weight:bold;'>{vis}</span></div></div>"
-                    st.markdown(html_p, unsafe_allow_html=True)
-                else:
-                    st.markdown("<p style='text-align:center; font-size:12px; padding: 15px;'>No hay partidos registrados.</p>", unsafe_allow_html=True)
-                st.markdown("</div></div>", unsafe_allow_html=True)
-
-                st.markdown("<div class='panel-verde'><div class='titulo-panel'>GOLEADORES</div>", unsafe_allow_html=True)
-                df_g = df_goles.dropna(subset=['Fecha_Global', 'Jugador'])
-                df_g = df_g[df_g['Fecha_Global'] <= fecha_seleccionada]
-                if not df_g.empty:
-                    df_g = df_g.groupby(['Jugador', 'Equipo'])['Goles'].sum().reset_index().sort_values(by='Goles', ascending=False).head(10)
-                    html_g = "<table class='tabla-pro'><thead><tr><th style='text-align:left;'>Jugador</th><th>Goles</th></tr></thead><tbody>"
-                    for _, row in df_g.iterrows():
-                        html_g += f"<tr><td style='text-align:left; color:#ffffff;'><img src='{logos_equipos.get(row['Equipo'], '')}' width='15' height='15' style='object-fit:contain; vertical-align:middle; margin-right:5px;' onerror=\"this.style.display='none'\"> {row['Jugador']}</td><td style='font-weight:bold; color:#ffffff;'>{row['Goles']}</td></tr>"
-                    html_g += "</tbody></table>"
-                    st.markdown(html_g, unsafe_allow_html=True)
-                else:
-                    st.markdown("<p style='text-align:center; font-size:12px;'>Aún no hay goles registrados.</p>", unsafe_allow_html=True)
-                st.markdown("</div>", unsafe_allow_html=True)
-
-            with col_izq:
-                if fecha_seleccionada <= 14:
-                    st.markdown("<div class='titulo-panel'>TORNEO DE VERANO</div>", unsafe_allow_html=True)
-                    df_verano = df_partidos[(df_partidos['Fecha_Global'] <= fecha_seleccionada) & (df_partidos['Torneo'] == 'Verano')]
-                    st.markdown(generar_html_tabla_2018(df_verano, equipo_A, "", zona="ZONA A", f_sel=fecha_seleccionada), unsafe_allow_html=True)
-                    st.markdown(generar_html_tabla_2018(df_verano, equipo_B, "", zona="ZONA B", f_sel=fecha_seleccionada), unsafe_allow_html=True)
-                elif fecha_seleccionada <= 29:
-                    df_apertura = df_partidos[(df_partidos['Fecha_Global'] >= 15) & (df_partidos['Fecha_Global'] <= fecha_seleccionada) & (df_partidos['Torneo'] == 'Apertura')]
-                    st.markdown(generar_html_tabla_2018(df_apertura, todos_equipos_2018, "TORNEO APERTURA", zona="ZONA ÚNICA", f_sel=fecha_seleccionada), unsafe_allow_html=True)
-                else:
-                    df_clausura = df_partidos[(df_partidos['Fecha_Global'] >= 30) & (df_partidos['Fecha_Global'] <= min(fecha_seleccionada, 44)) & (df_partidos['Torneo'] == 'Clausura')]
-                    st.markdown(generar_html_tabla_2018(df_clausura, todos_equipos_2018, "TORNEO CLAUSURA", zona="ZONA ÚNICA", f_sel=fecha_seleccionada), unsafe_allow_html=True)
-
-                df_acu = df_partidos[df_partidos['Fecha_Global'] <= min(fecha_seleccionada, 44)]
-                st.markdown(generar_html_tabla_2018(df_acu, todos_equipos_2018, f"TABLA ACUMULADA (HASTA LA FECHA {fecha_seleccionada})", es_acumulado=True, f_sel=fecha_seleccionada), unsafe_allow_html=True)
+    except FileNotFoundError:
+        st.error("🚨 Error crítico: No se encontró el archivo 'torneo_2018.xlsx'. Súbelo a tu GitHub.")
+        st.stop()
     except Exception as e:
-        st.error("⚠️ Sube tu archivo 'torneo_2018.xlsx' a GitHub.")
+        st.error(f"🚨 Error interno leyendo el Excel: {e}")
+        st.stop()
+        
+    todos_equipos_2018 = sorted(list(df_partidos['Local'].unique()))
+    
+    with tab_fixture:
+        col_izq, col_der = st.columns([2.2, 1.0]) 
+        
+        with col_der:
+            st.markdown("<div class='titulo-panel' style='color:#8cc63f; margin-bottom: 5px;'>TEMPORADA 2018</div>", unsafe_allow_html=True)
+            fechas_disponibles = [f"FECHA {i}" for i in range(1, 45)]
+            fecha_texto = st.selectbox("Selecciona Fecha", fechas_disponibles, index=29) 
+            fecha_seleccionada = int(fecha_texto.replace("FECHA ", ""))
+            
+            st.markdown("<div class='panel-verde' style='padding: 0;'><div class='contenedor-partidos'>", unsafe_allow_html=True)
+            partidos_fecha = df_partidos[df_partidos['Fecha_Global'] == fecha_seleccionada]
+            if not partidos_fecha.empty:
+                html_p = ""
+                for _, row in partidos_fecha.iterrows():
+                    loc, vis, gl, gv = row['Local'], row['Visitante'], row['GL'], row['GV']
+                    l_logo, v_logo = logos_equipos.get(loc, ''), logos_equipos.get(vis, '')
+                    html_p += f"<div class='fila-partido'><span style='color:white; font-size:10px; font-weight:bold;'>Final</span><div style='display:flex; align-items:center; width: 85%; justify-content: center;'><span style='text-align:right; width:40%; font-size:12px; color:#ffffff; font-weight:bold;'>{loc}</span><img src='{l_logo}' width='18' height='18' style='object-fit:contain; margin: 0 5px;' onerror=\"this.style.display='none'\"><div class='marcador-contenedor'><div class='gol-cajita'>{gl}</div><div class='separador-guion'>-</div><div class='gol-cajita'>{gv}</div></div><img src='{v_logo}' width='18' height='18' style='object-fit:contain; margin: 0 5px;' onerror=\"this.style.display='none'\"><span style='text-align:left; width:40%; font-size:12px; color:#ffffff; font-weight:bold;'>{vis}</span></div></div>"
+                st.markdown(html_p, unsafe_allow_html=True)
+            else:
+                st.markdown("<p style='text-align:center; font-size:12px; padding: 15px;'>No hay partidos registrados.</p>", unsafe_allow_html=True)
+            st.markdown("</div></div>", unsafe_allow_html=True)
+
+            st.markdown("<div class='panel-verde'><div class='titulo-panel'>GOLEADORES</div>", unsafe_allow_html=True)
+            df_g = df_goles.dropna(subset=['Fecha_Global', 'Jugador'])
+            df_g = df_g[df_g['Fecha_Global'] <= fecha_seleccionada]
+            if not df_g.empty:
+                df_g = df_g.groupby(['Jugador', 'Equipo'])['Goles'].sum().reset_index().sort_values(by='Goles', ascending=False).head(10)
+                html_g = "<table class='tabla-pro'><thead><tr><th style='text-align:left;'>Jugador</th><th>Goles</th></tr></thead><tbody>"
+                for _, row in df_g.iterrows():
+                    html_g += f"<tr><td style='text-align:left; color:#ffffff;'><img src='{logos_equipos.get(row['Equipo'], '')}' width='15' height='15' style='object-fit:contain; vertical-align:middle; margin-right:5px;' onerror=\"this.style.display='none'\"> {row['Jugador']}</td><td style='font-weight:bold; color:#ffffff;'>{row['Goles']}</td></tr>"
+                html_g += "</tbody></table>"
+                st.markdown(html_g, unsafe_allow_html=True)
+            else:
+                st.markdown("<p style='text-align:center; font-size:12px;'>Aún no hay goles registrados.</p>", unsafe_allow_html=True)
+            st.markdown("</div>", unsafe_allow_html=True)
+
+        with col_izq:
+            if fecha_seleccionada <= 14:
+                st.markdown("<div class='titulo-panel'>TORNEO DE VERANO</div>", unsafe_allow_html=True)
+                df_verano = df_partidos[(df_partidos['Fecha_Global'] <= fecha_seleccionada) & (df_partidos['Torneo'] == 'Verano')]
+                st.markdown(generar_html_tabla_2018(df_verano, equipo_A, "", zona="ZONA A", f_sel=fecha_seleccionada), unsafe_allow_html=True)
+                st.markdown(generar_html_tabla_2018(df_verano, equipo_B, "", zona="ZONA B", f_sel=fecha_seleccionada), unsafe_allow_html=True)
+            elif fecha_seleccionada <= 29:
+                df_apertura = df_partidos[(df_partidos['Fecha_Global'] >= 15) & (df_partidos['Fecha_Global'] <= fecha_seleccionada) & (df_partidos['Torneo'] == 'Apertura')]
+                st.markdown(generar_html_tabla_2018(df_apertura, todos_equipos_2018, "TORNEO APERTURA", zona="ZONA ÚNICA", f_sel=fecha_seleccionada), unsafe_allow_html=True)
+            else:
+                df_clausura = df_partidos[(df_partidos['Fecha_Global'] >= 30) & (df_partidos['Fecha_Global'] <= min(fecha_seleccionada, 44)) & (df_partidos['Torneo'] == 'Clausura')]
+                st.markdown(generar_html_tabla_2018(df_clausura, todos_equipos_2018, "TORNEO CLAUSURA", zona="ZONA ÚNICA", f_sel=fecha_seleccionada), unsafe_allow_html=True)
+
+            df_acu = df_partidos[df_partidos['Fecha_Global'] <= min(fecha_seleccionada, 44)]
+            st.markdown(generar_html_tabla_2018(df_acu, todos_equipos_2018, f"TABLA ACUMULADA (HASTA LA FECHA {fecha_seleccionada})", es_acumulado=True, f_sel=fecha_seleccionada), unsafe_allow_html=True)
 
 elif temporada == "2026":
     df_26 = obtener_datos_2026()
@@ -272,8 +279,8 @@ elif temporada == "2026":
             st.markdown(html_26, unsafe_allow_html=True)
             
         with col_der:
-            st.markdown("<div class='panel-verde'><div class='titulo-panel'>ACERCA DE LA LIGA 1 2026</div>", unsafe_allow_html=True)
-            st.markdown("<p style='text-align:center; font-size:12px;'>Alianza Lima y Los Chankas lideran el torneo con 20 puntos cada uno al término de la Fecha 8.<br><br><i>Datos oficiales actualizados a Marzo 2026.</i></p></div>", unsafe_allow_html=True)
+            st.markdown("<div class='panel-verde'><div class='titulo-panel'>INFO LIGA 1</div>", unsafe_allow_html=True)
+            st.markdown("<p style='text-align:center; font-size:12px;'>Alianza Lima y Los Chankas lideran el torneo con 20 puntos cada uno al término de la Fecha 8.<br><br><i>Datos oficiales de Sofascore actualizados a Marzo 2026.</i></p></div>", unsafe_allow_html=True)
 
 # =====================================================================
 # --- TAB 2: EQUIPOS Y ESTADÍSTICAS (SOLO LA CUADRÍCULA DE EQUIPOS) ---
