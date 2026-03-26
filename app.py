@@ -8,7 +8,7 @@ st.set_page_config(page_title="Liga Peruana 2018", page_icon="🏆", layout="wid
 st.markdown("""
 <style>
     /* Fondo principal de la página (Verde medio oscuro) */
-    .stApp { background-color: #0b3c24; color: #ffffff; }
+    .stApp { background-color: #0b6730; color: #ffffff; }
     .block-container { padding-top: 1rem; padding-bottom: 1rem; max-width: 1300px; }
     header {visibility: hidden;}
     footer {visibility: hidden;}
