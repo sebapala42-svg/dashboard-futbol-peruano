@@ -4,11 +4,11 @@ import pandas as pd
 # 1. CONFIGURACIÓN DE PÁGINA
 st.set_page_config(page_title="Liga Peruana 2018", page_icon="🏆", layout="wide")
 
-# 2. INYECCIÓN DE CSS EXTREMO (CONTRASTE DE VERDES)
+# 2. INYECCIÓN DE CSS (MODO INTERCALADO Y LETRAS BLANCAS)
 st.markdown("""
 <style>
-    /* Fondo principal de la página (Verde medio oscuro) */
-    .stApp { background-color: #0b3c24; color: #ffffff; }
+    /* Fondo principal de la página (Verde pasto) */
+    .stApp { background-color: #0b4026; color: #ffffff; }
     .block-container { padding-top: 1rem; padding-bottom: 1rem; max-width: 1300px; }
     header {visibility: hidden;}
     footer {visibility: hidden;}
@@ -17,30 +17,38 @@ st.markdown("""
     .stTabs [data-baseweb="tab"] { color: #87b897; padding: 8px 20px; font-weight: bold; font-size: 13px; background-color: transparent; }
     .stTabs [aria-selected="true"] { color: #ffffff !important; border-bottom: 3px solid #8cc63f !important; }
     
-    /* Contenedores de las tablas (Verde MUY oscuro para que resalten) */
-    .panel-verde { background-color: #1b402a; border: 1px solid #1b402a; border-radius: 6px; padding: 10px; margin-bottom: 15px;}
-    .titulo-panel { text-align: center; color: #ffffff; font-weight: bold; font-size: 13px; margin-bottom: 10px; text-transform: uppercase; }
-    .subtitulo-zona { background-color: #03120a; color: white; padding: 5px 10px; font-weight: bold; font-size: 11px; border-bottom: 2px solid #104225; border-top-left-radius: 6px; border-top-right-radius: 6px;}
+    /* Contenedores de las tablas (Borde redondeado, fondo oscuro) */
+    .panel-verde { background-color: #112d1e; border: 1px solid #1a4a2e; border-radius: 8px; padding: 10px 15px; margin-bottom: 15px;}
+    .titulo-panel { text-align: center; color: #ffffff; font-weight: bold; font-size: 14px; margin-bottom: 10px; text-transform: uppercase; }
+    .subtitulo-zona { background-color: #0d2418; color: white; padding: 6px 10px; font-weight: bold; font-size: 12px; border-bottom: 2px solid #1a4a2e; border-top-left-radius: 6px; border-top-right-radius: 6px;}
     
-    /* Diseño de Tablas */
-    .tabla-pro { width: 100%; border-collapse: collapse; color: #ffffff; font-size: 11.5px; font-family: sans-serif; margin-bottom: 5px;}
-    .tabla-pro th { background-color: #1b402a; color: #a1b5a8; border-bottom: 2px solid #104225; padding: 4px 2px; text-align: center; font-weight: normal; font-size: 10px;}
-    .tabla-pro td { padding: 4px 2px; border-bottom: 1px solid #104225; text-align: center; }
+    /* DISEÑO DE TABLAS - EFECTO INTERCALADO */
+    .tabla-pro { width: 100%; border-collapse: collapse; color: #ffffff; font-size: 12px; font-family: sans-serif; margin-bottom: 5px;}
+    
+    /* Cabecera de la tabla */
+    .tabla-pro th { background-color: #0d2418; color: #a1b5a8; border-bottom: 1px solid #1a4a2e; padding: 6px 4px; text-align: center; font-weight: normal; font-size: 11px;}
+    
+    /* Celdas sin bordes inferiores para que luzca el intercalado */
+    .tabla-pro td { padding: 6px 4px; border-bottom: none; text-align: center; color: #ffffff !important; }
     .tabla-pro td:nth-child(2) { text-align: left; font-weight: bold; } 
-    .tabla-pro tr:hover { background-color: #0a301a; }
+    
+    /* EL SECRETO: Filas Impar y Par (Zebra Striping) */
+    .tabla-pro tbody tr:nth-child(odd) { background-color: #153625; } /* Verde claro */
+    .tabla-pro tbody tr:nth-child(even) { background-color: #112d1e; } /* Verde oscuro */
+    .tabla-pro tbody tr:hover { background-color: #1c4531; } /* Brillo al pasar el mouse */
     
     .stSelectbox label { display: none; } 
-    .stSelectbox div[data-baseweb="select"] { background-color: #051d10; border: 1px solid #8cc63f; border-radius: 4px; color: white; font-size: 12px; min-height: 30px;}
-    h2 { font-size: 1.4rem !important; margin-bottom: 10px !important; padding-bottom: 0px !important;}
+    .stSelectbox div[data-baseweb="select"] { background-color: #0d2418; border: 1px solid #8cc63f; border-radius: 4px; color: white; font-size: 13px; min-height: 30px;}
+    h2 { font-size: 1.5rem !important; margin-bottom: 10px !important; padding-bottom: 0px !important;}
 
-    /* ALINEACIÓN PERFECTA DEL MARCADOR */
+    /* ALINEACIÓN DE MARCADORES */
     .marcador-contenedor { display: flex; align-items: center; justify-content: center; gap: 2px; margin: 0 10px; }
-    .gol-cajita { background-color: #03120a; border: 1px solid #104225; border-radius: 4px; color: #ffffff; font-weight: bold; font-size: 14px; width: 25px; height: 25px; display: flex; align-items: center; justify-content: center; }
+    .gol-cajita { background-color: #0d2418; border: 1px solid #1a4a2e; border-radius: 4px; color: #ffffff; font-weight: bold; font-size: 14px; width: 25px; height: 25px; display: flex; align-items: center; justify-content: center; }
     .separador-guion { color: #8cc63f; font-weight: bold; font-size: 14px; }
 </style>
 """, unsafe_allow_html=True)
 
-# --- TUS LINKS DE ESCUDOS OFICIALES ---
+# --- LINKS OFICIALES ---
 logos_equipos = {
     'Alianza Lima': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQwKgmyy62z_gymuS4MunKwkb5ibjpHdw4RFA&s',
     'Ayacucho FC': 'https://tmssl.akamaized.net//images/wappen/head/21178.png?lm=1420973967',
@@ -81,7 +89,7 @@ st.markdown("<h2 style='text-align: center; color: white;'>LIGA PROFESIONAL PERU
 
 tab_fixture, tab_estadisticas, tab_campeones = st.tabs(["FIXTURE Y TABLAS", "EQUIPOS Y ESTADISTICAS", "CAMPEONES"])
 
-# --- MOTOR CREADOR DE TABLAS (100% COMPRIMIDO PARA STREAMLIT) ---
+# --- MOTOR CREADOR DE TABLAS ---
 def generar_html_tabla(df_filtro, lista_equipos, titulo_panel, es_acumulado=False, zona=""):
     tabla_datos = []
     for equipo in lista_equipos:
@@ -130,10 +138,9 @@ def generar_html_tabla(df_filtro, lista_equipos, titulo_panel, es_acumulado=Fals
         else:
             if pos == 1: borde = "#3db4dc"
             
-        html += f"<tr><td style='border-left: 3px solid {borde}; font-weight:bold;'>{pos}</td><td style='text-align:left;'><img src='{logo}' width='15' height='15' style='object-fit:contain; vertical-align:middle; margin-right:6px;' onerror=\"this.style.display='none'\"> {row['Equipo']}</td><td style='font-weight:bold; font-size:12.5px;'>{row['PTS']}</td><td>{row['J']}</td><td>{row['GF']}:{row['GC']}</td><td>{row['+/-']}</td><td>{row['G']}</td><td>{row['E']}</td><td>{row['P']}</td><td>{row['Racha']}</td></tr>"
+        html += f"<tr><td style='border-left: 3px solid {borde}; font-weight:bold;'>{pos}</td><td style='text-align:left;'><img src='{logo}' width='15' height='15' style='object-fit:contain; vertical-align:middle; margin-right:6px;' onerror=\"this.style.display='none'\"> <span style='color:#ffffff;'>{row['Equipo']}</span></td><td style='font-weight:bold; font-size:13px; color:#ffffff;'>{row['PTS']}</td><td style='color:#ffffff;'>{row['J']}</td><td style='color:#ffffff;'>{row['GF']}:{row['GC']}</td><td style='color:#ffffff;'>{row['+/-']}</td><td style='color:#ffffff;'>{row['G']}</td><td style='color:#ffffff;'>{row['E']}</td><td style='color:#ffffff;'>{row['P']}</td><td>{row['Racha']}</td></tr>"
     html += "</tbody></table></div>"
     return html
-
 
 # --- RENDERIZADO VISUAL ---
 with tab_fixture:
@@ -154,10 +161,10 @@ with tab_fixture:
             for _, row in partidos_fecha.iterrows():
                 loc, vis, gl, gv = row['Local'], row['Visitante'], row['GL'], row['GV']
                 l_logo, v_logo = logos_equipos.get(loc, ''), logos_equipos.get(vis, '')
-                html_p += f"<div style='display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid #1a4a2e; padding: 6px 0;'><span style='color:white; font-size:10px; font-weight:bold;'>Final</span><div style='display:flex; align-items:center; width: 85%; justify-content: center;'><span style='text-align:right; width:40%; font-size:11px;'>{loc}</span><img src='{l_logo}' width='15' height='15' style='object-fit:contain; margin: 0 5px;' onerror=\"this.style.display='none'\"><div class='marcador-contenedor'><div class='gol-cajita'>{gl}</div><div class='separador-guion'>-</div><div class='gol-cajita'>{gv}</div></div><img src='{v_logo}' width='15' height='15' style='object-fit:contain; margin: 0 5px;' onerror=\"this.style.display='none'\"><span style='text-align:left; width:40%; font-size:11px;'>{vis}</span></div></div>"
+                html_p += f"<div style='display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid #1a4a2e; padding: 8px 0;'><span style='color:white; font-size:10px; font-weight:bold;'>Final</span><div style='display:flex; align-items:center; width: 85%; justify-content: center;'><span style='text-align:right; width:40%; font-size:12px; color:#ffffff; font-weight:bold;'>{loc}</span><img src='{l_logo}' width='18' height='18' style='object-fit:contain; margin: 0 5px;' onerror=\"this.style.display='none'\"><div class='marcador-contenedor'><div class='gol-cajita'>{gl}</div><div class='separador-guion'>-</div><div class='gol-cajita'>{gv}</div></div><img src='{v_logo}' width='18' height='18' style='object-fit:contain; margin: 0 5px;' onerror=\"this.style.display='none'\"><span style='text-align:left; width:40%; font-size:12px; color:#ffffff; font-weight:bold;'>{vis}</span></div></div>"
             st.markdown(html_p, unsafe_allow_html=True)
         else:
-            st.markdown("<p style='text-align:center; font-size:11px;'>No hay partidos registrados.</p>", unsafe_allow_html=True)
+            st.markdown("<p style='text-align:center; font-size:12px;'>No hay partidos registrados.</p>", unsafe_allow_html=True)
         st.markdown("</div>", unsafe_allow_html=True)
 
         # GOLEADORES
@@ -168,19 +175,21 @@ with tab_fixture:
             df_g = df_g.groupby(['Jugador', 'Equipo'])['Goles'].sum().reset_index().sort_values(by='Goles', ascending=False).head(10)
             html_g = "<table class='tabla-pro'><thead><tr><th style='text-align:left;'>Jugador</th><th>Goles</th></tr></thead><tbody>"
             for _, row in df_g.iterrows():
-                html_g += f"<tr><td style='text-align:left;'><img src='{logos_equipos.get(row['Equipo'], '')}' width='14' height='14' style='object-fit:contain; vertical-align:middle; margin-right:5px;' onerror=\"this.style.display='none'\"> {row['Jugador']}</td><td style='font-weight:bold;'>{row['Goles']}</td></tr>"
+                html_g += f"<tr><td style='text-align:left; color:#ffffff;'><img src='{logos_equipos.get(row['Equipo'], '')}' width='15' height='15' style='object-fit:contain; vertical-align:middle; margin-right:5px;' onerror=\"this.style.display='none'\"> {row['Jugador']}</td><td style='font-weight:bold; color:#ffffff;'>{row['Goles']}</td></tr>"
             html_g += "</tbody></table>"
             st.markdown(html_g, unsafe_allow_html=True)
         else:
-            st.markdown("<p style='text-align:center; font-size:11px;'>Aún no hay goles registrados.</p>", unsafe_allow_html=True)
+            st.markdown("<p style='text-align:center; font-size:12px;'>Aún no hay goles registrados.</p>", unsafe_allow_html=True)
         st.markdown("</div>", unsafe_allow_html=True)
 
     with col_izq:
-        # 4. TABLAS DINÁMICAS (LADO IZQUIERDO)
+        # TABLAS DE TORNEO CORTO
         if fecha_seleccionada <= 14:
+            st.markdown("<div class='panel-verde'><div class='titulo-panel'>TORNEO DE VERANO</div>", unsafe_allow_html=True)
             df_verano = df_partidos[(df_partidos['Fecha_Global'] <= fecha_seleccionada) & (df_partidos['Torneo'] == 'Verano')]
-            st.markdown(generar_html_tabla(df_verano, equipo_A, "TORNEO DE VERANO", zona="ZONA A"), unsafe_allow_html=True)
-            st.markdown(generar_html_tabla(df_verano, equipo_B, "TORNEO DE VERANO", zona="ZONA B"), unsafe_allow_html=True)
+            st.markdown(generar_html_tabla(df_verano, equipo_A, "", zona="ZONA A"), unsafe_allow_html=True)
+            st.markdown(generar_html_tabla(df_verano, equipo_B, "", zona="ZONA B"), unsafe_allow_html=True)
+            st.markdown("</div>", unsafe_allow_html=True)
         elif fecha_seleccionada <= 29:
             df_apertura = df_partidos[(df_partidos['Fecha_Global'] >= 15) & (df_partidos['Fecha_Global'] <= fecha_seleccionada) & (df_partidos['Torneo'] == 'Apertura')]
             st.markdown(generar_html_tabla(df_apertura, todos_equipos, "TORNEO APERTURA", zona="ZONA ÚNICA"), unsafe_allow_html=True)
@@ -188,6 +197,6 @@ with tab_fixture:
             df_clausura = df_partidos[(df_partidos['Fecha_Global'] >= 30) & (df_partidos['Fecha_Global'] <= min(fecha_seleccionada, 44)) & (df_partidos['Torneo'] == 'Clausura')]
             st.markdown(generar_html_tabla(df_clausura, todos_equipos, "TORNEO CLAUSURA", zona="ZONA ÚNICA"), unsafe_allow_html=True)
 
-        # TABLA ACUMULADA
+        # TABLA ACUMULADA (Siempre Visible)
         df_acu = df_partidos[df_partidos['Fecha_Global'] <= min(fecha_seleccionada, 44)]
         st.markdown(generar_html_tabla(df_acu, todos_equipos, f"TABLA ACUMULADA (HASTA LA FECHA {fecha_seleccionada})", es_acumulado=True), unsafe_allow_html=True)
