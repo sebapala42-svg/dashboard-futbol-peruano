@@ -63,7 +63,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# --- LINKS OFICIALES AMPLIADOS (Agregados los de 2026) ---
+# --- LINKS OFICIALES AMPLIADOS ---
 logos_equipos = {
     'Alianza Lima': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQwKgmyy62z_gymuS4MunKwkb5ibjpHdw4RFA&s',
     'Ayacucho FC': 'https://tmssl.akamaized.net//images/wappen/head/21178.png?lm=1420973967',
@@ -103,7 +103,7 @@ def cargar_datos():
     df_g = pd.read_excel('torneo_2018.xlsx', sheet_name='Registro_Goles')
     return df_p, df_g
 
-# --- DATOS REALES 2026 (TABLA FECHA 8 APERTURA SOFASCORE) ---
+# --- DATOS REALES 2026 (TABLA FECHA 8 APERTURA SOFASCORE/DEPOR) ---
 def obtener_datos_2026():
     data = [
         ['Alianza Lima', 20, 8, 6, 2, 0, 12, 4, 8, 'V E V V V'],
@@ -134,7 +134,7 @@ def formatear_racha(racha_str):
         html += f"<span style='background-color:{c}; color:white; padding: 1px 4px; border-radius:2px; font-size:8.5px; margin:0 1px; font-weight:bold;'>{char}</span>"
     return html
 
-# --- MOTOR CREADOR DE TABLAS (TU LÓGICA ORIGINAL PARA 2018) ---
+# --- MOTOR CREADOR DE TABLAS (LÓGICA ORIGINAL PARA 2018) ---
 def generar_html_tabla_2018(df_filtro, lista_equipos, titulo_panel, es_acumulado=False, zona="", f_sel=44):
     tabla_datos = []
     for equipo in lista_equipos:
@@ -199,8 +199,6 @@ tab_fixture, tab_estadisticas, tab_campeones = st.tabs(["FIXTURE Y TABLAS", "EQU
 # --- TAB 1: FIXTURE Y TABLAS (LÓGICA DEPENDIENDO DEL AÑO) ---
 # =====================================================================
 if temporada == "2018":
-    # Quitamos el envoltorio try-except del renderizado para ver posibles errores reales.
-    # Solo atraparemos los errores fatales si el archivo derechamente no existe.
     try:
         df_partidos, df_goles = cargar_datos()
     except FileNotFoundError:
@@ -210,7 +208,8 @@ if temporada == "2018":
         st.error(f"🚨 Error interno leyendo el Excel: {e}")
         st.stop()
         
-    todos_equipos_2018 = sorted(list(df_partidos['Local'].unique()))
+    # LA CORRECCIÓN CLAVE: dropna() para ignorar filas vacías de Excel
+    todos_equipos_2018 = sorted(list(df_partidos['Local'].dropna().unique()))
     
     with tab_fixture:
         col_izq, col_der = st.columns([2.2, 1.0]) 
@@ -280,7 +279,7 @@ elif temporada == "2026":
             
         with col_der:
             st.markdown("<div class='panel-verde'><div class='titulo-panel'>INFO LIGA 1</div>", unsafe_allow_html=True)
-            st.markdown("<p style='text-align:center; font-size:12px;'>Alianza Lima y Los Chankas lideran el torneo con 20 puntos cada uno al término de la Fecha 8.<br><br><i>Datos oficiales de Sofascore actualizados a Marzo 2026.</i></p></div>", unsafe_allow_html=True)
+            st.markdown("<p style='text-align:center; font-size:12px;'>Alianza Lima y Los Chankas lideran el torneo con 20 puntos cada uno al término de la Fecha 8.<br><br><i>Datos oficiales actualizados a Marzo 2026.</i></p></div>", unsafe_allow_html=True)
 
 # =====================================================================
 # --- TAB 2: EQUIPOS Y ESTADÍSTICAS (SOLO LA CUADRÍCULA DE EQUIPOS) ---
