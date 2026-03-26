@@ -1,7 +1,12 @@
 'use client';
 import React, { useState, useMemo } from 'react';
-// Ruta corregida: busca el JSON en la misma carpeta "app"
 import partidosJSON from './torneo_2018.json';
+
+// --- EL TRUCO SALVAVIDAS ---
+// Si el conversor lo metió en un objeto (ej. { "BaseDatos": [...] }), esto saca la lista real.
+const listaPartidos = Array.isArray(partidosJSON) 
+  ? partidosJSON 
+  : (partidosJSON.BaseDatos || Object.values(partidosJSON)[0] || []);
 
 export default function Home() {
   const [fecha, setFecha] = useState(29);
@@ -29,9 +34,9 @@ export default function Home() {
   const equipo_A = ['Sporting Cristal', 'Sport Rosario', 'UTC', 'U. San Martin', 'Alianza Lima', 'Comerciantes Unidos', 'Ayacucho FC', 'Universitario'];
   const equipo_B = ['Sport Huancayo', 'FBC Melgar', 'Cantolao', 'Dep. Municipal', 'Sport Boys', 'Cusco (Garcilaso)', 'Binacional', 'Union Comercio'];
 
-  // Filtramos la data hasta la fecha seleccionada
+  // Filtramos la data hasta la fecha seleccionada usando la lista extraída
   const partidosValidos = useMemo(() => {
-    return partidosJSON.filter(p => p.Fecha_Global <= fecha && p.GL !== null && p.GV !== null);
+    return listaPartidos.filter(p => p.Fecha_Global <= fecha && p.GL !== null && p.GV !== null);
   }, [fecha]);
 
   // --- MOTOR UNIVERSAL DE TABLAS EN JAVASCRIPT ---
@@ -163,7 +168,7 @@ export default function Home() {
               </select>
             </div>
             <div className="flex flex-col max-h-[600px] overflow-y-auto">
-              {partidosJSON.filter(p => p.Fecha_Global === fecha).map((p, idx) => (
+              {listaPartidos.filter(p => p.Fecha_Global === fecha).map((p, idx) => (
                 <div key={idx} className="flex items-center p-3 border-b border-[#1a4a2e] hover:bg-[#1a4a2e]/50 transition-colors">
                   <div className="flex-1 flex justify-center items-center gap-2">
                     <div className="flex items-center gap-2 w-full justify-end">
