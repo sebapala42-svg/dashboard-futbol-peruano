@@ -83,7 +83,7 @@ export default function Home() {
   const TablaComponent = ({ titulo, zona, datos, esAcumulado }) => (
     <div className="bg-[#112d1e] border border-[#1a4a2e] rounded-lg overflow-hidden mb-6">
       <div className="bg-[#0d2418] p-2 text-center border-b border-[#1a4a2e]">
-        <h3 className="text-xs font-bold text-white uppercase">{titulo}</h3>
+        <h3 className="text-[13px] font-bold text-white uppercase">{titulo}</h3>
         {zona && <span className="text-[10px] font-bold text-[#8cc63f] uppercase">{zona}</span>}
       </div>
       <div className="overflow-x-auto">
@@ -117,8 +117,13 @@ export default function Home() {
                 <tr key={eq.equipo} className={`border-b border-transparent hover:bg-[#1c4531] transition-colors ${i % 2 === 0 ? 'bg-[#153625]' : 'bg-[#112d1e]'}`}>
                   <td className="p-2 font-bold border-l-4" style={{ borderLeftColor: bordeColor }}>{i + 1}</td>
                   <td className="p-2 text-left flex items-center gap-2 font-bold">
-                    <img src={logos[eq.equipo]} className="w-5 h-5 min-w-[20px] object-contain" alt={eq.equipo} />
-                    <span className="text-white truncate">{eq.equipo}</span>
+                    {/* CAMISA DE FUERZA PARA LA IMAGEN */}
+                    <img 
+                      src={logos[eq.equipo] || 'https://cdn-icons-png.flaticon.com/128/33/33736.png'} 
+                      alt={eq.equipo} 
+                      style={{ width: '20px', height: '20px', objectFit: 'contain', flexShrink: 0 }} 
+                    />
+                    <span className="text-white whitespace-nowrap">{eq.equipo}</span>
                   </td>
                   <td className="p-2 font-bold text-sm text-white">{eq.pts}</td>
                   <td className="p-2 text-white">{eq.pj}</td>
@@ -148,20 +153,21 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-[#0b4026] text-white font-sans selection:bg-[#8cc63f] selection:text-black">
       <header className="pt-6 pb-2 text-center">
-        <h1 className="text-2xl font-bold uppercase text-white">LIGA PROFESIONAL PERUANA 2018</h1>
+        <h1 className="text-xl md:text-2xl font-bold uppercase text-white">LIGA PROFESIONAL PERUANA 2018</h1>
       </header>
 
-      {/* Tabs */}
-      <nav className="flex justify-center border-b border-[#1a4a2e] max-w-6xl mx-auto mb-6">
-        <button className="px-6 py-2 text-xs font-bold uppercase border-b-2 border-[#8cc63f] text-white">Fixture y Tablas</button>
-        <button className="px-6 py-2 text-xs font-bold uppercase text-gray-400 hover:text-white transition-colors">Equipos y Estadisticas</button>
-        <button className="px-6 py-2 text-xs font-bold uppercase text-gray-400 hover:text-white transition-colors">Campeones</button>
+      {/* Tabs Clásico Promiedos */}
+      <nav className="flex justify-center border-b border-[#1a4a2e] max-w-5xl mx-auto mb-6">
+        <button className="px-6 py-2 text-xs font-bold uppercase border-b-[3px] border-[#8cc63f] text-white">Fixture y Tablas</button>
+        <button className="px-6 py-2 text-xs font-bold uppercase text-[#87b897] hover:text-white transition-colors">Equipos y Estadisticas</button>
+        <button className="px-6 py-2 text-xs font-bold uppercase text-[#87b897] hover:text-white transition-colors">Campeones</button>
       </nav>
 
-      <main className="max-w-[1400px] mx-auto p-4 lg:p-6 grid grid-cols-1 xl:grid-cols-[65%_35%] gap-6">
+      {/* Grid Principal ajustado para mejor visibilidad */}
+      <main className="max-w-[1100px] mx-auto p-4 grid grid-cols-1 lg:grid-cols-[65%_35%] gap-6 items-start">
         
         {/* PANEL IZQUIERDO: TABLAS */}
-        <div>
+        <div className="w-full">
           {fecha <= 14 && (
             <>
               <TablaComponent titulo="Torneo de Verano" zona="Zona A" datos={generarTabla(partidosValidos.filter(p => p.Torneo === 'Verano'), equipo_A)} />
@@ -179,7 +185,7 @@ export default function Home() {
         </div>
 
         {/* PANEL DERECHO: FIXTURE Y GOLEADORES */}
-        <div className="flex flex-col gap-4">
+        <div className="w-full flex flex-col gap-4">
           
           {/* Selector de Fecha */}
           <div className="bg-[#112d1e] border border-[#1a4a2e] rounded-lg overflow-hidden">
@@ -195,23 +201,25 @@ export default function Home() {
                 ))}
               </select>
             </div>
-            <div className="flex flex-col max-h-[450px] overflow-y-auto">
+            <div className="flex flex-col max-h-[500px] overflow-y-auto">
               {listaPartidos.filter(p => p.Fecha_Global === fecha).map((p, idx) => (
-                <div key={idx} className={`flex items-center p-3 border-b border-[#1a4a2e] hover:bg-[#1a4a2e]/50 transition-colors ${idx % 2 === 0 ? 'bg-[#153625]' : 'bg-[#112d1e]'}`}>
-                  <span className="w-10 text-[9px] font-bold text-white uppercase text-center">Final</span>
+                <div key={idx} className={`flex items-center p-3 border-b border-[#1a4a2e] hover:bg-[#1c4531] transition-colors ${idx % 2 === 0 ? 'bg-[#153625]' : 'bg-[#112d1e]'}`}>
+                  <span className="w-8 text-[9px] font-bold text-[#a1b5a8] uppercase text-center">Final</span>
                   <div className="flex-1 flex justify-center items-center gap-2">
                     <div className="flex items-center gap-2 w-full justify-end">
-                      <span className="text-[11px] font-bold text-right truncate text-white">{p.Local}</span>
-                      <img src={logos[p.Local]} className="w-5 h-5 min-w-[20px] object-contain" />
+                      <span className="text-[11px] font-bold text-right text-white leading-tight">{p.Local}</span>
+                      {/* CAMISA DE FUERZA */}
+                      <img src={logos[p.Local] || 'https://cdn-icons-png.flaticon.com/128/33/33736.png'} style={{ width: '18px', height: '18px', objectFit: 'contain', flexShrink: 0 }} />
                     </div>
-                    <div className="flex items-center gap-1 bg-[#0d2418] px-2 py-1 rounded border border-[#1a4a2e] min-w-[45px] justify-center">
+                    <div className="flex items-center gap-1 bg-[#0d2418] px-2 py-1 rounded border border-[#1a4a2e] justify-center">
                       <span className="font-bold text-xs">{p.GL !== null ? p.GL : '-'}</span>
                       <span className="text-[#8cc63f] text-xs">-</span>
                       <span className="font-bold text-xs">{p.GV !== null ? p.GV : '-'}</span>
                     </div>
                     <div className="flex items-center gap-2 w-full justify-start">
-                      <img src={logos[p.Visitante]} className="w-5 h-5 min-w-[20px] object-contain" />
-                      <span className="text-[11px] font-bold truncate text-white">{p.Visitante}</span>
+                      {/* CAMISA DE FUERZA */}
+                      <img src={logos[p.Visitante] || 'https://cdn-icons-png.flaticon.com/128/33/33736.png'} style={{ width: '18px', height: '18px', objectFit: 'contain', flexShrink: 0 }} />
+                      <span className="text-[11px] font-bold text-white leading-tight">{p.Visitante}</span>
                     </div>
                   </div>
                 </div>
@@ -222,7 +230,7 @@ export default function Home() {
           {/* Caja Fija de Goleadores (Mock) */}
           <div className="bg-[#112d1e] border border-[#1a4a2e] rounded-lg overflow-hidden mt-2">
             <div className="bg-[#0d2418] p-3 text-center border-b border-[#1a4a2e]">
-              <h3 className="text-xs font-bold text-white uppercase">Goleadores</h3>
+              <h3 className="text-[13px] font-bold text-white uppercase">Goleadores</h3>
             </div>
             <table className="w-full text-xs text-left">
               <thead className="bg-[#0d2418] text-[#a1b5a8] border-b border-[#1a4a2e]">
@@ -242,7 +250,8 @@ export default function Home() {
                 ].map((g, i) => (
                   <tr key={i} className={`border-b border-[#1a4a2e]/50 ${i % 2 === 0 ? 'bg-[#153625]' : 'bg-[#112d1e]'}`}>
                     <td className="p-2 flex items-center gap-2">
-                      <img src={logos[g.eq]} className="w-4 h-4 object-contain" />
+                      {/* CAMISA DE FUERZA */}
+                      <img src={logos[g.eq] || 'https://cdn-icons-png.flaticon.com/128/33/33736.png'} style={{ width: '16px', height: '16px', objectFit: 'contain', flexShrink: 0 }} />
                       <span className="text-white text-[11px] font-bold">{g.n}</span>
                     </td>
                     <td className="p-2 text-center text-white font-bold">{g.g}</td>
