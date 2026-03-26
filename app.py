@@ -2,14 +2,9 @@ import streamlit as st
 import pandas as pd
 
 # 1. CONFIGURACIÓN DE PÁGINA
-st.set_page_config(page_title="Liga Peruana 2018-2026", page_icon="🏆", layout="wide")
+st.set_page_config(page_title="Liga Peruana", page_icon="🏆", layout="wide")
 
-# 2. SELECTOR GENERAL (SIDEBAR)
-with st.sidebar:
-    st.markdown("<h2 style='color:#8cc63f; text-align:center;'>TEMPORADA</h2>", unsafe_allow_html=True)
-    temporada = st.selectbox("Elegir Año:", ["2018", "2026"])
-
-# 3. INYECCIÓN DE CSS EXTREMO (CONTRASTE, ZEBRA TOTAL Y NOTAS)
+# 2. INYECCIÓN DE CSS EXTREMO (CONTRASTE, ZEBRA TOTAL Y NOTAS)
 st.markdown("""
 <style>
     .stApp { background-color: #0b4026; color: #ffffff; }
@@ -17,7 +12,7 @@ st.markdown("""
     header {visibility: hidden;}
     footer {visibility: hidden;}
     
-    .stTabs [data-baseweb="tab-list"] { gap: 0px; background-color: transparent; border-bottom: 1px solid #1a4a2e; justify-content: center; }
+    .stTabs [data-baseweb="tab-list"] { gap: 0px; background-color: transparent; border-bottom: 1px solid #1a4a2e; justify-content: center; margin-top: 10px;}
     .stTabs [data-baseweb="tab"] { color: #87b897; padding: 8px 20px; font-weight: bold; font-size: 13px; background-color: transparent; }
     .stTabs [aria-selected="true"] { color: #ffffff !important; border-bottom: 3px solid #8cc63f !important; }
     
@@ -25,7 +20,6 @@ st.markdown("""
     .titulo-panel { text-align: center; color: #ffffff; font-weight: bold; font-size: 14px; margin-bottom: 10px; text-transform: uppercase; }
     .subtitulo-zona { background-color: #0d2418; color: white; padding: 6px 10px; font-weight: bold; font-size: 12px; border-bottom: 2px solid #1a4a2e; border-top-left-radius: 6px; border-top-right-radius: 6px;}
     
-    /* ZEBRA PARA TABLAS */
     .tabla-pro { width: 100%; border-collapse: collapse; color: #ffffff; font-size: 12px; font-family: sans-serif; margin-bottom: 5px;}
     .tabla-pro th { background-color: #0d2418; color: #a1b5a8; border-bottom: 1px solid #1a4a2e; padding: 6px 4px; text-align: center; font-weight: normal; font-size: 11px;}
     .tabla-pro td { padding: 6px 4px; border-bottom: none; text-align: center; color: #ffffff !important;}
@@ -34,7 +28,6 @@ st.markdown("""
     .tabla-pro tbody tr:nth-child(even) { background-color: #112d1e; } 
     .tabla-pro tbody tr:hover { background-color: #1c4531; } 
     
-    /* ZEBRA PARA PARTIDOS */
     .contenedor-partidos { display: flex; flex-direction: column; border-radius: 6px; overflow: hidden; }
     .fila-partido { display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; border-bottom: 1px solid #1a4a2e; }
     .fila-partido:nth-child(odd) { background-color: #153625; }
@@ -42,18 +35,15 @@ st.markdown("""
     .fila-partido:hover { background-color: #1c4531; }
 
     .stSelectbox label { display: none; } 
-    .stSelectbox div[data-baseweb="select"] { background-color: #0d2418; border: 1px solid #8cc63f; border-radius: 4px; color: white; font-size: 13px; min-height: 30px;}
-    h2 { font-size: 1.5rem !important; margin-bottom: 10px !important; padding-bottom: 0px !important;}
+    .stSelectbox div[data-baseweb="select"] { background-color: #0d2418; border: 1px solid #8cc63f; border-radius: 4px; color: white; font-size: 13px; min-height: 30px; text-align: center;}
+    h2 { font-size: 1.5rem !important; margin-bottom: 5px !important; padding-bottom: 0px !important;}
 
-    /* MARCADORES ALINEADOS */
     .marcador-contenedor { display: flex; align-items: center; justify-content: center; gap: 2px; margin: 0 10px; }
     .gol-cajita { background-color: #0d2418; border: 1px solid #1a4a2e; border-radius: 4px; color: #ffffff; font-weight: bold; font-size: 14px; width: 25px; height: 25px; display: flex; align-items: center; justify-content: center; }
     .separador-guion { color: #8cc63f; font-weight: bold; font-size: 14px; }
     
-    /* NOTA ACLARATORIA */
     .nota-asterisco { font-size: 11px; color: #87b897; text-align: left; margin-top: 10px; padding: 5px; background-color: #0d2418; border-radius: 4px; border: 1px solid #1a4a2e;}
 
-    /* ESTILOS PARA EQUIPOS GRID EN PESTAÑA ESTADISTICAS */
     .eq-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; padding: 5px; }
     .eq-card { background-color: #112d1e; border: 1px solid #1a4a2e; border-radius: 6px; padding: 15px 5px; text-align: center; position: relative; transition: 0.2s; }
     .eq-card:hover { border-color: #8cc63f; background-color: #153625; transform: translateY(-3px); }
@@ -103,7 +93,7 @@ def cargar_datos():
     df_g = pd.read_excel('torneo_2018.xlsx', sheet_name='Registro_Goles')
     return df_p, df_g
 
-# --- DATOS REALES 2026 (TABLA FECHA 8 APERTURA SOFASCORE/DEPOR) ---
+# --- DATOS REALES 2026 ---
 def obtener_datos_2026():
     data = [
         ['Alianza Lima', 20, 8, 6, 2, 0, 12, 4, 8, 'V E V V V'],
@@ -134,7 +124,7 @@ def formatear_racha(racha_str):
         html += f"<span style='background-color:{c}; color:white; padding: 1px 4px; border-radius:2px; font-size:8.5px; margin:0 1px; font-weight:bold;'>{char}</span>"
     return html
 
-# --- MOTOR CREADOR DE TABLAS (LÓGICA ORIGINAL PARA 2018) ---
+# --- MOTOR CREADOR DE TABLAS (TU LÓGICA ORIGINAL PARA 2018) ---
 def generar_html_tabla_2018(df_filtro, lista_equipos, titulo_panel, es_acumulado=False, zona="", f_sel=44):
     tabla_datos = []
     for equipo in lista_equipos:
@@ -192,7 +182,15 @@ def generar_html_tabla_2018(df_filtro, lista_equipos, titulo_panel, es_acumulado
     html += "</div>"
     return html
 
-st.markdown(f"<h2 style='text-align: center; color: white;'>LIGA PROFESIONAL PERUANA {temporada}</h2>", unsafe_allow_html=True)
+# 3. CABECERA PRINCIPAL Y SELECTOR (CENTRADOS Y VISIBLES)
+st.markdown("<h2 style='text-align: center; color: white;'>LIGA PROFESIONAL PERUANA</h2>", unsafe_allow_html=True)
+
+col1, col2, col3 = st.columns([1.5, 1, 1.5])
+with col2:
+    st.markdown("<div style='text-align:center; color:#8cc63f; font-weight:bold; font-size:12px;'>ELEGIR TEMPORADA:</div>", unsafe_allow_html=True)
+    temporada = st.selectbox("Temporada", ["2018", "2026"])
+
+# 4. PESTAÑAS PRINCIPALES
 tab_fixture, tab_estadisticas, tab_campeones = st.tabs(["FIXTURE Y TABLAS", "EQUIPOS Y ESTADISTICAS", "CAMPEONES"])
 
 # =====================================================================
@@ -208,14 +206,13 @@ if temporada == "2018":
         st.error(f"🚨 Error interno leyendo el Excel: {e}")
         st.stop()
         
-    # LA CORRECCIÓN CLAVE: dropna() para ignorar filas vacías de Excel
     todos_equipos_2018 = sorted(list(df_partidos['Local'].dropna().unique()))
     
     with tab_fixture:
         col_izq, col_der = st.columns([2.2, 1.0]) 
         
         with col_der:
-            st.markdown("<div class='titulo-panel' style='color:#8cc63f; margin-bottom: 5px;'>TEMPORADA 2018</div>", unsafe_allow_html=True)
+            st.markdown("<div class='titulo-panel' style='color:#8cc63f; margin-bottom: 5px;'>FIXTURE 2018</div>", unsafe_allow_html=True)
             fechas_disponibles = [f"FECHA {i}" for i in range(1, 45)]
             fecha_texto = st.selectbox("Selecciona Fecha", fechas_disponibles, index=29) 
             fecha_seleccionada = int(fecha_texto.replace("FECHA ", ""))
