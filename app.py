@@ -287,3 +287,109 @@ with tab_campeones:
         html_r += "</tbody></table></div>"
         
         st.markdown(html_r, unsafe_allow_html=True)
+        # =====================================================================
+# --- PESTAÑA 2: EQUIPOS (GRID DE ESCUDOS ESTILO PROMIEDOS) ---
+# =====================================================================
+with tab_estadisticas:
+    st.markdown("<h3 style='text-align: center; color: white; margin-bottom: 5px;'>EQUIPOS</h3>", unsafe_allow_html=True)
+    st.markdown("<p style='text-align: center; color: #87b897; font-size: 12px; margin-bottom: 20px;'>Pulsar en el equipo para ver su info detallada (Próximamente)</p>", unsafe_allow_html=True)
+
+    # Definimos los títulos históricos para las insignias pequeñas (Badge)
+    titulos_peru = {
+        'Universitario': 29, 'Alianza Lima': 25, 'Sporting Cristal': 20,
+        'Sport Boys': 6, 'Dep. Municipal': 4, 'U. San Martin': 3,
+        'FBC Melgar': 2, 'Cusco (Garcilaso)': 0, 'UTC': 0, 'Sport Huancayo': 0,
+        'Ayacucho FC': 0, 'Binacional': 1, 'Union Comercio': 0, 'Cantolao': 0,
+        'Sport Rosario': 0, 'Comerciantes Unidos': 0
+    }
+
+    # CSS Especial para la cuadrícula de equipos
+    st.markdown("""
+    <style>
+        .equipo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 15px;
+            padding: 10px;
+        }
+        .equipo-card {
+            background-color: #0c3620;
+            border: 1px solid #1a4a2e;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            transition: transform 0.2s, border-color 0.2s;
+            cursor: pointer;
+            position: relative;
+        }
+        .equipo-card:hover {
+            transform: translateY(-5px);
+            border-color: #8cc63f;
+            background-color: #11452a;
+        }
+        .equipo-logo {
+            width: 50px;
+            height: 50px;
+            object-fit: contain;
+            margin-bottom: 10px;
+        }
+        .equipo-nombre {
+            color: #ffffff;
+            font-weight: bold;
+            font-size: 13px;
+            display: block;
+        }
+        .badge-copa {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: transparent;
+            color: #ffffff;
+            font-size: 11px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 3px;
+        }
+    </style>
+    """, unsafe_allow_html=True)
+
+    # Generamos el HTML de la cuadrícula
+    html_grid = "<div class='equipo-grid'>"
+    
+    for equipo in todos_equipos:
+        logo = logos_equipos.get(equipo, '')
+        copas = titulos_peru.get(equipo, 0)
+        
+        # Solo mostramos el número de copas si tiene al menos 1
+        insignia = f"<div class='badge-copa'>🏆{copas}</div>" if copas > 0 else ""
+        
+        html_grid += f"""
+        <div class='equipo-card'>
+            {insignia}
+            <img src='{logo}' class='equipo-logo' onerror="this.style.display='none'">
+            <span class='equipo-nombre'>{equipo}</span>
+        </div>
+        """
+    
+    html_grid += "</div>"
+    st.markdown(html_grid, unsafe_allow_html=True)
+
+    # --- ESPACIO PARA MÁS ESTADÍSTICAS ---
+    st.markdown("<br><hr style='border-color: #1a4a2e;'>", unsafe_allow_html=True)
+    st.markdown("<h3 style='text-align: center; color: white;'>ESTADÍSTICAS PERSONALES</h3>", unsafe_allow_html=True)
+    
+    # Aquí reutilizamos el código de Goleadores que ya tenías pero más expandido
+    col_goles, col_asist = st.columns(2)
+    
+    with col_goles:
+        st.markdown("<div class='panel-verde'><div class='titulo-panel'>MÁXIMOS GOLEADORES</div>", unsafe_allow_html=True)
+        # Lógica de goleadores (misma que ya tenemos en la home pero como tabla principal)
+        df_g = df_goles.dropna(subset=['Jugador']).groupby(['Jugador', 'Equipo'])['Goles'].sum().reset_index().sort_values(by='Goles', ascending=False).head(15)
+        html_g = "<table class='tabla-pro'><thead><tr><th>#</th><th>Jugador</th><th>Equipo</th><th>Goles</th></tr></thead><tbody>"
+        for idx, row in df_g.iterrows():
+            pos = idx + 1
+            logo = logos_equipos.get(row['Equipo'], '')
+            html_g += f"<tr><td>{pos}</td><td style='text-align:left;'>{row['Jugador']}</td><td><img src='{logo}' width='15'></td><td style='font-weight:bold;'>{row['Goles']}</td></tr>"
+        html_g += "</tbody></table></div>", unsafe_allow_html=True)
+        st.markdown(html_g, unsafe_allow_html=True)
