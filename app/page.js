@@ -1,7 +1,7 @@
 'use client';
 import React, { useState, useMemo } from 'react';
-// Importamos tu JSON directamente desde la raíz del proyecto
-import partidosJSON from '../torneo_2018.json';
+// Ruta corregida: busca el JSON en la misma carpeta "app"
+import partidosJSON from './torneo_2018.json';
 
 export default function Home() {
   const [fecha, setFecha] = useState(29);
@@ -23,8 +23,7 @@ export default function Home() {
     'U. San Martin': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcROfQWRTSLDENcZLhqUcuH2MNeOyHkGsCnxeQ&s',
     'Union Comercio': 'https://tmssl.akamaized.net//images/wappen/head/31337.png',
     'Ayacucho FC': 'https://tmssl.akamaized.net//images/wappen/head/21178.png',
-    'Binacional': 'https://tmssl.akamaized.net//images/wappen/head/41054.png',
-    'Pirata FC': 'https://tmssl.akamaized.net//images/wappen/head/67862.png'
+    'Binacional': 'https://tmssl.akamaized.net//images/wappen/head/41054.png'
   };
 
   const equipo_A = ['Sporting Cristal', 'Sport Rosario', 'UTC', 'U. San Martin', 'Alianza Lima', 'Comerciantes Unidos', 'Ayacucho FC', 'Universitario'];
@@ -61,8 +60,6 @@ export default function Home() {
       }
     });
 
-    // TODO: Aquí inyectaremos las penalidades exactas de Muni y Pirata FC cuando me las confirmes.
-    
     return Object.values(tabla)
       .map(t => ({ ...t, dif: t.gf - t.gc }))
       .sort((a, b) => b.pts - a.pts || b.dif - a.dif || b.gf - a.gf);
