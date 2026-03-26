@@ -4,10 +4,9 @@ import pandas as pd
 # 1. CONFIGURACIÓN DE PÁGINA
 st.set_page_config(page_title="Liga Peruana 2018", page_icon="🏆", layout="wide")
 
-# 2. INYECCIÓN DE CSS (MODO INTERCALADO Y LETRAS BLANCAS)
+# 2. INYECCIÓN DE CSS EXTREMO (CONTRASTE, ZEBRA TOTAL Y NOTAS)
 st.markdown("""
 <style>
-    /* Fondo principal de la página (Verde pasto) */
     .stApp { background-color: #0b4026; color: #ffffff; }
     .block-container { padding-top: 1rem; padding-bottom: 1rem; max-width: 1300px; }
     header {visibility: hidden;}
@@ -17,34 +16,37 @@ st.markdown("""
     .stTabs [data-baseweb="tab"] { color: #87b897; padding: 8px 20px; font-weight: bold; font-size: 13px; background-color: transparent; }
     .stTabs [aria-selected="true"] { color: #ffffff !important; border-bottom: 3px solid #8cc63f !important; }
     
-    /* Contenedores de las tablas (Borde redondeado, fondo oscuro) */
     .panel-verde { background-color: #112d1e; border: 1px solid #1a4a2e; border-radius: 8px; padding: 10px 15px; margin-bottom: 15px;}
     .titulo-panel { text-align: center; color: #ffffff; font-weight: bold; font-size: 14px; margin-bottom: 10px; text-transform: uppercase; }
     .subtitulo-zona { background-color: #0d2418; color: white; padding: 6px 10px; font-weight: bold; font-size: 12px; border-bottom: 2px solid #1a4a2e; border-top-left-radius: 6px; border-top-right-radius: 6px;}
     
-    /* DISEÑO DE TABLAS - EFECTO INTERCALADO */
+    /* ZEBRA PARA TABLAS */
     .tabla-pro { width: 100%; border-collapse: collapse; color: #ffffff; font-size: 12px; font-family: sans-serif; margin-bottom: 5px;}
-    
-    /* Cabecera de la tabla */
     .tabla-pro th { background-color: #0d2418; color: #a1b5a8; border-bottom: 1px solid #1a4a2e; padding: 6px 4px; text-align: center; font-weight: normal; font-size: 11px;}
-    
-    /* Celdas sin bordes inferiores para que luzca el intercalado */
-    .tabla-pro td { padding: 6px 4px; border-bottom: none; text-align: center; color: #ffffff !important; }
+    .tabla-pro td { padding: 6px 4px; border-bottom: none; text-align: center; color: #ffffff !important;}
     .tabla-pro td:nth-child(2) { text-align: left; font-weight: bold; } 
+    .tabla-pro tbody tr:nth-child(odd) { background-color: #153625; } 
+    .tabla-pro tbody tr:nth-child(even) { background-color: #112d1e; } 
+    .tabla-pro tbody tr:hover { background-color: #1c4531; } 
     
-    /* EL SECRETO: Filas Impar y Par (Zebra Striping) */
-    .tabla-pro tbody tr:nth-child(odd) { background-color: #153625; } /* Verde claro */
-    .tabla-pro tbody tr:nth-child(even) { background-color: #112d1e; } /* Verde oscuro */
-    .tabla-pro tbody tr:hover { background-color: #1c4531; } /* Brillo al pasar el mouse */
-    
+    /* ZEBRA PARA PARTIDOS */
+    .contenedor-partidos { display: flex; flex-direction: column; border-radius: 6px; overflow: hidden; }
+    .fila-partido { display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; border-bottom: 1px solid #1a4a2e; }
+    .fila-partido:nth-child(odd) { background-color: #153625; }
+    .fila-partido:nth-child(even) { background-color: #112d1e; }
+    .fila-partido:hover { background-color: #1c4531; }
+
     .stSelectbox label { display: none; } 
     .stSelectbox div[data-baseweb="select"] { background-color: #0d2418; border: 1px solid #8cc63f; border-radius: 4px; color: white; font-size: 13px; min-height: 30px;}
     h2 { font-size: 1.5rem !important; margin-bottom: 10px !important; padding-bottom: 0px !important;}
 
-    /* ALINEACIÓN DE MARCADORES */
+    /* MARCADORES ALINEADOS */
     .marcador-contenedor { display: flex; align-items: center; justify-content: center; gap: 2px; margin: 0 10px; }
     .gol-cajita { background-color: #0d2418; border: 1px solid #1a4a2e; border-radius: 4px; color: #ffffff; font-weight: bold; font-size: 14px; width: 25px; height: 25px; display: flex; align-items: center; justify-content: center; }
     .separador-guion { color: #8cc63f; font-weight: bold; font-size: 14px; }
+    
+    /* NOTA ACLARATORIA */
+    .nota-asterisco { font-size: 11px; color: #87b897; text-align: left; margin-top: 10px; padding: 5px; background-color: #0d2418; border-radius: 4px; border: 1px solid #1a4a2e;}
 </style>
 """, unsafe_allow_html=True)
 
@@ -139,8 +141,15 @@ def generar_html_tabla(df_filtro, lista_equipos, titulo_panel, es_acumulado=Fals
             if pos == 1: borde = "#3db4dc"
             
         html += f"<tr><td style='border-left: 3px solid {borde}; font-weight:bold;'>{pos}</td><td style='text-align:left;'><img src='{logo}' width='15' height='15' style='object-fit:contain; vertical-align:middle; margin-right:6px;' onerror=\"this.style.display='none'\"> <span style='color:#ffffff;'>{row['Equipo']}</span></td><td style='font-weight:bold; font-size:13px; color:#ffffff;'>{row['PTS']}</td><td style='color:#ffffff;'>{row['J']}</td><td style='color:#ffffff;'>{row['GF']}:{row['GC']}</td><td style='color:#ffffff;'>{row['+/-']}</td><td style='color:#ffffff;'>{row['G']}</td><td style='color:#ffffff;'>{row['E']}</td><td style='color:#ffffff;'>{row['P']}</td><td>{row['Racha']}</td></tr>"
-    html += "</tbody></table></div>"
+    html += "</tbody></table>"
+    
+    # Agregar la nota aclaratoria SOLO en la tabla acumulada
+    if es_acumulado:
+        html += "<div class='nota-asterisco'>* Nota: Resoluciones de la FPF aplicadas en esta tabla Acumulada: Sanciones a Sport Rosario (-7 pts), Dep. Municipal (-2 pts), UTC (-2 pts), Cantolao (-2 pts) y Universitario (-1 pt). Sporting Cristal (+2 pts) por Campeón de Reservas.</div>"
+        
+    html += "</div>"
     return html
+
 
 # --- RENDERIZADO VISUAL ---
 with tab_fixture:
@@ -153,19 +162,20 @@ with tab_fixture:
         fecha_texto = st.selectbox("Selecciona Fecha", fechas_disponibles, index=29) 
         fecha_seleccionada = int(fecha_texto.replace("FECHA ", ""))
         
-        # PARTIDOS DE LA FECHA
-        st.markdown("<div class='panel-verde'>", unsafe_allow_html=True)
+        # PARTIDOS DE LA FECHA (CON EFECTO ZEBRA INTERCALADO)
+        st.markdown("<div class='panel-verde' style='padding: 0;'><div class='contenedor-partidos'>", unsafe_allow_html=True)
         partidos_fecha = df_partidos[df_partidos['Fecha_Global'] == fecha_seleccionada]
         if not partidos_fecha.empty:
             html_p = ""
             for _, row in partidos_fecha.iterrows():
                 loc, vis, gl, gv = row['Local'], row['Visitante'], row['GL'], row['GV']
                 l_logo, v_logo = logos_equipos.get(loc, ''), logos_equipos.get(vis, '')
-                html_p += f"<div style='display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid #1a4a2e; padding: 8px 0;'><span style='color:white; font-size:10px; font-weight:bold;'>Final</span><div style='display:flex; align-items:center; width: 85%; justify-content: center;'><span style='text-align:right; width:40%; font-size:12px; color:#ffffff; font-weight:bold;'>{loc}</span><img src='{l_logo}' width='18' height='18' style='object-fit:contain; margin: 0 5px;' onerror=\"this.style.display='none'\"><div class='marcador-contenedor'><div class='gol-cajita'>{gl}</div><div class='separador-guion'>-</div><div class='gol-cajita'>{gv}</div></div><img src='{v_logo}' width='18' height='18' style='object-fit:contain; margin: 0 5px;' onerror=\"this.style.display='none'\"><span style='text-align:left; width:40%; font-size:12px; color:#ffffff; font-weight:bold;'>{vis}</span></div></div>"
+                # Usamos la clase .fila-partido para que agarre el color intercalado del CSS
+                html_p += f"<div class='fila-partido'><span style='color:white; font-size:10px; font-weight:bold;'>Final</span><div style='display:flex; align-items:center; width: 85%; justify-content: center;'><span style='text-align:right; width:40%; font-size:12px; color:#ffffff; font-weight:bold;'>{loc}</span><img src='{l_logo}' width='18' height='18' style='object-fit:contain; margin: 0 5px;' onerror=\"this.style.display='none'\"><div class='marcador-contenedor'><div class='gol-cajita'>{gl}</div><div class='separador-guion'>-</div><div class='gol-cajita'>{gv}</div></div><img src='{v_logo}' width='18' height='18' style='object-fit:contain; margin: 0 5px;' onerror=\"this.style.display='none'\"><span style='text-align:left; width:40%; font-size:12px; color:#ffffff; font-weight:bold;'>{vis}</span></div></div>"
             st.markdown(html_p, unsafe_allow_html=True)
         else:
-            st.markdown("<p style='text-align:center; font-size:12px;'>No hay partidos registrados.</p>", unsafe_allow_html=True)
-        st.markdown("</div>", unsafe_allow_html=True)
+            st.markdown("<p style='text-align:center; font-size:12px; padding: 15px;'>No hay partidos registrados.</p>", unsafe_allow_html=True)
+        st.markdown("</div></div>", unsafe_allow_html=True)
 
         # GOLEADORES
         st.markdown("<div class='panel-verde'><div class='titulo-panel'>GOLEADORES</div>", unsafe_allow_html=True)
@@ -185,11 +195,10 @@ with tab_fixture:
     with col_izq:
         # TABLAS DE TORNEO CORTO
         if fecha_seleccionada <= 14:
-            st.markdown("<div class='panel-verde'><div class='titulo-panel'>TORNEO DE VERANO</div>", unsafe_allow_html=True)
+            st.markdown("<div class='titulo-panel'>TORNEO DE VERANO</div>", unsafe_allow_html=True)
             df_verano = df_partidos[(df_partidos['Fecha_Global'] <= fecha_seleccionada) & (df_partidos['Torneo'] == 'Verano')]
             st.markdown(generar_html_tabla(df_verano, equipo_A, "", zona="ZONA A"), unsafe_allow_html=True)
             st.markdown(generar_html_tabla(df_verano, equipo_B, "", zona="ZONA B"), unsafe_allow_html=True)
-            st.markdown("</div>", unsafe_allow_html=True)
         elif fecha_seleccionada <= 29:
             df_apertura = df_partidos[(df_partidos['Fecha_Global'] >= 15) & (df_partidos['Fecha_Global'] <= fecha_seleccionada) & (df_partidos['Torneo'] == 'Apertura')]
             st.markdown(generar_html_tabla(df_apertura, todos_equipos, "TORNEO APERTURA", zona="ZONA ÚNICA"), unsafe_allow_html=True)
@@ -197,6 +206,6 @@ with tab_fixture:
             df_clausura = df_partidos[(df_partidos['Fecha_Global'] >= 30) & (df_partidos['Fecha_Global'] <= min(fecha_seleccionada, 44)) & (df_partidos['Torneo'] == 'Clausura')]
             st.markdown(generar_html_tabla(df_clausura, todos_equipos, "TORNEO CLAUSURA", zona="ZONA ÚNICA"), unsafe_allow_html=True)
 
-        # TABLA ACUMULADA (Siempre Visible)
+        # TABLA ACUMULADA (Siempre Visible y con la nota al final)
         df_acu = df_partidos[df_partidos['Fecha_Global'] <= min(fecha_seleccionada, 44)]
         st.markdown(generar_html_tabla(df_acu, todos_equipos, f"TABLA ACUMULADA (HASTA LA FECHA {fecha_seleccionada})", es_acumulado=True), unsafe_allow_html=True)
