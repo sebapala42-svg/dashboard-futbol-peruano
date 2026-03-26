@@ -24,7 +24,7 @@ st.markdown("""
     
     /* Diseño de Tablas */
     .tabla-pro { width: 100%; border-collapse: collapse; color: #ffffff; font-size: 11.5px; font-family: sans-serif; margin-bottom: 5px;}
-    .tabla-pro th { background-color: #03120a; color: #a1b5a8; border-bottom: 2px solid #104225; padding: 4px 2px; text-align: center; font-weight: normal; font-size: 10px;}
+    .tabla-pro th { background-color: #1b402a; color: #a1b5a8; border-bottom: 2px solid #104225; padding: 4px 2px; text-align: center; font-weight: normal; font-size: 10px;}
     .tabla-pro td { padding: 4px 2px; border-bottom: 1px solid #104225; text-align: center; }
     .tabla-pro td:nth-child(2) { text-align: left; font-weight: bold; } 
     .tabla-pro tr:hover { background-color: #0a301a; }
