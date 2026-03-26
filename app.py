@@ -18,7 +18,7 @@ st.markdown("""
     .stTabs [aria-selected="true"] { color: #ffffff !important; border-bottom: 3px solid #8cc63f !important; }
     
     /* Contenedores de las tablas (Verde MUY oscuro para que resalten) */
-    .panel-verde { background-color: #1b402a; border: 1px solid #104225; border-radius: 6px; padding: 10px; margin-bottom: 15px;}
+    .panel-verde { background-color: #1b402a; border: 1px solid #1b402a; border-radius: 6px; padding: 10px; margin-bottom: 15px;}
     .titulo-panel { text-align: center; color: #ffffff; font-weight: bold; font-size: 13px; margin-bottom: 10px; text-transform: uppercase; }
     .subtitulo-zona { background-color: #03120a; color: white; padding: 5px 10px; font-weight: bold; font-size: 11px; border-bottom: 2px solid #104225; border-top-left-radius: 6px; border-top-right-radius: 6px;}
     
