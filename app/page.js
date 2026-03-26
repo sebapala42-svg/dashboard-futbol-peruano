@@ -28,7 +28,8 @@ export default function Home() {
     'U. San Martin': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcROfQWRTSLDENcZLhqUcuH2MNeOyHkGsCnxeQ&s',
     'Union Comercio': 'https://tmssl.akamaized.net//images/wappen/head/31337.png',
     'Ayacucho FC': 'https://tmssl.akamaized.net//images/wappen/head/21178.png',
-    'Binacional': 'https://tmssl.akamaized.net//images/wappen/head/41054.png'
+    'Binacional': 'https://tmssl.akamaized.net//images/wappen/head/41054.png',
+    'Pirata FC': 'https://tmssl.akamaized.net//images/wappen/head/67862.png'
   };
 
   const equipo_A = ['Sporting Cristal', 'Sport Rosario', 'UTC', 'U. San Martin', 'Alianza Lima', 'Comerciantes Unidos', 'Ayacucho FC', 'Universitario'];
