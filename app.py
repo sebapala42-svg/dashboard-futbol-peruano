@@ -69,7 +69,7 @@ logos_equipos = {
     'Sport Boys': 'https://tmssl.akamaized.net//images/wappen/head/2730.png',
     'UTC': 'https://tmssl.akamaized.net//images/wappen/head/21170.png',
     'Sport Huancayo': 'https://tmssl.akamaized.net//images/wappen/head/21655.png',
-    'ADT': 'https://tmssl.akamaized.net//images/wappen/head/31201.png',
+    'ADT': 'https://tmssl.akamaized.net//images/wappen/head/35588.png?lm=1705855304',
     'Alianza Atlético': 'https://tmssl.akamaized.net//images/wappen/head/6561.png',
     'Atlético Grau': 'https://tmssl.akamaized.net//images/wappen/head/31200.png',
     'Comerciantes Unidos': 'https://tmssl.akamaized.net//images/wappen/head/47107.png',
