@@ -3,28 +3,6 @@ import pandas as pd
 
 # 1. CONFIGURACIÓN DE PÁGINA Y TEMA ROBUSTO
 st.set_page_config(page_title="Dashboard Descentralizado 2018 - Modo Pro", page_icon="⚽", layout="wide")
-
-
-# --- BASE DE DATOS DE ESCUDOS 2018 (Enlaces Directos y Robustos) ---
-logos_equipos = {
-    'Sporting Cristal': 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/Escudo_del_Club_Sporting_Cristal.svg/100px-Escudo_del_Club_Sporting_Cristal.svg.png',
-    'Alianza Lima': 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d2/Escudo_Alianza_Lima_3_-_1988-2011.png/100px-Escudo_Alianza_Lima_3_-_1988-2011.png',
-    'Universitario': 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/67/Logo_oficial_de_Universitario.png/100px-Logo_oficial_de_Universitario.png',
-    'FBC Melgar': 'https://upload.wikimedia.org/wikipedia/en/thumb/f/ff/FBC_Melgar.png/100px-FBC_Melgar.png',
-    'Sport Huancayo': 'https://upload.wikimedia.org/wikipedia/en/thumb/6/62/Sport_Huancayo.png/100px-Sport_Huancayo.png',
-    'UTC': 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/UTC_Cajamarca.svg/100px-UTC_Cajamarca.svg.png',
-    'U. San Martin': 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Universidad_San_Martin.svg/100px-Universidad_San_Martin.svg.png',
-    'Ayacucho FC': 'https://upload.wikimedia.org/wikipedia/en/thumb/d/dd/Ayacucho_FC.png/100px-Ayacucho_FC.png',
-    'Cusco (Garcilaso)': 'https://upload.wikimedia.org/wikipedia/en/thumb/8/87/Cusco_FC_logo.png/100px-Cusco_FC_logo.png', # Nota: Contexto 2018 es Real Garcilaso
-    'Binacional': 'https://upload.wikimedia.org/wikipedia/en/thumb/c/c5/Deportivo_Binacional.png/100px-Deportivo_Binacional.png',
-    'Sport Boys': 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ee/Sport_Boys_As.svg/100px-Sport_Boys_As.svg.png',
-    'Dep. Municipal': 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Deportivo_Municipal.svg/100px-Deportivo_Municipal.svg.png',
-    'Cantolao': 'https://upload.wikimedia.org/wikipedia/en/thumb/7/70/Academia_Deportiva_Cantolao.gif/100px-Academia_Deportiva_Cantolao.gif',
-    'Comerciantes Unidos': 'https://upload.wikimedia.org/wikipedia/en/thumb/8/86/Logo_of_Comerciantes_Unidos_%282024%29.png/100px-Logo_of_Comerciantes_Unidos_%282024%29.png',
-    'Union Comercio': 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/Union_Comercio.svg/100px-Union_Comercio.svg.png',
-    'Sport Rosario': 'https://upload.wikimedia.org/wikipedia/ru/thumb/2/2d/Sport_Rosario_Logo.png/100px-Sport_Rosario_Logo.png'
-}
-
 # Equipos y Grupos
 equipo_A = ['Sporting Cristal', 'Sport Rosario', 'UTC', 'U. San Martin', 'Alianza Lima', 'Comerciantes Unidos', 'Ayacucho FC', 'Universitario']
 equipo_B = ['Sport Huancayo', 'FBC Melgar', 'Cantolao', 'Dep. Municipal', 'Sport Boys', 'Cusco (Garcilaso)', 'Binacional', 'Union Comercio']
