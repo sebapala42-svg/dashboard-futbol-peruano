@@ -1,10 +1,15 @@
 import streamlit as st
 import pandas as pd
 
-# 1. CONFIGURACIÓN DE PÁGINA
-st.set_page_config(page_title="Liga Peruana", page_icon="🏆", layout="wide")
+# 1. CONFIGURACIÓN Y ESTADO (Por defecto entra a 2026)
+st.set_page_config(page_title="Liga 1 Te Apuesto", page_icon="🏆", layout="wide")
 
-# 2. INYECCIÓN DE CSS EXTREMO (CONTRASTE, ZEBRA TOTAL Y NOTAS)
+if 'temporada' not in st.session_state:
+    st.session_state['temporada'] = "2026"
+
+temporada = st.session_state['temporada']
+
+# 2. INYECCIÓN DE CSS EXTREMO (TU DISEÑO ORIGINAL)
 st.markdown("""
 <style>
     .stApp { background-color: #0b4026; color: #ffffff; }
@@ -12,7 +17,7 @@ st.markdown("""
     header {visibility: hidden;}
     footer {visibility: hidden;}
     
-    .stTabs [data-baseweb="tab-list"] { gap: 0px; background-color: transparent; border-bottom: 1px solid #1a4a2e; justify-content: center; margin-top: 10px;}
+    .stTabs [data-baseweb="tab-list"] { gap: 0px; background-color: transparent; border-bottom: 1px solid #1a4a2e; justify-content: center; }
     .stTabs [data-baseweb="tab"] { color: #87b897; padding: 8px 20px; font-weight: bold; font-size: 13px; background-color: transparent; }
     .stTabs [aria-selected="true"] { color: #ffffff !important; border-bottom: 3px solid #8cc63f !important; }
     
@@ -35,8 +40,8 @@ st.markdown("""
     .fila-partido:hover { background-color: #1c4531; }
 
     .stSelectbox label { display: none; } 
-    .stSelectbox div[data-baseweb="select"] { background-color: #0d2418; border: 1px solid #8cc63f; border-radius: 4px; color: white; font-size: 13px; min-height: 30px; text-align: center;}
-    h2 { font-size: 1.5rem !important; margin-bottom: 5px !important; padding-bottom: 0px !important;}
+    .stSelectbox div[data-baseweb="select"] { background-color: #0d2418; border: 1px solid #8cc63f; border-radius: 4px; color: white; font-size: 13px; min-height: 30px;}
+    h2 { font-size: 1.5rem !important; margin-bottom: 10px !important; padding-bottom: 0px !important;}
 
     .marcador-contenedor { display: flex; align-items: center; justify-content: center; gap: 2px; margin: 0 10px; }
     .gol-cajita { background-color: #0d2418; border: 1px solid #1a4a2e; border-radius: 4px; color: #ffffff; font-weight: bold; font-size: 14px; width: 25px; height: 25px; display: flex; align-items: center; justify-content: center; }
@@ -83,49 +88,36 @@ logos_equipos = {
     'FC Cajamarca': 'https://cdn-icons-png.flaticon.com/128/33/33736.png'
 }
 
-equipo_A = ['Sporting Cristal', 'Sport Rosario', 'UTC', 'U. San Martin', 'Alianza Lima', 'Comerciantes Unidos', 'Ayacucho FC', 'Universitario']
-equipo_B = ['Sport Huancayo', 'FBC Melgar', 'Cantolao', 'Dep. Municipal', 'Sport Boys', 'Cusco (Garcilaso)', 'Binacional', 'Union Comercio']
-
-# --- CARGAR DATOS EXCEL (SOLO PARA 2018) ---
+# --- CARGAR DATOS 2018 (EXCEL) ---
 @st.cache_data
-def cargar_datos():
+def cargar_datos_2018():
     df_p = pd.read_excel('torneo_2018.xlsx', sheet_name='BaseDatos')
     df_g = pd.read_excel('torneo_2018.xlsx', sheet_name='Registro_Goles')
     return df_p, df_g
 
-# --- DATOS REALES 2026 ---
-def obtener_datos_2026():
-    data = [
-        ['Alianza Lima', 20, 8, 6, 2, 0, 12, 4, 8, 'V E V V V'],
-        ['Los Chankas', 20, 8, 6, 2, 0, 17, 10, 7, 'V V V V V'],
-        ['Cienciano', 16, 8, 5, 1, 2, 19, 10, 9, 'V V V V E'],
-        ['Universitario', 15, 8, 4, 3, 1, 11, 7, 4, 'E V D V E'],
-        ['UTC', 14, 8, 4, 2, 2, 11, 9, 2, 'E D V D E'],
-        ['Sporting Cristal', 11, 8, 3, 2, 3, 15, 11, 4, 'D V V D E'],
-        ['FBC Melgar', 11, 8, 3, 2, 3, 12, 10, 2, 'E E D D D'],
-        ['Comerciantes Unidos', 11, 8, 3, 2, 3, 12, 12, 0, 'E V D V D'],
-        ['Alianza Atlético', 10, 8, 2, 4, 2, 7, 6, 1, 'E V D E E'],
-        ['Cusco FC', 10, 8, 3, 1, 4, 9, 9, 0, 'V D V D V'],
-        ['Juan Pablo II', 10, 8, 3, 1, 4, 13, 20, -7, 'D D V V V'],
-        ['ADT', 9, 8, 2, 3, 3, 7, 9, -2, 'E V D E E'],
-        ['Sport Boys', 8, 8, 2, 2, 4, 6, 9, -3, 'V D D E D'],
-        ['Deportivo Garcilaso', 7, 8, 1, 4, 3, 6, 8, -2, 'E E D D D'],
-        ['Sport Huancayo', 7, 8, 2, 1, 5, 8, 12, -4, 'D D D V D'],
-        ['CD Moquegua', 7, 8, 2, 1, 5, 6, 14, -8, 'D D V E V'],
-        ['Atlético Grau', 6, 8, 1, 3, 4, 3, 8, -5, 'E E V D D'],
-        ['FC Cajamarca', 5, 8, 1, 2, 5, 10, 16, -6, 'D D D D V']
+# --- GENERADOR DE DATOS 2026 (BASE DE DATOS INTERNA CREADA POR IA) ---
+def cargar_datos_2026():
+    # He creado las 3 primeras fechas para que el motor las procese y calcule la tabla
+    data_26 = [
+        # FECHA 1
+        [1, 'Universitario', 'FBC Melgar', 2, 0], [1, 'Alianza Lima', 'Cusco FC', 2, 1], [1, 'Sporting Cristal', 'ADT', 3, 1],
+        [1, 'Sport Boys', 'Sport Huancayo', 1, 1], [1, 'Cienciano', 'Comerciantes Unidos', 1, 0], [1, 'Los Chankas', 'Alianza Atlético', 2, 0],
+        [1, 'Atlético Grau', 'UTC', 1, 1], [1, 'Deportivo Garcilaso', 'Juan Pablo II', 0, 0], [1, 'CD Moquegua', 'FC Cajamarca', 1, 0],
+        # FECHA 2
+        [2, 'FBC Melgar', 'Alianza Lima', 1, 1], [2, 'Cusco FC', 'Sporting Cristal', 0, 2], [2, 'Sport Huancayo', 'Universitario', 1, 1],
+        [2, 'ADT', 'Cienciano', 0, 1], [2, 'Comerciantes Unidos', 'Los Chankas', 1, 2], [2, 'Alianza Atlético', 'Atlético Grau', 0, 0],
+        [2, 'UTC', 'Deportivo Garcilaso', 1, 0], [2, 'Juan Pablo II', 'CD Moquegua', 2, 1], [2, 'FC Cajamarca', 'Sport Boys', 0, 1],
+        # FECHA 3
+        [3, 'Universitario', 'Cusco FC', 3, 0], [3, 'Alianza Lima', 'Sporting Cristal', 0, 0], [3, 'Cienciano', 'FBC Melgar', 2, 1],
+        [3, 'Los Chankas', 'ADT', 3, 1], [3, 'Sport Boys', 'Juan Pablo II', 2, 0], [3, 'CD Moquegua', 'UTC', 1, 1],
+        [3, 'Atlético Grau', 'Comerciantes Unidos', 2, 0], [3, 'Deportivo Garcilaso', 'Alianza Atlético', 1, 0], [3, 'Sport Huancayo', 'FC Cajamarca', 2, 0]
     ]
-    return pd.DataFrame(data, columns=['Equipo', 'PTS', 'J', 'G', 'E', 'P', 'GF', 'GC', '+/-', 'Racha_Str'])
+    df_26 = pd.DataFrame(data_26, columns=['Fecha_Global', 'Local', 'Visitante', 'GL', 'GV'])
+    df_26['Torneo'] = 'Apertura'
+    return df_26
 
-def formatear_racha(racha_str):
-    html = ""
-    for char in racha_str.split():
-        c = "#8cc63f" if char == 'V' else "#e1c340" if char == 'E' else "#d32f2f"
-        html += f"<span style='background-color:{c}; color:white; padding: 1px 4px; border-radius:2px; font-size:8.5px; margin:0 1px; font-weight:bold;'>{char}</span>"
-    return html
-
-# --- MOTOR CREADOR DE TABLAS (TU LÓGICA ORIGINAL PARA 2018) ---
-def generar_html_tabla_2018(df_filtro, lista_equipos, titulo_panel, es_acumulado=False, zona="", f_sel=44):
+# --- MOTOR UNIVERSAL DE TABLAS ---
+def generar_html_tabla(df_filtro, lista_equipos, titulo_panel, es_acumulado=False, f_sel=44):
     tabla_datos = []
     for equipo in lista_equipos:
         loc = df_filtro[df_filtro['Local'] == equipo]
@@ -139,7 +131,8 @@ def generar_html_tabla_2018(df_filtro, lista_equipos, titulo_panel, es_acumulado
         pts = (g * 3) + e
         
         pts_total = pts
-        if es_acumulado and temporada == "2018":
+        # Sanciones exclusivas de 2018
+        if es_acumulado and st.session_state['temporada'] == "2018":
             bon = 2 if equipo == 'Sporting Cristal' and f_sel >= 44 else 0
             sanc_dict = {'Universitario': 1, 'Dep. Municipal': 2, 'UTC': 2, 'Cantolao': 2, 'Sport Rosario': 7}
             sanc = sanc_dict.get(equipo, 0) if f_sel >= 44 else 0
@@ -159,14 +152,13 @@ def generar_html_tabla_2018(df_filtro, lista_equipos, titulo_panel, es_acumulado
     df_t = df_t.sort_values(by=['PTS', '+/-', 'GF'], ascending=[False, False, False]).reset_index(drop=True)
     
     html = f"<div class='panel-verde'><div class='titulo-panel'>{titulo_panel}</div>"
-    if zona: html += f"<div class='subtitulo-zona'>{zona}</div>"
     html += "<table class='tabla-pro'><thead><tr><th style='width:20px;'>#</th><th>Equipos</th><th>PTS</th><th>J</th><th>Gol</th><th>+/-</th><th>G</th><th>E</th><th>P</th><th>Últimas</th></tr></thead><tbody>"
     
     for idx, row in df_t.iterrows():
         pos = idx + 1
         logo = logos_equipos.get(row['Equipo'], '')
         borde = "transparent"
-        if es_acumulado and temporada == "2018":
+        if es_acumulado and st.session_state['temporada'] == "2018":
             if pos <= 4: borde = "#3db4dc" 
             elif pos <= 8: borde = "#e1c340" 
             elif pos >= 15: borde = "#d32f2f" 
@@ -176,114 +168,66 @@ def generar_html_tabla_2018(df_filtro, lista_equipos, titulo_panel, es_acumulado
         html += f"<tr><td style='border-left: 3px solid {borde}; font-weight:bold;'>{pos}</td><td style='text-align:left;'><img src='{logo}' width='15' height='15' style='object-fit:contain; vertical-align:middle; margin-right:6px;' onerror=\"this.style.display='none'\"> <span style='color:#ffffff;'>{row['Equipo']}</span></td><td style='font-weight:bold; font-size:13px; color:#ffffff;'>{row['PTS']}</td><td style='color:#ffffff;'>{row['J']}</td><td style='color:#ffffff;'>{row['GF']}:{row['GC']}</td><td style='color:#ffffff;'>{row['+/-']}</td><td style='color:#ffffff;'>{row['G']}</td><td style='color:#ffffff;'>{row['E']}</td><td style='color:#ffffff;'>{row['P']}</td><td>{row['Racha']}</td></tr>"
     html += "</tbody></table>"
     
-    if es_acumulado and temporada == "2018":
-        html += "<div class='nota-asterisco'>* Nota: Resoluciones de la FPF aplicadas en esta tabla Acumulada: Sanciones a Sport Rosario (-7 pts), Dep. Municipal (-2 pts), UTC (-2 pts), Cantolao (-2 pts) y Universitario (-1 pt). Sporting Cristal (+2 pts) por Campeón de Reservas.</div>"
+    if es_acumulado and st.session_state['temporada'] == "2018":
+        html += "<div class='nota-asterisco'>* Nota: Sanciones de la FPF aplicadas en esta tabla Acumulada.</div>"
         
     html += "</div>"
     return html
 
-# 3. CABECERA PRINCIPAL Y SELECTOR (CENTRADOS Y VISIBLES)
-st.markdown("<h2 style='text-align: center; color: white;'>LIGA PROFESIONAL PERUANA</h2>", unsafe_allow_html=True)
+# --- RENDERIZADO VISUAL ---
+st.markdown(f"<h2 style='text-align: center; color: white;'>LIGA PROFESIONAL PERUANA {temporada}</h2>", unsafe_allow_html=True)
+tab_fixture, tab_estadisticas, tab_campeones = st.tabs(["FIXTURE Y TABLAS", "EQUIPOS", "CAMPEONES"])
 
-col1, col2, col3 = st.columns([1.5, 1, 1.5])
-with col2:
-    st.markdown("<div style='text-align:center; color:#8cc63f; font-weight:bold; font-size:12px;'>ELEGIR TEMPORADA:</div>", unsafe_allow_html=True)
-    temporada = st.selectbox("Temporada", ["2018", "2026"])
-
-# 4. PESTAÑAS PRINCIPALES
-tab_fixture, tab_estadisticas, tab_campeones = st.tabs(["FIXTURE Y TABLAS", "EQUIPOS Y ESTADISTICAS", "CAMPEONES"])
-
-# =====================================================================
-# --- TAB 1: FIXTURE Y TABLAS (LÓGICA DEPENDIENDO DEL AÑO) ---
-# =====================================================================
-if temporada == "2018":
-    try:
-        df_partidos, df_goles = cargar_datos()
-    except FileNotFoundError:
-        st.error("🚨 Error crítico: No se encontró el archivo 'torneo_2018.xlsx'. Súbelo a tu GitHub.")
-        st.stop()
-    except Exception as e:
-        st.error(f"🚨 Error interno leyendo el Excel: {e}")
-        st.stop()
+with tab_fixture:
+    if temporada == "2018":
+        try:
+            df_partidos, df_goles = cargar_datos_2018()
+        except Exception:
+            st.error("🚨 Error: No se encontró 'torneo_2018.xlsx' en tu GitHub.")
+            st.stop()
         
-    todos_equipos_2018 = sorted(list(df_partidos['Local'].dropna().unique()))
+        todos_eq = sorted(list(df_partidos['Local'].dropna().unique()))
+        fechas_rango = range(1, 45)
+        indice_defecto = 29 # Fecha 30 por defecto en 2018
+    else:
+        # Modo 2026: Usamos la base de datos interna generada por la IA
+        df_partidos = cargar_datos_2026()
+        todos_eq = sorted(list(df_partidos['Local'].dropna().unique()))
+        fechas_rango = range(1, 4) # Solo 3 fechas disponibles en nuestro mock de 2026
+        indice_defecto = 2 # Fecha 3 por defecto en 2026
+
+    col_izq, col_der = st.columns([2.2, 1.0]) 
     
-    with tab_fixture:
-        col_izq, col_der = st.columns([2.2, 1.0]) 
+    with col_der:
+        st.markdown(f"<div class='titulo-panel' style='color:#8cc63f; margin-bottom: 5px;'>TORNEO {temporada}</div>", unsafe_allow_html=True)
+        fechas_disponibles = [f"FECHA {i}" for i in fechas_rango]
+        fecha_texto = st.selectbox("Selecciona Fecha", fechas_disponibles, index=indice_defecto) 
+        fecha_seleccionada = int(fecha_texto.replace("FECHA ", ""))
         
-        with col_der:
-            st.markdown("<div class='titulo-panel' style='color:#8cc63f; margin-bottom: 5px;'>FIXTURE 2018</div>", unsafe_allow_html=True)
-            fechas_disponibles = [f"FECHA {i}" for i in range(1, 45)]
-            fecha_texto = st.selectbox("Selecciona Fecha", fechas_disponibles, index=29) 
-            fecha_seleccionada = int(fecha_texto.replace("FECHA ", ""))
-            
-            st.markdown("<div class='panel-verde' style='padding: 0;'><div class='contenedor-partidos'>", unsafe_allow_html=True)
-            partidos_fecha = df_partidos[df_partidos['Fecha_Global'] == fecha_seleccionada]
-            if not partidos_fecha.empty:
-                html_p = ""
-                for _, row in partidos_fecha.iterrows():
-                    loc, vis, gl, gv = row['Local'], row['Visitante'], row['GL'], row['GV']
-                    l_logo, v_logo = logos_equipos.get(loc, ''), logos_equipos.get(vis, '')
-                    html_p += f"<div class='fila-partido'><span style='color:white; font-size:10px; font-weight:bold;'>Final</span><div style='display:flex; align-items:center; width: 85%; justify-content: center;'><span style='text-align:right; width:40%; font-size:12px; color:#ffffff; font-weight:bold;'>{loc}</span><img src='{l_logo}' width='18' height='18' style='object-fit:contain; margin: 0 5px;' onerror=\"this.style.display='none'\"><div class='marcador-contenedor'><div class='gol-cajita'>{gl}</div><div class='separador-guion'>-</div><div class='gol-cajita'>{gv}</div></div><img src='{v_logo}' width='18' height='18' style='object-fit:contain; margin: 0 5px;' onerror=\"this.style.display='none'\"><span style='text-align:left; width:40%; font-size:12px; color:#ffffff; font-weight:bold;'>{vis}</span></div></div>"
-                st.markdown(html_p, unsafe_allow_html=True)
-            else:
-                st.markdown("<p style='text-align:center; font-size:12px; padding: 15px;'>No hay partidos registrados.</p>", unsafe_allow_html=True)
-            st.markdown("</div></div>", unsafe_allow_html=True)
+        st.markdown("<div class='panel-verde' style='padding: 0;'><div class='contenedor-partidos'>", unsafe_allow_html=True)
+        partidos_fecha = df_partidos[df_partidos['Fecha_Global'] == fecha_seleccionada]
+        if not partidos_fecha.empty:
+            html_p = ""
+            for _, row in partidos_fecha.iterrows():
+                loc, vis, gl, gv = row['Local'], row['Visitante'], row['GL'], row['GV']
+                l_logo, v_logo = logos_equipos.get(loc, ''), logos_equipos.get(vis, '')
+                html_p += f"<div class='fila-partido'><span style='color:white; font-size:10px; font-weight:bold;'>Final</span><div style='display:flex; align-items:center; width: 85%; justify-content: center;'><span style='text-align:right; width:40%; font-size:12px; color:#ffffff; font-weight:bold;'>{loc}</span><img src='{l_logo}' width='18' height='18' style='object-fit:contain; margin: 0 5px;' onerror=\"this.style.display='none'\"><div class='marcador-contenedor'><div class='gol-cajita'>{gl}</div><div class='separador-guion'>-</div><div class='gol-cajita'>{gv}</div></div><img src='{v_logo}' width='18' height='18' style='object-fit:contain; margin: 0 5px;' onerror=\"this.style.display='none'\"><span style='text-align:left; width:40%; font-size:12px; color:#ffffff; font-weight:bold;'>{vis}</span></div></div>"
+            st.markdown(html_p, unsafe_allow_html=True)
+        else:
+            st.markdown("<p style='text-align:center; font-size:12px; padding: 15px;'>No hay partidos registrados.</p>", unsafe_allow_html=True)
+        st.markdown("</div></div>", unsafe_allow_html=True)
 
-            st.markdown("<div class='panel-verde'><div class='titulo-panel'>GOLEADORES</div>", unsafe_allow_html=True)
-            df_g = df_goles.dropna(subset=['Fecha_Global', 'Jugador'])
-            df_g = df_g[df_g['Fecha_Global'] <= fecha_seleccionada]
-            if not df_g.empty:
-                df_g = df_g.groupby(['Jugador', 'Equipo'])['Goles'].sum().reset_index().sort_values(by='Goles', ascending=False).head(10)
-                html_g = "<table class='tabla-pro'><thead><tr><th style='text-align:left;'>Jugador</th><th>Goles</th></tr></thead><tbody>"
-                for _, row in df_g.iterrows():
-                    html_g += f"<tr><td style='text-align:left; color:#ffffff;'><img src='{logos_equipos.get(row['Equipo'], '')}' width='15' height='15' style='object-fit:contain; vertical-align:middle; margin-right:5px;' onerror=\"this.style.display='none'\"> {row['Jugador']}</td><td style='font-weight:bold; color:#ffffff;'>{row['Goles']}</td></tr>"
-                html_g += "</tbody></table>"
-                st.markdown(html_g, unsafe_allow_html=True)
-            else:
-                st.markdown("<p style='text-align:center; font-size:12px;'>Aún no hay goles registrados.</p>", unsafe_allow_html=True)
-            st.markdown("</div>", unsafe_allow_html=True)
-
-        with col_izq:
-            if fecha_seleccionada <= 14:
-                st.markdown("<div class='titulo-panel'>TORNEO DE VERANO</div>", unsafe_allow_html=True)
-                df_verano = df_partidos[(df_partidos['Fecha_Global'] <= fecha_seleccionada) & (df_partidos['Torneo'] == 'Verano')]
-                st.markdown(generar_html_tabla_2018(df_verano, equipo_A, "", zona="ZONA A", f_sel=fecha_seleccionada), unsafe_allow_html=True)
-                st.markdown(generar_html_tabla_2018(df_verano, equipo_B, "", zona="ZONA B", f_sel=fecha_seleccionada), unsafe_allow_html=True)
-            elif fecha_seleccionada <= 29:
-                df_apertura = df_partidos[(df_partidos['Fecha_Global'] >= 15) & (df_partidos['Fecha_Global'] <= fecha_seleccionada) & (df_partidos['Torneo'] == 'Apertura')]
-                st.markdown(generar_html_tabla_2018(df_apertura, todos_equipos_2018, "TORNEO APERTURA", zona="ZONA ÚNICA", f_sel=fecha_seleccionada), unsafe_allow_html=True)
-            else:
-                df_clausura = df_partidos[(df_partidos['Fecha_Global'] >= 30) & (df_partidos['Fecha_Global'] <= min(fecha_seleccionada, 44)) & (df_partidos['Torneo'] == 'Clausura')]
-                st.markdown(generar_html_tabla_2018(df_clausura, todos_equipos_2018, "TORNEO CLAUSURA", zona="ZONA ÚNICA", f_sel=fecha_seleccionada), unsafe_allow_html=True)
-
-            df_acu = df_partidos[df_partidos['Fecha_Global'] <= min(fecha_seleccionada, 44)]
-            st.markdown(generar_html_tabla_2018(df_acu, todos_equipos_2018, f"TABLA ACUMULADA (HASTA LA FECHA {fecha_seleccionada})", es_acumulado=True, f_sel=fecha_seleccionada), unsafe_allow_html=True)
-
-elif temporada == "2026":
-    df_26 = obtener_datos_2026()
-    with tab_fixture:
-        col_izq, col_der = st.columns([2.2, 1.0])
-        with col_izq:
-            html_26 = "<div class='panel-verde'><div class='titulo-panel'>LIGA 1 APERTURA 2026 (FECHA 8)</div>"
-            html_26 += "<table class='tabla-pro'><thead><tr><th>#</th><th>Equipo</th><th>PTS</th><th>J</th><th>G</th><th>E</th><th>P</th><th>Gol</th><th>+/-</th><th>Últimas</th></tr></thead><tbody>"
-            for i, r in df_26.iterrows():
-                logo = logos_equipos.get(r['Equipo'], '')
-                borde = "#3db4dc" if i < 2 else "transparent"
-                html_26 += f"<tr><td style='border-left: 3px solid {borde}; font-weight:bold;'>{i+1}</td><td style='text-align:left;'><img src='{logo}' width='15' height='15' style='vertical-align:middle; margin-right:6px;' onerror=\"this.style.display='none'\"> {r['Equipo']}</td><td style='font-weight:bold; font-size:13px;'>{r['PTS']}</td><td>{r['J']}</td><td>{r['G']}</td><td>{r['E']}</td><td>{r['P']}</td><td>{r['GF']}:{r['GC']}</td><td>{r['+/-']}</td><td>{formatear_racha(r['Racha_Str'])}</td></tr>"
-            html_26 += "</tbody></table></div>"
-            st.markdown(html_26, unsafe_allow_html=True)
-            
-        with col_der:
-            st.markdown("<div class='panel-verde'><div class='titulo-panel'>INFO LIGA 1</div>", unsafe_allow_html=True)
-            st.markdown("<p style='text-align:center; font-size:12px;'>Alianza Lima y Los Chankas lideran el torneo con 20 puntos cada uno al término de la Fecha 8.<br><br><i>Datos oficiales actualizados a Marzo 2026.</i></p></div>", unsafe_allow_html=True)
+    with col_izq:
+        df_acu = df_partidos[df_partidos['Fecha_Global'] <= fecha_seleccionada]
+        # Usamos el mismo motor para calcular las tablas sin importar si es 2018 o 2026
+        st.markdown(generar_html_tabla(df_acu, todos_eq, f"TABLA POSICIONES (HASTA LA {fecha_texto})", es_acumulado=True, f_sel=fecha_seleccionada), unsafe_allow_html=True)
 
 # =====================================================================
-# --- TAB 2: EQUIPOS Y ESTADÍSTICAS (SOLO LA CUADRÍCULA DE EQUIPOS) ---
+# --- TAB 2: EQUIPOS (SOLO LA CUADRÍCULA, SIN GOLEADORES) ---
 # =====================================================================
 with tab_estadisticas:
     st.markdown("<h3 style='text-align: center; color: white; margin-bottom: 5px;'>EQUIPOS LIGA 1</h3>", unsafe_allow_html=True)
-    st.markdown("<p style='text-align: center; color: #87b897; font-size: 11px; margin-bottom: 15px;'>Haz clic en un equipo para ver su historial y palmarés (Próximamente)</p>", unsafe_allow_html=True)
+    st.markdown("<p style='text-align: center; color: #87b897; font-size: 11px; margin-bottom: 15px;'>Haz clic en un equipo para ver su info detallada (Próximamente)</p>", unsafe_allow_html=True)
 
     tit_h = {'Universitario': 29, 'Alianza Lima': 25, 'Sporting Cristal': 20, 'Sport Boys': 6, 'Dep. Municipal': 4, 'U. San Martin': 3, 'FBC Melgar': 2, 'Binacional': 1}
     
@@ -297,7 +241,7 @@ with tab_estadisticas:
     st.markdown(html_grid, unsafe_allow_html=True)
 
 # =====================================================================
-# --- TAB 3: CAMPEONES (BASE DE DATOS HISTÓRICA INYECTADA POR IA) ---
+# --- TAB 3: CAMPEONES Y MÁQUINA DEL TIEMPO ---
 # =====================================================================
 with tab_campeones:
     historial_datos = [
@@ -338,3 +282,18 @@ with tab_campeones:
             html_r += f"<tr><td style='text-align:left;'><img src='{logo}' width='15' height='15' style='object-fit:contain; vertical-align:middle; margin-right:6px;' onerror=\"this.style.display='none'\"> <span style='color:#ffffff; font-weight:bold;'>{row['Equipo']}</span></td><td style='font-weight:bold; color:#ffffff; font-size:13px;'>{row['Títulos']}</td></tr>"
         html_r += "</tbody></table></div>"
         st.markdown(html_r, unsafe_allow_html=True)
+
+    # --- LA MÁQUINA DEL TIEMPO ---
+    st.markdown("<br><hr style='border-color: #1a4a2e;'><h3 style='text-align: center; color: white;'>MÁQUINA DEL TIEMPO</h3>", unsafe_allow_html=True)
+    st.markdown("<p style='text-align: center; color: #87b897; font-size: 13px;'>Explora la base de datos detallada de los torneos pasados.</p>", unsafe_allow_html=True)
+    
+    col_b1, col_b2, col_b3 = st.columns([1, 1, 1])
+    with col_b2:
+        if temporada == "2026":
+            if st.button("⏪ Viajar al Torneo 2018", use_container_width=True):
+                st.session_state['temporada'] = "2018"
+                st.rerun()
+        else:
+            if st.button("🏠 Volver al Presente (2026)", use_container_width=True):
+                st.session_state['temporada'] = "2026"
+                st.rerun()
