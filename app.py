@@ -209,133 +209,58 @@ with tab_fixture:
         # TABLA ACUMULADA (Siempre Visible y con la nota al final)
         df_acu = df_partidos[df_partidos['Fecha_Global'] <= min(fecha_seleccionada, 44)]
         st.markdown(generar_html_tabla(df_acu, todos_equipos, f"TABLA ACUMULADA (HASTA LA FECHA {fecha_seleccionada})", es_acumulado=True), unsafe_allow_html=True)
-   # =====================================================================
+  # =====================================================================
 # --- PESTAÑA 2: EQUIPOS Y ESTADÍSTICAS (BLOQUE COMPLETO REPARADO) ---
 # =====================================================================
 with tab_estadisticas:
     st.markdown("<h3 style='text-align: center; color: white; margin-bottom: 5px;'>EQUIPOS</h3>", unsafe_allow_html=True)
-    st.markdown("<p style='text-align: center; color: #87b897; font-size: 12px; margin-bottom: 20px;'>Pulsar en el equipo para ver su info detallada (Próximamente)</p>", unsafe_allow_html=True)
+    st.markdown("<p style='text-align: center; color: #87b897; font-size: 11px; margin-bottom: 15px;'>Pulsar en el equipo para ver su info detallada (Próximamente)</p>", unsafe_allow_html=True)
 
-    # Diccionario de títulos históricos para las insignias (Badges)
-    titulos_peru = {
-        'Universitario': 29, 'Alianza Lima': 25, 'Sporting Cristal': 20,
-        'Sport Boys': 6, 'Dep. Municipal': 4, 'U. San Martin': 3,
-        'FBC Melgar': 2, 'Binacional': 1, 'Cusco (Garcilaso)': 0, 
-        'UTC': 0, 'Sport Huancayo': 0, 'Ayacucho FC': 0, 
-        'Union Comercio': 0, 'Cantolao': 0, 'Sport Rosario': 0, 
-        'Comerciantes Unidos': 0
-    }
+    # 1. Diccionario de títulos históricos para las insignias (Badges)
+    tit_h = {'Universitario': 29, 'Alianza Lima': 25, 'Sporting Cristal': 20, 'Sport Boys': 6, 'Dep. Municipal': 4, 'U. San Martin': 3, 'FBC Melgar': 2, 'Binacional': 1, 'Cusco (Garcilaso)': 0, 'UTC': 0, 'Sport Huancayo': 0, 'Ayacucho FC': 0, 'Union Comercio': 0, 'Cantolao': 0, 'Sport Rosario': 0, 'Comerciantes Unidos': 0}
 
-    # CSS para la cuadrícula de equipos estilo Promiedos
-    st.markdown("""
-    <style>
-        .equipo-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-            gap: 15px;
-            padding: 10px;
-        }
-        .equipo-card {
-            background-color: #0c3620;
-            border: 1px solid #1a4a2e;
-            border-radius: 8px;
-            padding: 20px 10px;
-            text-align: center;
-            transition: transform 0.2s, border-color 0.2s;
-            position: relative;
-        }
-        .equipo-card:hover {
-            transform: translateY(-5px);
-            border-color: #8cc63f;
-            background-color: #11452a;
-        }
-        .equipo-logo-grid {
-            width: 55px;
-            height: 55px;
-            object-fit: contain;
-            margin-bottom: 12px;
-        }
-        .equipo-nombre-grid {
-            color: #ffffff;
-            font-weight: bold;
-            font-size: 12px;
-            display: block;
-            text-transform: uppercase;
-        }
-        .badge-copa-grid {
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            color: #ffffff;
-            font-size: 10px;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            gap: 2px;
-        }
-    </style>
-    """, unsafe_allow_html=True)
+    # 2. Estilos CSS compactos para la cuadrícula
+    st.markdown("<style>.eq-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;padding:5px;}.eq-card{background-color:#0c3620;border:1px solid #1a4a2e;border-radius:6px;padding:15px 5px;text-align:center;position:relative;transition:0.2s;}.eq-card:hover{border-color:#8cc63f;background-color:#11452a;transform:translateY(-3px);}.eq-logo{width:45px;height:45px;object-fit:contain;margin-bottom:8px;}.eq-nom{color:#ffffff;font-weight:bold;font-size:11px;text-transform:uppercase;display:block;}.eq-badge{position:absolute;top:5px;right:5px;color:#ffffff;font-size:9px;font-weight:bold;display:flex;align-items:center;gap:2px;}</style>", unsafe_allow_html=True)
 
-    # Generamos el HTML de la cuadrícula de escudos
-    html_grid = "<div class='equipo-grid'>"
+    # 3. GENERACIÓN DEL GRID (HTML comprimido en una sola cadena)
+    html_grid = "<div class='eq-grid'>"
     for equipo in todos_equipos:
         logo = logos_equipos.get(equipo, '')
-        copas = titulos_peru.get(equipo, 0)
-        insignia = f"<div class='badge-copa-grid'>🏆{copas}</div>" if copas > 0 else ""
-        
-        html_grid += f"""
-        <div class='equipo-card'>
-            {insignia}
-            <img src='{logo}' class='equipo-logo-grid' onerror="this.style.display='none'">
-            <span class='equipo-nombre-grid'>{equipo}</span>
-        </div>
-        """
+        copas = tit_h.get(equipo, 0)
+        insignia = f"<div class='eq-badge'>🏆{copas}</div>" if copas > 0 else ""
+        html_grid += f"<div class='eq-card'>{insignia}<img src='{logo}' class='eq-logo' onerror=\"this.style.display='none'\"><span class='eq-nom'>{equipo}</span></div>"
     html_grid += "</div>"
+    
+    # Renderizado del Grid
     st.markdown(html_grid, unsafe_allow_html=True)
 
-    # Separador sutil
-    st.markdown("<br><hr style='border-color: #1a4a2e; opacity: 0.3;'><br>", unsafe_allow_html=True)
+    # 4. SECCIÓN DE ESTADÍSTICAS TOTALES (GOLEADORES Y RESUMEN)
+    st.markdown("<br><hr style='border-color: #1a4a2e; opacity: 0.3;'><h3 style='text-align: center; color: white; margin-top:10px;'>ESTADÍSTICAS DE TEMPORADA</h3>", unsafe_allow_html=True)
     
-    # Sección de Goleadores Expandida
-    st.markdown("<h3 style='text-align: center; color: white;'>ESTADÍSTICAS PERSONALES</h3>", unsafe_allow_html=True)
+    col_izq_s, col_der_s = st.columns(2)
     
-    col_izq_stats, col_der_stats = st.columns(2)
-    
-    with col_izq_stats:
+    with col_izq_s:
         st.markdown("<div class='panel-verde'><div class='titulo-panel'>MÁXIMOS GOLEADORES</div>", unsafe_allow_html=True)
-        # Filtramos goleadores de toda la temporada registrada en el Excel
+        # Lógica para Goleadores Históricos del Excel
         df_g_full = df_goles.dropna(subset=['Jugador']).groupby(['Jugador', 'Equipo'])['Goles'].sum().reset_index()
-        df_g_full = df_g_full.sort_values(by='Goles', ascending=False).head(15).reset_index(drop=True)
+        df_g_full = df_g_full.sort_values(by='Goles', ascending=False).head(12).reset_index(drop=True)
         
-        html_g_full = "<table class='tabla-pro'><thead><tr><th>#</th><th>Jugador</th><th>Equipo</th><th>Goles</th></tr></thead><tbody>"
+        h_g_full = "<table class='tabla-pro'><thead><tr><th>#</th><th>Jugador</th><th>Equipo</th><th>Goles</th></tr></thead><tbody>"
         for idx, row in df_g_full.iterrows():
             pos = idx + 1
-            l_escudo = logos_equipos.get(row['Equipo'], '')
-            html_g_full += f"<tr><td>{pos}</td><td style='text-align:left;'>{row['Jugador']}</td><td><img src='{l_escudo}' width='15' height='15'></td><td style='font-weight:bold;'>{int(row['Goles'])}</td></tr>"
-        html_g_full += "</tbody></table></div>"
-        st.markdown(html_g_full, unsafe_allow_html=True)
+            escudo = logos_equipos.get(row['Equipo'], '')
+            h_g_full += f"<tr><td>{pos}</td><td style='text-align:left;'>{row['Jugador']}</td><td><img src='{escudo}' width='15' height='15' style='object-fit:contain;'></td><td style='font-weight:bold; font-size:13px;'>{int(row['Goles'])}</td></tr>"
+        h_g_full += "</tbody></table></div>"
+        st.markdown(h_g_full, unsafe_allow_html=True)
 
-    with col_der_stats:
-        # Aquí podrías poner Vallas Invictas o Asistencias si las tuvieras en el Excel
-        st.markdown("<div class='panel-verde'><div class='titulo-panel'>DATOS DE TEMPORADA</div>", unsafe_allow_html=True)
-        total_goles = int(df_goles['Goles'].sum())
-        total_partidos = len(df_partidos.dropna(subset=['GL']))
-        promedio = round(total_goles / total_partidos, 2) if total_partidos > 0 else 0
+    with col_der_s:
+        st.markdown("<div class='panel-verde'><div class='titulo-panel'>RESUMEN GENERAL</div>", unsafe_allow_html=True)
+        total_g = int(df_goles['Goles'].sum())
+        total_p = len(df_partidos.dropna(subset=['GL']))
+        promedio = round(total_g / total_p, 2) if total_p > 0 else 0
         
-        html_resumen = f"""
-        <div style='padding: 20px; text-align: center;'>
-            <div style='font-size: 14px; color: #87b897;'>Goles Totales</div>
-            <div style='font-size: 30px; font-weight: bold; color: #ffffff;'>{total_goles}</div>
-            <br>
-            <div style='font-size: 14px; color: #87b897;'>Partidos Jugados</div>
-            <div style='font-size: 30px; font-weight: bold; color: #ffffff;'>{total_partidos}</div>
-            <br>
-            <div style='font-size: 14px; color: #87b897;'>Promedio de Gol</div>
-            <div style='font-size: 30px; font-weight: bold; color: #8cc63f;'>{promedio}</div>
-        </div>
-        """
-        st.markdown(html_resumen, unsafe_allow_html=True)
-        st.markdown("</div>", unsafe_allow_html=True)
+        html_res = f"<div style='text-align:center; padding:15px;'><div style='color:#87b897; font-size:12px;'>GOLES TOTALES</div><div style='font-size:28px; font-weight:bold; color:#ffffff;'>{total_g}</div><br><div style='color:#87b897; font-size:12px;'>PARTIDOS JUGADOS</div><div style='font-size:28px; font-weight:bold; color:#ffffff;'>{total_p}</div><br><div style='color:#8cc63f; font-size:12px;'>PROMEDIO POR PARTIDO</div><div style='font-size:28px; font-weight:bold; color:#8cc63f;'>{promedio}</div></div></div>"
+        st.markdown(html_res, unsafe_allow_html=True)
         # =====================================================================
 # --- PESTAÑA 3: CAMPEONES (BASE DE DATOS HISTÓRICA INYECTADA POR IA) ---
 # =====================================================================
