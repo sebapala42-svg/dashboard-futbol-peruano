@@ -1,4 +1,4 @@
-"'use client';
+'use client';
 import React, { useState, useMemo } from 'react';
 // Importamos tu JSON directamente desde la raíz del proyecto
 import partidosJSON from '../torneo_2018.json';
