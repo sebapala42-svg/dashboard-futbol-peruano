@@ -347,7 +347,7 @@ export default function Home() {
       {/* Aquí es donde he agregado el contenedor para tu logo */}
       <header className="w-full px-[30px] py-[15px] bg-[#0b4026] flex items-center shadow-sm z-10">
         <img 
-          src="/ruta-a-tu-logo.png" 
+          src="https://ibb.co/tM9xqkqw" 
           alt="Logo Universitario" 
           className="h-[50px] w-auto block object-contain" 
         />
