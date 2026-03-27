@@ -346,6 +346,7 @@ export default function Home() {
       {/* ======================= FIXTURE Y TABLAS ======================= */}
       {tab === 'fixture' && (
         <main style={{ display: 'grid', gridTemplateColumns: '64% 34%', gap: '2%', maxWidth: '1250px', margin: '0 auto', padding: '20px', alignItems: 'start' }}>
+          
           {/* COLUMNA IZQUIERDA */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
             {temporada === '2018' && fecha <= 14 && (
@@ -363,34 +364,31 @@ export default function Home() {
             {temporada === '2026' && fecha <= 17 && (
               <TablaComponent titulo="TORNEO APERTURA 2026" zona="ZONA ÚNICA" datos={generarTabla(partidosValidos.filter(p => p.Torneo === 'Apertura'))} />
             )}
-            <TablaComponent titulo={`TABLA ACUMULADA (HASTA LA FECHA ${fecha})`} datos={generarTabla(partidosValidos, null, true)} esAcumulado={true} />
+
+            {/* LÓGICA DE LIGUILLAS Y TABLA ACUMULADA INTEGRADA AQUÍ */}
+            {temporada === '2013' && fecha > 30 && fecha <= 44 ? (
+              <>
+                <TablaComponent 
+                  titulo="LIGUILLA A" 
+                  datos={generarTabla(partidosValidos, liguillaA_2013, true)} 
+                  esAcumulado={true} 
+                />
+                <TablaComponent 
+                  titulo="LIGUILLA B" 
+                  datos={generarTabla(partidosValidos, liguillaB_2013, true)} 
+                  esAcumulado={true} 
+                />
+              </>
+            ) : (
+              /* CASO NORMAL: UNA SOLA TABLA ACUMULADA */
+              <TablaComponent 
+                titulo={fecha > 44 ? "TABLA FINAL ACUMULADA" : `TABLA ACUMULADA (HASTA LA FECHA ${fecha})`} 
+                datos={generarTabla(temporada === '2013' && fecha > 44 ? listaPartidos.filter(p => p.Fecha_Global <= 44) : partidosValidos, null, true)} 
+                esAcumulado={true} 
+              />
+            )}
           </div>
-          <main className="grid grid-cols-1 md:grid-cols-[1fr_400px] gap-6 max-w-[1250px] mx-auto px-4">
-    <div>
-      {/* SI ES 2013 Y FECHA > 30, MOSTRAR LIGUILLAS */}
-      {temporada === '2013' && fecha > 30 && fecha <= 44 ? (
-        <>
-          <TablaComponent 
-            titulo="LIGUILLA A" 
-            datos={generarTabla(partidosValidos, liguillaA_2013, true)} 
-            esAcumulado={true} 
-          />
-          <div className="my-6"></div> {/* Espacio entre tablas */}
-          <TablaComponent 
-            titulo="LIGUILLA B" 
-            datos={generarTabla(partidosValidos, liguillaB_2013, true)} 
-            esAcumulado={true} 
-          />
-        </>
-      ) : (
-        /* CASO NORMAL: UNA SOLA TABLA */
-        <TablaComponent 
-          titulo={fecha > 44 ? "TABLA FINAL ACUMULADA" : `TABLA ACUMULADA ${temporada}`} 
-          datos={generarTabla(temporada === '2013' && fecha > 44 ? listaPartidos.filter(p => p.Fecha_Global <= 44) : partidosValidos, null, true)} 
-          esAcumulado={true} 
-        />
-      )}
-    </div>                                                                                           
+                                                                           
           {/* COLUMNA DERECHA */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
             <div className="flex flex-col gap-[10px]">
