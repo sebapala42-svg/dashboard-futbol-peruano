@@ -48,6 +48,7 @@ export default function Home() {
     if (temporada === '2013') return Array.isArray(partidos2013JSON) ? partidos2013JSON : [];
     return partidos2026JSON;
   }, [temporada]);
+  
   const [fecha, setFecha] = useState(8); 
   const [tab, setTab] = useState('fixture');
   const [equipoSeleccionado, setEquipoSeleccionado] = useState(null);
@@ -110,6 +111,9 @@ export default function Home() {
   const equipo_A_2018 = ['Sporting Cristal', 'Sport Rosario', 'UTC', 'U. San Martin', 'Alianza Lima', 'Comerciantes Unidos', 'Ayacucho FC', 'Universitario'];
   const equipo_B_2018 = ['Sport Huancayo', 'FBC Melgar', 'Cantolao', 'Dep. Municipal', 'Sport Boys', 'Cusco (Garcilaso)', 'Binacional', 'Union Comercio'];
 
+  const liguillaA_2013 = ['Cusco (Garcilaso)', 'Sporting Cristal', 'Alianza Lima', 'Cesar Vallejo', 'Sport Huancayo', 'FBC Melgar', 'Pacifico FC', 'Union Comercio'];
+  const liguillaB_2013 = ['Universitario', 'UTC', 'Ayacucho FC', 'Juan Aurich', 'Cienciano', 'Leon de Huanuco', 'U. San Martin', 'Jose Galvez'];
+
   const partidosValidos = useMemo(() => {
     return listaPartidos.filter(p => p.Fecha_Global <= fecha && p.GL !== null && p.GV !== null);
   }, [listaPartidos, fecha]);
@@ -169,26 +173,15 @@ export default function Home() {
           if (['Dep. Municipal', 'UTC', 'Cantolao'].includes(t.equipo)) finalPts -= 2;
           if (t.equipo === 'Universitario') finalPts -= 1;
         }
-        // --- BONIFICACIONES 2013 (Torneo Reservas) ---
-    // Se sumaron en la Fecha 31 al empezar las liguillas
-    if (temporada === '2013' && esAcumulado && fecha >= 31) {
-      if (t.equipo === 'U. San Martin') finalPts += 2; // Campeón Reservas
-      if (t.equipo === 'Alianza Lima') finalPts += 1;  // Subcampeón Reservas
-    }
+        if (temporada === '2013' && esAcumulado && fecha >= 31) {
+          if (t.equipo === 'U. San Martin') finalPts += 2; 
+          if (t.equipo === 'Alianza Lima') finalPts += 1;  
+        }
         return { ...t, pts: finalPts, dif: t.gf - t.gc, ultimas: t.racha.slice(-5).reverse() };
       })
       .sort((a, b) => b.pts - a.pts || b.dif - a.dif || b.gf - a.gf);
   };
-// --- GRUPOS LIGUILLAS 2013 ---
-  const liguillaA_2013 = [
-    'Cusco (Garcilaso)', 'Sporting Cristal', 'Alianza Lima', 'Cesar Vallejo', 
-    'Sport Huancayo', 'FBC Melgar', 'Pacifico FC', 'Union Comercio'
-  ];
 
-  const liguillaB_2013 = [
-    'Universitario', 'UTC', 'Ayacucho FC', 'Juan Aurich', 
-    'Cienciano', 'Leon de Huanuco', 'U. San Martin', 'Jose Galvez'
-  ];
   const TablaComponent = ({ titulo, zona, datos, esAcumulado, compactLogo = false }) => (
     <div className="bg-[#112d1e] border border-[#1a4a2e] rounded-[8px] overflow-hidden shadow-lg mb-[15px] pb-1">
       <div className="text-center text-white font-bold text-[14px] uppercase py-[10px]">
@@ -307,63 +300,12 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-[#0b4026] font-sans selection:bg-[#8cc63f] selection:text-black">
-      {/* Título Principal */}
-    {tab === 'fixture' && (
-        <main style={{ display: 'grid', gridTemplateColumns: '64% 34%', gap: '2%', maxWidth: '1250px', margin: '0 auto', padding: '20px', alignItems: 'start' }}>
-          
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-            {/* Tablas específicas por temporada */}
-            {temporada === '2018' && fecha <= 14 && (
-              <>
-                <TablaComponent titulo="TORNEO DE VERANO" zona="ZONA A" datos={generarTabla(partidosValidos.filter(p => p.Torneo === 'Verano'), equipo_A_2018)} />
-                <TablaComponent titulo="TORNEO DE VERANO" zona="ZONA B" datos={generarTabla(partidosValidos.filter(p => p.Torneo === 'Verano'), equipo_B_2018)} />
-              </>
-            )}
-
-            {/* Lógica de Liguillas 2013 o Tabla Acumulada */}
-            {temporada === '2013' && fecha > 30 && fecha <= 44 ? (
-              <>
-                <TablaComponent titulo="LIGUILLA A" datos={generarTabla(partidosValidos, liguillaA_2013, true)} esAcumulado={true} />
-                <TablaComponent titulo="LIGUILLA B" datos={generarTabla(partidosValidos, liguillaB_2013, true)} esAcumulado={true} />
-              </>
-            ) : (
-              <TablaComponent 
-                titulo={fecha > 44 ? "TABLA FINAL ACUMULADA" : `TABLA ACUMULADA (HASTA LA FECHA ${fecha})`} 
-                datos={generarTabla(partidosValidos, null, true)} 
-                esAcumulado={true} 
-              />
-            )}
-          </div>
-
-          {/* COLUMNA DERECHA: Resultados de la fecha */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-             <div className="flex flex-col gap-[10px]">
-                {/* Selector de fecha dinámico según temporada */}
-                <select value={fecha} onChange={(e) => setFecha(Number(e.target.value))} className="...">
-                   {[...Array(temporada === '2018' ? 44 : 17)].map((_, i) => (
-                     <option key={i+1} value={i+1}>FECHA {i+1}</option>
-                   ))}
-                </select>
-
-                <div className="bg-[#112d1e] border border-[#1a4a2e] rounded-lg overflow-hidden shadow-lg">
-                  {listaPartidos.filter(p => p.Fecha_Global === fecha).map((p, idx) => (
-                    // ... Tu render de partidos (Local vs Visitante)
-                    <div key={idx}>{/* p.Local vs p.Visitante */}</div>
-                  ))}
-                  {listaPartidos.filter(p => p.Fecha_Global === fecha).length === 0 && (
-                    <div className="p-4 text-center text-white text-xs">No hay partidos en esta fecha.</div>
-                  )}
-                </div>
-             </div>
-          </div>
-        </main>
-      )}
-    
+      
+      {/* ======================= TÍTULO PRINCIPAL ======================= */}
       <div className="pt-6 pb-2 relative">
         <h2 className="text-center text-[24px] font-bold m-0 flex flex-col items-center justify-center" style={{ color: '#ffffff' }}>
           LIGA PROFESIONAL PERUANA {temporada}
         </h2>
-        {/* BOTON DE ESCAPE AL PRESENTE */}
         {temporada !== '2026' && (
           <div className="absolute right-4 top-6">
             <button 
@@ -376,7 +318,7 @@ export default function Home() {
         )}
       </div>
 
-      {/* TABS */}
+      {/* ======================= MENÚ DE NAVEGACIÓN (TABS) ======================= */}
       <nav className="w-full mb-6 mt-4 border-b border-[#1a4a2e]">
         <div className="max-w-5xl mx-auto flex justify-center">
           {[
@@ -398,15 +340,11 @@ export default function Home() {
           ))}
         </div>
       </nav>
-</div>
-  );
-}
 
       {/* ======================= FIXTURE Y TABLAS ======================= */}
       {tab === 'fixture' && (
         <main style={{ display: 'grid', gridTemplateColumns: '64% 34%', gap: '2%', maxWidth: '1250px', margin: '0 auto', padding: '20px', alignItems: 'start' }}>
           
-          {/* COLUMNA IZQUIERDA */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
             {temporada === '2018' && fecha <= 14 && (
               <>
@@ -424,22 +362,12 @@ export default function Home() {
               <TablaComponent titulo="TORNEO APERTURA 2026" zona="ZONA ÚNICA" datos={generarTabla(partidosValidos.filter(p => p.Torneo === 'Apertura'))} />
             )}
 
-            {/* LÓGICA DE LIGUILLAS Y TABLA ACUMULADA INTEGRADA AQUÍ */}
             {temporada === '2013' && fecha > 30 && fecha <= 44 ? (
               <>
-                <TablaComponent 
-                  titulo="LIGUILLA A" 
-                  datos={generarTabla(partidosValidos, liguillaA_2013, true)} 
-                  esAcumulado={true} 
-                />
-                <TablaComponent 
-                  titulo="LIGUILLA B" 
-                  datos={generarTabla(partidosValidos, liguillaB_2013, true)} 
-                  esAcumulado={true} 
-                />
+                <TablaComponent titulo="LIGUILLA A" datos={generarTabla(partidosValidos, liguillaA_2013, true)} esAcumulado={true} />
+                <TablaComponent titulo="LIGUILLA B" datos={generarTabla(partidosValidos, liguillaB_2013, true)} esAcumulado={true} />
               </>
             ) : (
-              /* CASO NORMAL: UNA SOLA TABLA ACUMULADA */
               <TablaComponent 
                 titulo={fecha > 44 ? "TABLA FINAL ACUMULADA" : `TABLA ACUMULADA (HASTA LA FECHA ${fecha})`} 
                 datos={generarTabla(temporada === '2013' && fecha > 44 ? listaPartidos.filter(p => p.Fecha_Global <= 44) : partidosValidos, null, true)} 
@@ -448,7 +376,6 @@ export default function Home() {
             )}
           </div>
                                                                            
-          {/* COLUMNA DERECHA */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
             <div className="flex flex-col gap-[10px]">
               <div className="text-center font-bold text-[14px] uppercase mb-[-5px]" style={{ color: '#8cc63f' }}>TEMPORADA {temporada}</div>
@@ -491,10 +418,10 @@ export default function Home() {
                <table className="w-full text-[12px] text-white font-sans border-collapse mt-[5px]">
                  <thead><tr><th className="bg-[#0d2418] text-[#a1b5a8] border-b border-[#1a4a2e] py-[6px] px-[4px] font-normal text-[11px] text-left">Jugador</th><th className="bg-[#0d2418] text-[#a1b5a8] border-b border-[#1a4a2e] py-[6px] px-[4px] font-normal text-[11px] text-center w-[40px]">Goles</th></tr></thead>
                  <tbody>{[
-                    { n: temporada === '2018' ? "E. Herrera" : "Cauteruccio", eq: temporada === '2018' ? "Sporting Cristal" : "Sporting Cristal", g: 8 },
+                    { n: temporada === '2018' ? "E. Herrera" : "Cauteruccio", eq: "Sporting Cristal", g: 8 },
                     { n: "Mauricio Montes", eq: "Ayacucho FC", g: 6 },
                     { n: "Tulio Etchemaite", eq: "Sport Rosario", g: 5 },
-                  ].map((g, i) => (
+                 ].map((g, i) => (
                     <tr key={i} className={`hover:bg-[#1c4531] transition-colors ${i % 2 === 0 ? 'bg-[#112d1e]' : 'bg-[#153625]'}`}>
                       <td className="py-[6px] px-[4px] text-left flex items-center">
                         <img src={logos[g.eq] || 'https://cdn-icons-png.flaticon.com/128/33/33736.png'} style={{ width: '15px', height: '15px', minWidth: '15px', objectFit: 'contain', marginRight: '6px' }} />
@@ -502,7 +429,7 @@ export default function Home() {
                       </td>
                       <td className="py-[6px] px-[4px] text-center font-bold" style={{ color: '#ffffff' }}>{g.g}</td>
                     </tr>
-                  ))}</tbody>
+                 ))}</tbody>
                </table>
             </div>
           </div>
@@ -518,7 +445,7 @@ export default function Home() {
               <p className="text-center text-[#87b897] text-[12px] mb-8">Pulsar en el equipo para ver su info detallada</p>
               
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
-                {Object.keys(logos)
+                {Object.keys(logos)
                   .sort()
                   .filter(eq => {
                     if (temporada === '2026') return partidos2026JSON.some(p => p.Local === eq || p.Visitante === eq);
@@ -526,21 +453,18 @@ export default function Home() {
                     return true; 
                   })
                   .map(eq => (
-                    <button 
-                      key={eq} 
-                      onClick={() => setEquipoSeleccionado(eq)} 
-                      className="p-4 flex flex-col items-center justify-center bg-[#112d1e] border border-[#1a4a2e] rounded-[8px] hover:bg-[#153625] transition-colors cursor-pointer group shadow-sm"
-                    >
-                      <img src={logos[eq]} style={{ width: '40px', height: '40px', objectFit: 'contain', marginBottom: '10px' }} alt={eq} />
-                      <span 
-                        className="font-bold text-[13px] text-center uppercase leading-tight group-hover:text-[#8cc63f]"
-                        style={{ color: '#ffffff' }}
-                      >
-                        {eq}
-                      </span>
-                    </button>
-                  ))}
-              </div>
+                    <button 
+                      key={eq} 
+                      onClick={() => setEquipoSeleccionado(eq)} 
+                      className="p-4 flex flex-col items-center justify-center bg-[#112d1e] border border-[#1a4a2e] rounded-[8px] hover:bg-[#153625] transition-colors cursor-pointer group shadow-sm"
+                    >
+                      <img src={logos[eq]} style={{ width: '40px', height: '40px', objectFit: 'contain', marginBottom: '10px' }} alt={eq} />
+                      <span className="font-bold text-[13px] text-center uppercase leading-tight group-hover:text-[#8cc63f]" style={{ color: '#ffffff' }}>
+                        {eq}
+                      </span>
+                    </button>
+                  ))}
+              </div>
             </div>
           ) : (
             <div>
@@ -585,7 +509,6 @@ export default function Home() {
                       <img src={logos[row.Campeón] || 'https://cdn-icons-png.flaticon.com/128/33/33736.png'} style={{ width: '16px', height: '16px', objectFit: 'contain' }} />
                       <span style={{ color: '#ffffff' }}>{row.Campeón}</span>
                     </div>
-                    {/* BOTON VER AÑO (CORREGIDO A VERDE Y LETRA NEGRA) */}
                     {row.Año === '2018' && (
                       <button 
                         onClick={() => { setTemporada('2018'); setFecha(44); setTab('fixture'); setEquipoSeleccionado(null); window.scrollTo(0,0); }}
@@ -594,15 +517,14 @@ export default function Home() {
                         VER AÑO
                       </button>
                     )}
-{/* BOTON VER AÑO 2013 */}
-{row.Año === '2013' && (
-  <button 
-    onClick={() => { setTemporada('2013'); setFecha(44); setTab('fixture'); setEquipoSeleccionado(null); window.scrollTo(0,0); }}
-    className="bg-[#8cc63f] text-black font-bold text-[10px] px-3 py-1 rounded border-none outline-none cursor-pointer"
-  >
-    VER AÑO
-  </button>
-)}
+                    {row.Año === '2013' && (
+                      <button 
+                        onClick={() => { setTemporada('2013'); setFecha(44); setTab('fixture'); setEquipoSeleccionado(null); window.scrollTo(0,0); }}
+                        className="bg-[#8cc63f] text-black font-bold text-[10px] px-3 py-1 rounded border-none outline-none cursor-pointer"
+                      >
+                        VER AÑO
+                      </button>
+                    )}
                   </td>
                 </tr>
               ))}</tbody>
