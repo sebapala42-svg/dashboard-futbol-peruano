@@ -202,17 +202,13 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-[#0b4026] font-sans selection:bg-[#8cc63f] selection:text-black">
-      {/* Título Principal */}
+      {/* Título Principal Limpio (Sin el logo roto) */}
       <div className="pt-6 pb-2">
         <h2 className="text-center text-[24px] font-bold m-0 flex items-center justify-center gap-2" style={{ color: '#ffffff' }}>
-          <img src="https://tmssl.akamaized.net//images/logo/header/per1.png" className="w-8 h-8 object-contain" alt="Liga 1"/>
           LIGA PROFESIONAL PERUANA 2018
         </h2>
       </div>
 
-      {/* =========================================================================
-          TABS CORREGIDOS: Fondo verde transparente, texto blanco forzado y línea amarilla
-          ========================================================================= */}
       <nav className="w-full mb-6 mt-4 border-b border-[#1a4a2e]">
         <div className="max-w-5xl mx-auto flex justify-center">
           {[
@@ -318,7 +314,6 @@ export default function Home() {
               <h3 className="text-center font-bold mb-1 uppercase tracking-widest text-[18px]" style={{ color: '#ffffff' }}>EQUIPOS LIGA 1</h3>
               <p className="text-center text-[#87b897] text-[12px] mb-8">Pulsar en el equipo para ver su info detallada</p>
               
-              {/* EQUIPOS CORREGIDOS: Con cajas (bg-[#112d1e]), más juntos (gap-3), texto forzado a blanco */}
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
                 {Object.keys(logos).sort().map(eq => (
                   <button 
