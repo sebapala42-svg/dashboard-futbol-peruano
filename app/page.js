@@ -138,7 +138,7 @@ export default function Home() {
       .slice(0, 3);
   }, [listaPartidos, equipoSeleccionado, fecha]);
 
-  // EL CEREBRO DE LA TABLA CORREGIDO: Suma puntos de TODOS los partidos jugados, arrastrando el historial.
+  // EL CEREBRO DE LA TABLA CORREGIDO: Solucionado el error de empates y derrotas.
   const generarTabla = (partidos, listaFiltro = null, esAcumulado = false) => {
     const tabla = {};
     let equiposActuales = listaFiltro;
@@ -157,8 +157,8 @@ export default function Home() {
         tabla[p.Local].gf += p.GL;
         tabla[p.Local].gc += p.GV;
         if (p.GL > p.GV) { tabla[p.Local].g++; tabla[p.Local].pts += 3; tabla[p.Local].racha.push('V'); }
-        else if (p.GL < p.GV) { tabla[p.Local].e++; tabla[p.Local].pts += 1; tabla[p.Local].racha.push('E'); }
-        else { tabla[p.Local].p++; tabla[p.Local].racha.push('D'); }
+        else if (p.GL < p.GV) { tabla[p.Local].p++; tabla[p.Local].racha.push('D'); } // CORREGIDO AQUÍ: Era Derrota
+        else { tabla[p.Local].e++; tabla[p.Local].pts += 1; tabla[p.Local].racha.push('E'); } // CORREGIDO AQUÍ: Era Empate
       }
       
       // Sumamos al Visitante si pertenece a la tabla que estamos armando
@@ -167,8 +167,8 @@ export default function Home() {
         tabla[p.Visitante].gf += p.GV;
         tabla[p.Visitante].gc += p.GL;
         if (p.GV > p.GL) { tabla[p.Visitante].g++; tabla[p.Visitante].pts += 3; tabla[p.Visitante].racha.push('V'); }
-        else if (p.GV < p.GL) { tabla[p.Visitante].e++; tabla[p.Visitante].pts += 1; tabla[p.Visitante].racha.push('E'); }
-        else { tabla[p.Visitante].p++; tabla[p.Visitante].racha.push('D'); }
+        else if (p.GV < p.GL) { tabla[p.Visitante].p++; tabla[p.Visitante].racha.push('D'); } // CORREGIDO AQUÍ: Era Derrota
+        else { tabla[p.Visitante].e++; tabla[p.Visitante].pts += 1; tabla[p.Visitante].racha.push('E'); } // CORREGIDO AQUÍ: Era Empate
       }
     });
 
