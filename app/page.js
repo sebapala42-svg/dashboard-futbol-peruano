@@ -138,6 +138,7 @@ export default function Home() {
       .slice(0, 3);
   }, [listaPartidos, equipoSeleccionado, fecha]);
 
+  // EL CEREBRO DE LA TABLA CORREGIDO: Suma puntos de TODOS los partidos jugados, arrastrando el historial.
   const generarTabla = (partidos, listaFiltro = null, esAcumulado = false) => {
     const tabla = {};
     let equiposActuales = listaFiltro;
@@ -150,21 +151,24 @@ export default function Home() {
     equiposActuales.forEach(eq => tabla[eq] = { equipo: eq, pj: 0, g: 0, e: 0, p: 0, gf: 0, gc: 0, pts: 0, racha: [] });
 
     partidos.forEach(p => {
-      if (tabla[p.Local] && tabla[p.Visitante]) {
-        tabla[p.Local].pj++; tabla[p.Visitante].pj++;
-        tabla[p.Local].gf += p.GL; tabla[p.Visitante].gf += p.GV;
-        tabla[p.Local].gc += p.GV; tabla[p.Visitante].gc += p.GL;
-
-        if (p.GL > p.GV) {
-          tabla[p.Local].g++; tabla[p.Local].pts += 3; tabla[p.Local].racha.push('V');
-          tabla[p.Visitante].p++; tabla[p.Visitante].racha.push('D');
-        } else if (p.GL < p.GV) {
-          tabla[p.Visitante].g++; tabla[p.Visitante].pts += 3; tabla[p.Visitante].racha.push('V');
-          tabla[p.Local].p++; tabla[p.Local].racha.push('D');
-        } else {
-          tabla[p.Local].e++; tabla[p.Visitante].e++; tabla[p.Local].pts += 1; tabla[p.Visitante].pts += 1;
-          tabla[p.Local].racha.push('E'); tabla[p.Visitante].racha.push('E');
-        }
+      // Sumamos al Local si pertenece a la tabla que estamos armando
+      if (tabla[p.Local]) {
+        tabla[p.Local].pj++;
+        tabla[p.Local].gf += p.GL;
+        tabla[p.Local].gc += p.GV;
+        if (p.GL > p.GV) { tabla[p.Local].g++; tabla[p.Local].pts += 3; tabla[p.Local].racha.push('V'); }
+        else if (p.GL < p.GV) { tabla[p.Local].e++; tabla[p.Local].pts += 1; tabla[p.Local].racha.push('E'); }
+        else { tabla[p.Local].p++; tabla[p.Local].racha.push('D'); }
+      }
+      
+      // Sumamos al Visitante si pertenece a la tabla que estamos armando
+      if (tabla[p.Visitante]) {
+        tabla[p.Visitante].pj++;
+        tabla[p.Visitante].gf += p.GV;
+        tabla[p.Visitante].gc += p.GL;
+        if (p.GV > p.GL) { tabla[p.Visitante].g++; tabla[p.Visitante].pts += 3; tabla[p.Visitante].racha.push('V'); }
+        else if (p.GV < p.GL) { tabla[p.Visitante].e++; tabla[p.Visitante].pts += 1; tabla[p.Visitante].racha.push('E'); }
+        else { tabla[p.Visitante].p++; tabla[p.Visitante].racha.push('D'); }
       }
     });
 
@@ -215,11 +219,25 @@ export default function Home() {
           <tbody>
             {datos.map((eq, i) => {
               let bordeColor = 'transparent';
+              
+              // REGLAS DE COLORES 2018
               if (temporada === '2018' && esAcumulado) {
-                if (i < 4) bordeColor = '#3db4dc';
-                else if (i < 8) bordeColor = '#e1c340';
-                else if (i >= datos.length - 2) bordeColor = '#d32f2f';
-              } else if (i === 0) {
+                if (i < 4) bordeColor = '#3db4dc'; // Play-off / Libertadores
+                else if (i < 8) bordeColor = '#e1c340'; // Sudamericana
+                else if (i >= datos.length - 2) bordeColor = '#d32f2f'; // Descenso
+              } 
+              // REGLAS DE COLORES 2013 - ACUMULADO (FECHAS 30 O LIGUILLAS)
+              else if (temporada === '2013' && esAcumulado && !zona) {
+                if (i < 3) bordeColor = '#3db4dc'; // Libertadores (Finalistas + 3ro)
+                else if (i >= 3 && i < 7) bordeColor = '#e1c340'; // Sudamericana (4to al 7mo)
+                else if (i >= datos.length - 2) bordeColor = '#d32f2f'; // Descenso (2 últimos)
+              }
+              // REGLAS DE COLORES 2013 - TABLAS DE LIGUILLA INDIVIDUALES
+              else if (temporada === '2013' && esAcumulado && zona) {
+                if (i === 0) bordeColor = '#3db4dc'; // Ganador de liguilla va a la final
+              }
+              // REGLA POR DEFECTO PARA LÍDERES
+              else if (i === 0) {
                 bordeColor = '#3db4dc';
               }
 
@@ -259,6 +277,11 @@ export default function Home() {
       {temporada === '2018' && esAcumulado && fecha >= 44 && (
         <div className="text-[11px] text-[#87b897] text-left mx-[10px] my-[10px] p-[5px] bg-[#0d2418] rounded-[4px] border border-[#1a4a2e]">
           * Nota: Resoluciones FPF aplicadas en Acumulada 2018: Rosario (-7), Muni (-2), UTC (-2), Cantolao (-2), U (-1). Cristal (+2) por Reservas.
+        </div>
+      )}
+      {temporada === '2013' && esAcumulado && fecha >= 44 && !zona && (
+        <div className="text-[11px] text-[#87b897] text-left mx-[10px] my-[10px] p-[5px] bg-[#0d2418] rounded-[4px] border border-[#1a4a2e]">
+          * Nota (2013): Garcilaso y Universitario (ganadores de Liguilla) a Libertadores. El 3° de esta tabla acumulada a Libertadores. Del 4° al 7° a Sudamericana. Los dos últimos descienden (Comercio y Pacífico jugaron partido extra de desempate).
         </div>
       )}
     </div>
@@ -368,8 +391,9 @@ export default function Home() {
 
             {temporada === '2013' && fecha > 30 && fecha <= 44 ? (
               <>
-                <TablaComponent titulo="LIGUILLA A" datos={generarTabla(partidosValidos, liguillaA_2013, true)} esAcumulado={true} />
-                <TablaComponent titulo="LIGUILLA B" datos={generarTabla(partidosValidos, liguillaB_2013, true)} esAcumulado={true} />
+                <TablaComponent titulo="LIGUILLA A" zona="(Puntos Acumulados)" datos={generarTabla(partidosValidos, liguillaA_2013, true)} esAcumulado={true} />
+                <TablaComponent titulo="LIGUILLA B" zona="(Puntos Acumulados)" datos={generarTabla(partidosValidos, liguillaB_2013, true)} esAcumulado={true} />
+                <TablaComponent titulo="TABLA GENERAL ACUMULADA" datos={generarTabla(partidosValidos, null, true)} esAcumulado={true} />
               </>
             ) : (
               <TablaComponent 
