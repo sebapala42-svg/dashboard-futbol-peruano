@@ -48,7 +48,18 @@ export default function Home() {
     if (temporada === '2018') return listaPartidos2018;
     if (temporada === '2013') {
       const raw2013 = Array.isArray(partidos2013JSON) ? partidos2013JSON : [];
-      return raw2013.map(p => ({ Fecha_Global: p[0], Torneo: 'Descentralizado', Local: p[1], Visitante: p[2], GL: p[3], GV: p[4] }));
+      return raw2013.map(p => {
+        let gl = p[3];
+        let gv = p[4];
+        
+        // CORRECCIÓN ADMINISTRATIVA MESA 2013: Garcilaso vs León de Huánuco (Fecha 5)
+        if (p[0] === 5 && p[1] === 'Cusco (Garcilaso)' && p[2] === 'Leon de Huanuco') {
+          gl = 0;
+          gv = 3;
+        }
+
+        return { Fecha_Global: p[0], Torneo: 'Descentralizado', Local: p[1], Visitante: p[2], GL: gl, GV: gv };
+      });
     }
     return partidos2026JSON;
   }, [temporada]);
@@ -84,7 +95,6 @@ export default function Home() {
     'Union Comercio': 'https://tmssl.akamaized.net//images/wappen/head/31337.png',
     'Ayacucho FC': 'https://tmssl.akamaized.net//images/wappen/head/21178.png',
     'Binacional': 'https://tmssl.akamaized.net//images/wappen/head/41054.png',
-    // LOGOS 2013 AGREGADOS
     'Leon de Huanuco': 'https://tmssl.akamaized.net//images/wappen/big/25774.png?lm=1424441686',
     'Pacifico FC': 'https://tmssl.akamaized.net//images/wappen/head/37579.png?lm=1749433973',
     'Jose Galvez': 'https://tmssl.akamaized.net//images/wappen/head/16700.png?lm=1699653454',
@@ -189,7 +199,6 @@ export default function Home() {
             if (t.equipo === 'U. San Martin') finalPts += 2; 
             if (t.equipo === 'Alianza Lima') finalPts += 1;  
           }
-          // SANCIÓN: A Garcilaso se le resta 1 punto y suma 3 goles en contra desde la Fecha 5
           if (fecha >= 5 && t.equipo === 'Cusco (Garcilaso)') {
             finalPts -= 1;
             t.gc += 3;
@@ -414,11 +423,29 @@ export default function Home() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
             <div className="flex flex-col gap-[10px]">
               <div className="text-center font-bold text-[14px] uppercase mb-[-5px]" style={{ color: '#8cc63f' }}>TEMPORADA {temporada}</div>
-              <div className="bg-transparent border border-[#8cc63f] rounded-[4px]">
+              
+              <div className="flex items-center justify-between bg-transparent border border-[#8cc63f] rounded-[4px] px-2">
+                <button 
+                  onClick={() => setFecha(prev => Math.max(1, prev - 1))} 
+                  className="text-[#8cc63f] hover:text-white font-bold text-[14px] px-2 py-1 bg-transparent border-none outline-none cursor-pointer transition-colors"
+                  style={{ opacity: fecha === 1 ? 0.3 : 1, cursor: fecha === 1 ? 'default' : 'pointer' }}
+                  disabled={fecha === 1}
+                >
+                  ◀
+                </button>
                 <select value={fecha} onChange={(e) => setFecha(Number(e.target.value))} className="w-full bg-transparent font-bold text-[13px] px-[10px] py-[8px] outline-none appearance-none text-center cursor-pointer border-none" style={{ color: '#ffffff' }}>
                   {[...Array(temporada === '2013' ? 48 : (temporada === '2018' ? 44 : 17))].map((_, i) => <option key={i+1} value={i+1} className="bg-[#0b4026]">FECHA {i+1}</option>)}
                 </select>
+                <button 
+                  onClick={() => setFecha(prev => Math.min(temporada === '2013' ? 48 : (temporada === '2018' ? 44 : 17), prev + 1))} 
+                  className="text-[#8cc63f] hover:text-white font-bold text-[14px] px-2 py-1 bg-transparent border-none outline-none cursor-pointer transition-colors"
+                  style={{ opacity: fecha === (temporada === '2013' ? 48 : (temporada === '2018' ? 44 : 17)) ? 0.3 : 1, cursor: fecha === (temporada === '2013' ? 48 : (temporada === '2018' ? 44 : 17)) ? 'default' : 'pointer' }}
+                  disabled={fecha === (temporada === '2013' ? 48 : (temporada === '2018' ? 44 : 17))}
+                >
+                  ▶
+                </button>
               </div>
+
               <div className="bg-[#112d1e] border border-[#1a4a2e] rounded-lg overflow-hidden shadow-lg">
                 <div className="flex flex-col max-h-[550px] overflow-y-auto custom-scrollbar">
                   {listaPartidos.filter(p => p.Fecha_Global === fecha).map((p, idx) => (
