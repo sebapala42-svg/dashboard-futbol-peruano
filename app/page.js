@@ -1,6 +1,7 @@
 'use client';
 import React, { useState, useMemo } from 'react';
 import partidosJSON from './torneo_2018.json';
+import partidos2013JSON from './torneo_2013.json';
 
 const partidos2026JSON = [
   [1, 'Sport Huancayo', 'Alianza Lima', 1, 2], [1, 'UTC', 'Atlético Grau', 2, 0], [1, 'Comerciantes Unidos', 'CD Moquegua', 1, 0],
@@ -46,7 +47,11 @@ export default function Home() {
   const [tab, setTab] = useState('fixture');
   const [equipoSeleccionado, setEquipoSeleccionado] = useState(null);
 
-  const listaPartidos = useMemo(() => temporada === '2018' ? listaPartidos2018 : partidos2026JSON, [temporada]);
+const listaPartidos = useMemo(() => {
+  if (temporada === '2013') return partidos2013JSON.map(p => ({ Fecha_Global: p[0], Local: p[1], Visitante: p[2], GL: p[3], GV: p[4] }));
+  if (temporada === '2018') return listaPartidos2018;
+  return partidos2026JSON;
+}, [temporada]);
 
   const logos = {
     'Alianza Lima': 'https://tmssl.akamaized.net//images/wappen/head/184.png?lm=1755275805',
@@ -498,6 +503,15 @@ export default function Home() {
                         VER AÑO
                       </button>
                     )}
+                    {/* BOTON VER AÑO 2013 */}
+{row.Año === '2013' && (
+  <button 
+    onClick={() => { setTemporada('2013'); setFecha(44); setTab('fixture'); setEquipoSeleccionado(null); window.scrollTo(0,0); }}
+    className="bg-[#8cc63f] text-black font-bold text-[10px] px-3 py-1 rounded border-none outline-none cursor-pointer"
+  >
+    VER AÑO
+  </button>
+)}
                   </td>
                 </tr>
               ))}</tbody>
