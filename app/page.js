@@ -2,6 +2,8 @@
 import React, { useState, useMemo } from 'react';
 import partidosJSON from './torneo_2018.json';
 
+// --- TRUCO SALVAVIDAS ---
+// Si el conversor lo metió en un objeto (ej. { "BaseDatos": [...] }), esto saca la lista real.
 const listaPartidos = Array.isArray(partidosJSON) 
   ? partidosJSON 
   : (partidosJSON.BaseDatos || Object.values(partidosJSON)[0] || []);
@@ -11,6 +13,7 @@ export default function Home() {
   const [tab, setTab] = useState('fixture');
   const [equipoSeleccionado, setEquipoSeleccionado] = useState(null);
 
+  // --- DICCIONARIO DE LOGOS DEFECTUOSOS Y CORREGIDOS ---
   const logos = {
     'Universitario': 'https://tmssl.akamaized.net//images/wappen/head/6593.png',
     'Alianza Lima': 'https://tmssl.akamaized.net//images/wappen/head/184.png?lm=1755275805',
@@ -124,7 +127,8 @@ export default function Home() {
       .sort((a, b) => b.pts - a.pts || b.dif - a.dif || b.gf - a.gf);
   };
 
-  const TablaComponent = ({ titulo, zona, datos, esAcumulado, compactLogo = false }) => (
+  // Renderizador de Tabla Reutilizable
+  const TablaComponent = ({ titulo, zona, datos, esAcumulado, compacLogo = false }) => (
     <div className="bg-[#112d1e] border border-[#1a4a2e] rounded-[8px] overflow-hidden shadow-lg mb-[15px] pb-1">
       <div className="text-center text-white font-bold text-[14px] uppercase py-[10px]">
         {titulo}
@@ -134,7 +138,7 @@ export default function Home() {
           {zona}
         </div>
       )}
-      <table className="w-full text-[12px] text-center text-white font-sans border-collapse">
+      <table className="w-full text-[12px] text-center text-white font-sans border-collapse mt-1">
         <thead>
           <tr>
             <th className="bg-[#0d2418] text-[#a1b5a8] border-b border-[#1a4a2e] py-[6px] px-[4px] font-normal text-[11px] w-[30px]">#</th>
@@ -165,7 +169,7 @@ export default function Home() {
                 <td className="py-[6px] px-[4px] font-bold border-l-[3px]" style={{ borderLeftColor: bordeColor }}>{i + 1}</td>
                 <td className="py-[6px] px-[4px] text-left font-bold flex items-center">
                   <img src={logos[eq.equipo] || 'https://cdn-icons-png.flaticon.com/128/33/33736.png'} 
-                       style={{ width: compactLogo ? '13px' : '15px', height: compactLogo ? '13px' : '15px', minWidth: compactLogo ? '13px' : '15px', objectFit: 'contain', marginRight: '6px' }} 
+                       style={{ width: compacLogo ? '13px' : '15px', height: compacLogo ? '13px' : '15px', minWidth: compacLogo ? '13px' : '15px', objectFit: 'contain', marginRight: '6px' }} 
                        alt={eq.equipo} />
                   <span>{eq.equipo}</span>
                 </td>
@@ -210,8 +214,8 @@ export default function Home() {
         </h2>
       </div>
 
-      {/* TABS CORREGIDOS: Estilo Promiedos limpio, fondo oscuro, línea verde (Basado en imagen 2) */}
-      <nav className="w-full mb-6 mt-4 border-b border-[#1a4a2e]">
+      {/* NUEVO DISEÑO DE TABS (Ui Mejorada - Como la imagen 16/21) */}
+      <nav className="w-full mb-6 border-b border-[#1a4a2e]">
         <div className="max-w-5xl mx-auto flex justify-center">
           {[
             { id: 'fixture', label: 'FIXTURE Y TABLAS' },
@@ -231,7 +235,7 @@ export default function Home() {
       {/* ======================= FIXTURE Y TABLAS ======================= */}
       {tab === 'fixture' && (
         <main style={{ display: 'grid', gridTemplateColumns: '64% 34%', gap: '2%', maxWidth: '1250px', margin: '0 auto', padding: '20px', alignItems: 'start' }}>
-          {/* COLUMNA IZQUIERDA */}
+          {/* COLUMNA IZQUIERDA (Tablas - 64%) */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
             {fecha <= 14 && (
               <>
@@ -245,49 +249,78 @@ export default function Home() {
             {fecha > 29 && (
               <TablaComponent titulo="TORNEO CLAUSURA" zona="ZONA ÚNICA" datos={generarTabla(partidosValidos.filter(p => p.Torneo === 'Clausura' && p.Fecha_Global >= 30))} />
             )}
+            
             <TablaComponent titulo={`TABLA ACUMULADA (HASTA LA FECHA ${fecha})`} datos={generarTabla(partidosValidos, null, true)} esAcumulado={true} />
           </div>
 
-          {/* COLUMNA DERECHA */}
+          {/* COLUMNA DERECHA (Fixture - 34%) */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
             <div className="flex flex-col gap-[10px]">
               <div className="text-center text-[#8cc63f] font-bold text-[14px] uppercase mb-[-5px]">TEMPORADA 2018</div>
+              
               <div className="bg-[#0d2418] border border-[#8cc63f] rounded-[4px]">
-                <select value={fecha} onChange={(e) => setFecha(Number(e.target.value))} className="w-full bg-transparent text-white font-bold text-[13px] px-[10px] py-[8px] outline-none appearance-none text-center cursor-pointer">
-                  {[...Array(44)].map((_, i) => <option key={i+1} value={i+1} className="bg-[#0d2418]">FECHA {i+1}</option>)}
+                <select 
+                  value={fecha} 
+                  onChange={(e) => setFecha(Number(e.target.value))}
+                  className="w-full bg-transparent text-white font-bold text-[13px] px-[10px] py-[8px] outline-none appearance-none text-center cursor-pointer"
+                >
+                  {[...Array(44)].map((_, i) => (
+                    <option key={i+1} value={i+1} className="bg-[#0d2418]">FECHA {i+1}</option>
+                  ))}
                 </select>
               </div>
+
               <div className="bg-[#112d1e] border border-[#1a4a2e] rounded-lg overflow-hidden shadow-lg">
                 <div className="flex flex-col max-h-[550px] overflow-y-auto custom-scrollbar">
                   {listaPartidos.filter(p => p.Fecha_Global === fecha).map((p, idx) => (
                     <div key={idx} className={`flex justify-between items-center py-[8px] px-[10px] border-b border-[#1a4a2e] hover:bg-[#1c4531] transition-colors ${idx % 2 === 0 ? 'bg-[#112d1e]' : 'bg-[#153625]'}`}>
                       <span className="text-white text-[10px] font-bold w-[35px]">Final</span>
+                      
                       <div className="flex items-center w-[85%] justify-center">
                         <span className="text-right w-[40%] text-[12px] text-white font-bold truncate">{p.Local}</span>
-                        <img src={logos[p.Local] || 'https://cdn-icons-png.flaticon.com/128/33/33736.png'} style={{ width: '18px', height: '18px', minWidth: '18px', objectFit: 'contain', margin: '0 5px' }} />
+                        <img src={logos[p.Local] || 'https://cdn-icons-png.flaticon.com/128/33/33736.png'} 
+                             style={{ width: '18px', height: '18px', minWidth: '18px', objectFit: 'contain', margin: '0 5px' }} />
+                        
                         <div className="flex items-center justify-center gap-[2px] mx-[5px]">
-                          <div className="bg-[#0d2418] border border-[#1a4a2e] rounded-[4px] text-white font-bold text-[14px] w-[25px] h-[25px] flex items-center justify-center">{p.GL !== null ? p.GL : '-'}</div>
+                          <div className="bg-[#0d2418] border border-[#1a4a2e] rounded-[4px] text-white font-bold text-[14px] w-[25px] h-[25px] flex items-center justify-center">
+                            {p.GL !== null ? p.GL : '-'}
+                          </div>
                           <div className="text-[#8cc63f] font-bold text-[14px] mx-[2px]">-</div>
-                          <div className="bg-[#0d2418] border border-[#1a4a2e] rounded-[4px] text-white font-bold text-[14px] w-[25px] h-[25px] flex items-center justify-center">{p.GV !== null ? p.GV : '-'}</div>
+                          <div className="bg-[#0d2418] border border-[#1a4a2e] rounded-[4px] text-white font-bold text-[14px] w-[25px] h-[25px] flex items-center justify-center">
+                            {p.GV !== null ? p.GV : '-'}
+                          </div>
                         </div>
-                        <img src={logos[p.Visitante] || 'https://cdn-icons-png.flaticon.com/128/33/33736.png'} style={{ width: '18px', height: '18px', minWidth: '18px', objectFit: 'contain', margin: '0 5px' }} />
+                        
+                        <img src={logos[p.Visitante] || 'https://cdn-icons-png.flaticon.com/128/33/33736.png'} 
+                             style={{ width: '18px', height: '18px', minWidth: '18px', objectFit: 'contain', margin: '0 5px' }} />
                         <span className="text-left w-[40%] text-[12px] text-white font-bold truncate">{p.Visitante}</span>
                       </div>
                     </div>
                   ))}
-                  {listaPartidos.filter(p => p.Fecha_Global === fecha).length === 0 && <div className="text-center text-[12px] p-[15px]">No hay partidos registrados.</div>}
+                  {listaPartidos.filter(p => p.Fecha_Global === fecha).length === 0 && (
+                    <div className="text-center text-[12px] p-[15px]">No hay partidos registrados.</div>
+                  )}
                 </div>
               </div>
             </div>
 
             <div className="bg-[#112d1e] border border-[#1a4a2e] rounded-[8px] p-[10px] px-[15px] shadow-lg">
-               <div className="text-center text-white font-bold text-[14px] uppercase mb-[10px]">GOLEADORES</div>
+               <div className="text-center text-white font-bold text-[14px] uppercase mb-[10px]">GOLEADORES (Mock)</div>
                <table className="w-full text-[12px] text-white font-sans border-collapse mt-[5px]">
-                 <thead><tr><th className="bg-[#0d2418] text-[#a1b5a8] border-b border-[#1a4a2e] py-[6px] px-[4px] font-normal text-[11px] text-left">Jugador</th><th className="bg-[#0d2418] text-[#a1b5a8] border-b border-[#1a4a2e] py-[6px] px-[4px] font-normal text-[11px] text-center w-[40px]">Goles</th></tr></thead>
-                 <tbody>{[
-                    { n: "Emanuel Herrera", eq: "Sporting Cristal", g: 8 }, { n: "Mauricio Montes", eq: "Ayacucho FC", g: 6 },
-                    { n: "Tulio Etchemaite", eq: "Sport Rosario", g: 5 }, { n: "Neumann", eq: "Sport Huancayo", g: 5 },
-                    { n: "Luis Tejada", eq: "Sport Boys", g: 5 }, { n: "Jeremias Bogado", eq: "Comerciantes Unidos", g: 4 }
+                 <thead>
+                   <tr>
+                     <th className="bg-[#0d2418] text-[#a1b5a8] border-b border-[#1a4a2e] py-[6px] px-[4px] font-normal text-[11px] text-left">Jugador</th>
+                     <th className="bg-[#0d2418] text-[#a1b5a8] border-b border-[#1a4a2e] py-[6px] px-[4px] font-normal text-[11px] text-center w-[40px]">Goles</th>
+                   </tr>
+                 </thead>
+                 <tbody>
+                  {[
+                    { n: "Emanuel Herrera", eq: "Sporting Cristal", g: 8 },
+                    { n: "Mauricio Montes", eq: "Ayacucho FC", g: 6 },
+                    { n: "Tulio Etchemaite", eq: "Sport Rosario", g: 5 },
+                    { n: "Neumann", eq: "Sport Huancayo", g: 5 },
+                    { n: "Luis Tejada", eq: "Sport Boys", g: 5 },
+                    { n: "Jeremias Bogado", eq: "Comerciantes Unidos", g: 4 }
                   ].map((g, i) => (
                     <tr key={i} className={`hover:bg-[#1c4531] transition-colors ${i % 2 === 0 ? 'bg-[#112d1e]' : 'bg-[#153625]'}`}>
                       <td className="py-[6px] px-[4px] text-left flex items-center">
@@ -296,7 +329,8 @@ export default function Home() {
                       </td>
                       <td className="py-[6px] px-[4px] text-center font-bold text-white text-[13px]">{g.g}</td>
                     </tr>
-                  ))}</tbody>
+                  ))}
+                 </tbody>
                </table>
             </div>
           </div>
@@ -311,7 +345,7 @@ export default function Home() {
               <h3 className="text-center text-white text-[18px] font-bold mb-1 uppercase tracking-widest">EQUIPOS LIGA 1</h3>
               <p className="text-center text-[#87b897] text-[12px] mb-8">Pulsar en el equipo para ver su info detallada</p>
               
-              {/* GRILLA DE EQUIPOS CORREGIDA (Como la primera imagen): Líneas finas, Logo arriba, Texto blanco abajo */}
+              {/* LA GRILLA ORDENADA: Clon del diseño solicitado - Líneas finas, Logo arriba, Texto blanco abajo */}
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 divide-x divide-y divide-[#1a4a2e] border-t border-l border-[#1a4a2e]">
                 {Object.keys(logos).sort().map(eq => (
                   <button 
@@ -338,8 +372,8 @@ export default function Home() {
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '60% 35%', gap: '5%' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                  <TablaComponent titulo="Últimos Resultados" datos={generarTabla(partidosJugadosEquipo)} compactLogo={true} />
-                  <TablaComponent titulo="Próximos Partidos" datos={generarTabla(proximosPartidosEquipo)} compactLogo={true} />
+                  <TablaComponent titulo="Últimos Resultados" datos={generarTabla(partidosJugadosEquipo)} compacLogo={true} />
+                  <TablaComponent titulo="Próximos Partidos" datos={generarTabla(proximosPartidosEquipo)} compacLogo={true} />
                 </div>
                 <div>
                   <div className="bg-[#112d1e] border border-[#1a4a2e] rounded p-4 sticky top-20">
