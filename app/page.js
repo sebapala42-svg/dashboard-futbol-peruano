@@ -43,9 +43,13 @@ const listaPartidos2018 = Array.isArray(partidosJSON) ? partidosJSON : (partidos
 
 export default function Home() {
   const [temporada, setTemporada] = useState('2026');
+  
   const listaPartidos = useMemo(() => {
     if (temporada === '2018') return listaPartidos2018;
-    if (temporada === '2013') return Array.isArray(partidos2013JSON) ? partidos2013JSON : [];
+    if (temporada === '2013') {
+      const raw2013 = Array.isArray(partidos2013JSON) ? partidos2013JSON : [];
+      return raw2013.map(p => ({ Fecha_Global: p[0], Torneo: 'Descentralizado', Local: p[1], Visitante: p[2], GL: p[3], GV: p[4] }));
+    }
     return partidos2026JSON;
   }, [temporada]);
   
@@ -381,7 +385,7 @@ export default function Home() {
               <div className="text-center font-bold text-[14px] uppercase mb-[-5px]" style={{ color: '#8cc63f' }}>TEMPORADA {temporada}</div>
               <div className="bg-transparent border border-[#8cc63f] rounded-[4px]">
                 <select value={fecha} onChange={(e) => setFecha(Number(e.target.value))} className="w-full bg-transparent font-bold text-[13px] px-[10px] py-[8px] outline-none appearance-none text-center cursor-pointer border-none" style={{ color: '#ffffff' }}>
-                  {[...Array(temporada === '2018' ? 44 : 17)].map((_, i) => <option key={i+1} value={i+1} className="bg-[#0b4026]">FECHA {i+1}</option>)}
+                  {[...Array(temporada === '2013' ? 48 : (temporada === '2018' ? 44 : 17))].map((_, i) => <option key={i+1} value={i+1} className="bg-[#0b4026]">FECHA {i+1}</option>)}
                 </select>
               </div>
               <div className="bg-[#112d1e] border border-[#1a4a2e] rounded-lg overflow-hidden shadow-lg">
@@ -519,7 +523,7 @@ export default function Home() {
                     )}
                     {row.Año === '2013' && (
                       <button 
-                        onClick={() => { setTemporada('2013'); setFecha(44); setTab('fixture'); setEquipoSeleccionado(null); window.scrollTo(0,0); }}
+                        onClick={() => { setTemporada('2013'); setFecha(48); setTab('fixture'); setEquipoSeleccionado(null); window.scrollTo(0,0); }}
                         className="bg-[#8cc63f] text-black font-bold text-[10px] px-3 py-1 rounded border-none outline-none cursor-pointer"
                       >
                         VER AÑO
