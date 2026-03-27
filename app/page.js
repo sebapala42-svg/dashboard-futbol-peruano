@@ -345,7 +345,6 @@ export default function Home() {
 
       {/* ======================= FIXTURE Y TABLAS ======================= */}
       {tab === 'fixture' && (
-        
         <main style={{ display: 'grid', gridTemplateColumns: '64% 34%', gap: '2%', maxWidth: '1250px', margin: '0 auto', padding: '20px', alignItems: 'start' }}>
           {/* COLUMNA IZQUIERDA */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
@@ -392,7 +391,6 @@ export default function Home() {
         />
       )}
     </div>                                                                                           
-
           {/* COLUMNA DERECHA */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
             <div className="flex flex-col gap-[10px]">
