@@ -2,6 +2,7 @@
 import React, { useState, useMemo } from 'react';
 import partidosJSON from './torneo_2018.json';
 
+// --- TRUCO SALVAVIDAS ---
 const listaPartidos = Array.isArray(partidosJSON) 
   ? partidosJSON 
   : (partidosJSON.BaseDatos || Object.values(partidosJSON)[0] || []);
@@ -11,6 +12,7 @@ export default function Home() {
   const [tab, setTab] = useState('fixture');
   const [equipoSeleccionado, setEquipoSeleccionado] = useState(null);
 
+  // --- DICCIONARIO DE LOGOS (SEBA) ---
   const logos = {
     'Universitario': 'https://tmssl.akamaized.net//images/wappen/head/6593.png',
     'Alianza Lima': 'https://tmssl.akamaized.net//images/wappen/head/184.png?lm=1755275805',
@@ -124,7 +126,8 @@ export default function Home() {
       .sort((a, b) => b.pts - a.pts || b.dif - a.dif || b.gf - a.gf);
   };
 
-  const TablaComponent = ({ titulo, zona, datos, esAcumulado, compacLogo = false }) => (
+  // Renderizador de Tabla Reutilizable
+  const TablaComponent = ({ titulo, zona, datos, esAcumulado, compactLogo = false }) => (
     <div className="bg-[#112d1e] border border-[#1a4a2e] rounded-[8px] overflow-hidden shadow-lg mb-[15px] pb-1">
       <div className="text-center text-white font-bold text-[14px] uppercase py-[10px]">
         {titulo}
@@ -165,7 +168,7 @@ export default function Home() {
                 <td className="py-[6px] px-[4px] font-bold border-l-[3px]" style={{ borderLeftColor: bordeColor }}>{i + 1}</td>
                 <td className="py-[6px] px-[4px] text-left font-bold flex items-center">
                   <img src={logos[eq.equipo] || 'https://cdn-icons-png.flaticon.com/128/33/33736.png'} 
-                       style={{ width: compacLogo ? '13px' : '15px', height: compacLogo ? '13px' : '15px', minWidth: compacLogo ? '13px' : '15px', objectFit: 'contain', marginRight: '6px' }} 
+                       style={{ width: compactLogo ? '13px' : '15px', height: compactLogo ? '13px' : '15px', minWidth: compactLogo ? '13px' : '15px', objectFit: 'contain', marginRight: '6px' }} 
                        alt={eq.equipo} />
                   <span>{eq.equipo}</span>
                 </td>
@@ -179,7 +182,7 @@ export default function Home() {
                 <td className="py-[6px] px-[4px]">
                   <div className="flex gap-[2px] justify-center">
                     {eq.ultimas.map((r, idx) => (
-                      <span key={idx} 
+                    <span key={idx} 
                             className="inline-flex items-center justify-center text-white text-[8.5px] font-bold rounded-[2px] px-[4px] py-[1px]"
                             style={{ backgroundColor: r === 'V' ? '#8cc63f' : r === 'E' ? '#e1c340' : '#d32f2f' }}>
                         {r}
@@ -210,7 +213,7 @@ export default function Home() {
         </h2>
       </div>
 
-      {/* TABS CORREGIDOS: Fondo 100% transparente, texto blanco, línea amarilla al seleccionar */}
+      {/* TABS CORREGIDOS: Estilo Promiedos limpio, fondo transparente, línea amarilla (Basado en imagen 2) */}
       <nav className="w-full mb-6 mt-4 border-b border-[#1a4a2e]">
         <div className="max-w-5xl mx-auto flex justify-center">
           {[
@@ -221,9 +224,7 @@ export default function Home() {
             <button 
               key={t.id} 
               onClick={() => { setTab(t.id); setEquipoSeleccionado(null); }} 
-              className={`px-[30px] py-[12px] font-bold text-[13px] uppercase transition-all bg-transparent border-none outline-none cursor-pointer ${tab === t.id ? 'text-white border-b-[3px] border-[#fbbf24]' : 'text-[#87b897] hover:text-white border-b-[3px] border-transparent'}`}
-              style={{ borderBottom: tab === t.id ? '3px solid #fbbf24' : '3px solid transparent' }}
-            >
+              className={`px-[30px] py-[12px] font-bold text-[13px] uppercase transition-all bg-transparent border-none outline-none cursor-pointer ${tab === t.id ? 'text-white border-b-[3px] border-[#fbbf24]' : 'text-[#87b897] hover:text-white border-b-[3px] border-transparent'}`}>
               {t.label}
             </button>
           ))}
@@ -253,9 +254,9 @@ export default function Home() {
           {/* COLUMNA DERECHA */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
             <div className="flex flex-col gap-[10px]">
-              <div className="text-center text-[#8cc63f] font-bold text-[14px] uppercase mb-[-5px]">TEMPORADA 2018</div>
+              <div className="text-center text-white font-bold text-[14px] uppercase mb-[-5px]">TEMPORADA 2018</div>
               <div className="bg-[#0d2418] border border-[#8cc63f] rounded-[4px]">
-                <select value={fecha} onChange={(e) => setFecha(Number(e.target.value))} className="w-full bg-transparent text-white font-bold text-[13px] px-[10px] py-[8px] outline-none appearance-none text-center cursor-pointer border-none">
+                <select value={fecha} onChange={(e) => setFecha(Number(e.target.value))} className="w-full bg-transparent text-white font-bold text-[13px] px-[10px] py-[8px] outline-none appearance-none text-center cursor-pointer">
                   {[...Array(44)].map((_, i) => <option key={i+1} value={i+1} className="bg-[#0d2418]">FECHA {i+1}</option>)}
                 </select>
               </div>
@@ -264,15 +265,15 @@ export default function Home() {
                   {listaPartidos.filter(p => p.Fecha_Global === fecha).map((p, idx) => (
                     <div key={idx} className={`flex justify-between items-center py-[8px] px-[10px] border-b border-[#1a4a2e] hover:bg-[#1c4531] transition-colors ${idx % 2 === 0 ? 'bg-[#112d1e]' : 'bg-[#153625]'}`}>
                       <span className="text-white text-[10px] font-bold w-[35px]">Final</span>
-                      <div className="flex items-center w-[85%] justify-center">
+                      <div className="flex items-center w-[85%] justify-center gap-1">
                         <span className="text-right w-[40%] text-[12px] text-white font-bold truncate">{p.Local}</span>
-                        <img src={logos[p.Local] || 'https://cdn-icons-png.flaticon.com/128/33/33736.png'} style={{ width: '18px', height: '18px', minWidth: '18px', objectFit: 'contain', margin: '0 5px' }} />
-                        <div className="flex items-center justify-center gap-[2px] mx-[5px]">
-                          <div className="bg-[#0d2418] border border-[#1a4a2e] rounded-[4px] text-white font-bold text-[14px] w-[25px] h-[25px] flex items-center justify-center">{p.GL !== null ? p.GL : '-'}</div>
-                          <div className="text-[#8cc63f] font-bold text-[14px] mx-[2px]">-</div>
-                          <div className="bg-[#0d2418] border border-[#1a4a2e] rounded-[4px] text-white font-bold text-[14px] w-[25px] h-[25px] flex items-center justify-center">{p.GV !== null ? p.GV : '-'}</div>
+                        <img src={logos[p.Local] || 'https://cdn-icons-png.flaticon.com/128/33/33736.png'} style={{ width: '18px', height: '18px', minWidth: '18px', objectFit: 'contain' }} />
+                        <div className="flex items-center gap-[1px]">
+                          <div className="bg-[#0d2418] border border-[#1a4a2e] rounded font-black text-white text-[14px] w-[22px] h-[22px] flex items-center justify-center">{p.GL !== null ? p.GL : '-'}</div>
+                          <div className="text-[#8cc63f] font-bold text-[14px]mx-[1px]">-</div>
+                          <div className="bg-[#0d2418] border border-[#1a4a2e] rounded font-black text-white text-[14px] w-[22px] h-[22px] flex items-center justify-center">{p.GV !== null ? p.GV : '-'}</div>
                         </div>
-                        <img src={logos[p.Visitante] || 'https://cdn-icons-png.flaticon.com/128/33/33736.png'} style={{ width: '18px', height: '18px', minWidth: '18px', objectFit: 'contain', margin: '0 5px' }} />
+                        <img src={logos[p.Visitante] || 'https://cdn-icons-png.flaticon.com/128/33/33736.png'} style={{ width: '18px', height: '18px', minWidth: '18px', objectFit: 'contain' }} />
                         <span className="text-left w-[40%] text-[12px] text-white font-bold truncate">{p.Visitante}</span>
                       </div>
                     </div>
@@ -282,8 +283,8 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="bg-[#112d1e] border border-[#1a4a2e] rounded-[8px] p-[10px] px-[15px] shadow-lg">
-               <div className="text-center text-white font-bold text-[14px] uppercase mb-[10px]">GOLEADORES</div>
+            <div className="bg-[#112d1e] border border-[#1a4a2e] rounded-lg p-3 text-center shadow-lg">
+               <div className="text-center text-white font-bold text-[14px] uppercase mb-[10px]">GOLEADORES (Mock)</div>
                <table className="w-full text-[12px] text-white font-sans border-collapse mt-[5px]">
                  <thead><tr><th className="bg-[#0d2418] text-[#a1b5a8] border-b border-[#1a4a2e] py-[6px] px-[4px] font-normal text-[11px] text-left">Jugador</th><th className="bg-[#0d2418] text-[#a1b5a8] border-b border-[#1a4a2e] py-[6px] px-[4px] font-normal text-[11px] text-center w-[40px]">Goles</th></tr></thead>
                  <tbody>{[
@@ -291,13 +292,7 @@ export default function Home() {
                     { n: "Tulio Etchemaite", eq: "Sport Rosario", g: 5 }, { n: "Neumann", eq: "Sport Huancayo", g: 5 },
                     { n: "Luis Tejada", eq: "Sport Boys", g: 5 }, { n: "Jeremias Bogado", eq: "Comerciantes Unidos", g: 4 }
                   ].map((g, i) => (
-                    <tr key={i} className={`hover:bg-[#1c4531] transition-colors ${i % 2 === 0 ? 'bg-[#112d1e]' : 'bg-[#153625]'}`}>
-                      <td className="py-[6px] px-[4px] text-left flex items-center">
-                        <img src={logos[g.eq] || 'https://cdn-icons-png.flaticon.com/128/33/33736.png'} style={{ width: '15px', height: '15px', minWidth: '15px', objectFit: 'contain', marginRight: '6px' }} />
-                        <span className="text-white text-[11px] font-bold">{g.n}</span>
-                      </td>
-                      <td className="py-[6px] px-[4px] text-center font-bold text-white text-[13px]">{g.g}</td>
-                    </tr>
+                    <tr key={i} className={`border-b border-[#1a4a2e]/50 ${i % 2 === 0 ? 'bg-[#112d1e]' : 'bg-[#153625]'}`}><td className="py-[6px] px-[4px] text-left flex items-center gap-1"><img src={logos[g.eq]} style={{ width: '13px', height: '13px', objectFit: 'contain' }} /><span className="text-white">{g.n}</span></td><td className="py-[6px] px-[4px] text-center font-bold text-white">{g.g}</td></tr>
                   ))}</tbody>
                </table>
             </div>
@@ -309,19 +304,19 @@ export default function Home() {
       {tab === 'equipos' && (
         <main className="max-w-[1250px] mx-auto p-4 animate-in fade-in">
           {!equipoSeleccionado ? (
-            <div className="max-w-5xl mx-auto">
+            <div className="bg-[#0d2418] border border-[#1a4a2e] rounded-lg p-6 max-w-5xl mx-auto shadow-xl">
               <h3 className="text-center text-white text-[18px] font-bold mb-1 uppercase tracking-widest">EQUIPOS LIGA 1</h3>
               <p className="text-center text-[#87b897] text-[12px] mb-8">Pulsar en el equipo para ver su info detallada</p>
               
-              {/* EQUIPOS CORREGIDOS: Fondo totalmente transparente, solo texto blanco negrita */}
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+              {/* GRILLA DE EQUIPOS CORREGIDA (como la imagen 20/21): Líneas finas, Logo arriba, Texto blanco abajo, Más Juntos (gap-3) */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
                 {Object.keys(logos).sort().map(eq => (
                   <button 
                     key={eq} 
                     onClick={() => setEquipoSeleccionado(eq)} 
-                    className="p-4 flex flex-col items-center justify-center bg-transparent border-none outline-none cursor-pointer group"
+                    className="p-5 flex flex-col items-center justify-center bg-[#112d1e] border border-[#1a4a2e] rounded-[8px] hover:bg-[#153625] transition-colors cursor-pointer group shadow-lg"
                   >
-                    <img src={logos[eq]} style={{ width: '45px', height: '45px', objectFit: 'contain', marginBottom: '12px' }} alt={eq} />
+                    <img src={logos[eq]} style={{ width: '40px', height: '40px', objectFit: 'contain', marginBottom: '12px' }} alt={eq} />
                     <span className="text-white font-bold text-[13px] text-center uppercase leading-tight group-hover:text-[#8cc63f]">
                       {eq}
                     </span>
@@ -331,7 +326,7 @@ export default function Home() {
             </div>
           ) : (
             <div>
-              <button onClick={() => setEquipoSeleccionado(null)} className="mb-4 bg-transparent border-none text-white text-[11px] font-bold px-0 py-1.5 hover:text-[#8cc63f] outline-none cursor-pointer">
+              <button onClick={() => setEquipoSeleccionado(null)} className="mb-4 bg-[#0d2418] border border-[#1a4a2e] text-white text-[11px] font-bold px-3 py-1.5 rounded hover:bg-[#1c4531]">
                 ⬅️ VOLVER
               </button>
               <div className="text-center mb-6">
@@ -340,11 +335,11 @@ export default function Home() {
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '60% 35%', gap: '5%' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                  <TablaComponent titulo="Últimos Resultados" datos={generarTabla(partidosJugadosEquipo)} compacLogo={true} />
-                  <TablaComponent titulo="Próximos Partidos" datos={generarTabla(proximosPartidosEquipo)} compacLogo={true} />
+                  <TablaComponent titulo="Últimos Resultados" datos={generarTabla(partidosJugadosEquipo)} compactLogo={true} />
+                  <TablaComponent titulo="Próximos Partidos" datos={generarTabla(proximosPartidosEquipo)} compactLogo={true} />
                 </div>
                 <div>
-                  <div className="bg-[#112d1e] border border-[#1a4a2e] rounded p-4 sticky top-20">
+                  <div className="bg-[#112d1e] border border-[#1a4a2e] rounded p-4 sticky top-20 shadow-lg">
                     <div className="text-center text-white font-bold text-[14px] uppercase mb-[15px]">INFO DEL CLUB</div>
                     <div className="bg-[#0d2418] border border-[#1a4a2e] rounded p-[10px] mb-[10px] flex justify-between text-[12px]"><span className="text-[#a1b5a8] font-bold uppercase">Apodo</span><span className="text-white font-bold">{info_clubes[equipoSeleccionado]?.Apodo || '-'}</span></div>
                     <div className="bg-[#0d2418] border border-[#1a4a2e] rounded p-[10px] mb-[10px] flex justify-between text-[12px]"><span className="text-[#a1b5a8] font-bold uppercase">Fundación</span><span className="text-white font-bold">{info_clubes[equipoSeleccionado]?.Fundación || '-'}</span></div>
