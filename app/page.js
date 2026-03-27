@@ -48,7 +48,18 @@ export default function Home() {
     if (temporada === '2018') return listaPartidos2018;
     if (temporada === '2013') {
       const raw2013 = Array.isArray(partidos2013JSON) ? partidos2013JSON : [];
-      return raw2013.map(p => ({ Fecha_Global: p[0], Torneo: 'Descentralizado', Local: p[1], Visitante: p[2], GL: p[3], GV: p[4] }));
+      return raw2013.map(p => {
+        let gl = p[3];
+        let gv = p[4];
+        
+        // CORRECCIÓN ADMINISTRATIVA MESA 2013: Garcilaso vs León de Huánuco (Fecha 5)
+        if (p[0] === 5 && p[1] === 'Cusco (Garcilaso)' && p[2] === 'Leon de Huanuco') {
+          gl = 0;
+          gv = 3;
+        }
+
+        return { Fecha_Global: p[0], Torneo: 'Descentralizado', Local: p[1], Visitante: p[2], GL: gl, GV: gv };
+      });
     }
     return partidos2026JSON;
   }, [temporada]);
@@ -83,7 +94,13 @@ export default function Home() {
     'U. San Martin': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcROfQWRTSLDENcZLhqUcuH2MNeOyHkGsCnxeQ&s',
     'Union Comercio': 'https://tmssl.akamaized.net//images/wappen/head/31337.png',
     'Ayacucho FC': 'https://tmssl.akamaized.net//images/wappen/head/21178.png',
-    'Binacional': 'https://tmssl.akamaized.net//images/wappen/head/41054.png'
+    'Binacional': 'https://tmssl.akamaized.net//images/wappen/head/41054.png',
+    // EQUIPOS 2013 FALTANTES (Placeholders para que aparezcan en la grilla)
+    'Leon de Huanuco': 'https://cdn-icons-png.flaticon.com/128/33/33736.png',
+    'Pacifico FC': 'https://cdn-icons-png.flaticon.com/128/33/33736.png',
+    'Jose Galvez': 'https://cdn-icons-png.flaticon.com/128/33/33736.png',
+    'Juan Aurich': 'https://cdn-icons-png.flaticon.com/128/33/33736.png',
+    'Cesar Vallejo': 'https://cdn-icons-png.flaticon.com/128/33/33736.png'
   };
 
   const info_clubes = {
@@ -138,7 +155,6 @@ export default function Home() {
       .slice(0, 3);
   }, [listaPartidos, equipoSeleccionado, fecha]);
 
-  // EL CEREBRO DE LA TABLA CORREGIDO: Solucionado el error de empates y derrotas.
   const generarTabla = (partidos, listaFiltro = null, esAcumulado = false) => {
     const tabla = {};
     let equiposActuales = listaFiltro;
@@ -157,8 +173,8 @@ export default function Home() {
         tabla[p.Local].gf += p.GL;
         tabla[p.Local].gc += p.GV;
         if (p.GL > p.GV) { tabla[p.Local].g++; tabla[p.Local].pts += 3; tabla[p.Local].racha.push('V'); }
-        else if (p.GL < p.GV) { tabla[p.Local].p++; tabla[p.Local].racha.push('D'); } // CORREGIDO AQUÍ: Era Derrota
-        else { tabla[p.Local].e++; tabla[p.Local].pts += 1; tabla[p.Local].racha.push('E'); } // CORREGIDO AQUÍ: Era Empate
+        else if (p.GL < p.GV) { tabla[p.Local].p++; tabla[p.Local].racha.push('D'); } 
+        else { tabla[p.Local].e++; tabla[p.Local].pts += 1; tabla[p.Local].racha.push('E'); } 
       }
       
       // Sumamos al Visitante si pertenece a la tabla que estamos armando
@@ -167,8 +183,8 @@ export default function Home() {
         tabla[p.Visitante].gf += p.GV;
         tabla[p.Visitante].gc += p.GL;
         if (p.GV > p.GL) { tabla[p.Visitante].g++; tabla[p.Visitante].pts += 3; tabla[p.Visitante].racha.push('V'); }
-        else if (p.GV < p.GL) { tabla[p.Visitante].p++; tabla[p.Visitante].racha.push('D'); } // CORREGIDO AQUÍ: Era Derrota
-        else { tabla[p.Visitante].e++; tabla[p.Visitante].pts += 1; tabla[p.Visitante].racha.push('E'); } // CORREGIDO AQUÍ: Era Empate
+        else if (p.GV < p.GL) { tabla[p.Visitante].p++; tabla[p.Visitante].racha.push('D'); } 
+        else { tabla[p.Visitante].e++; tabla[p.Visitante].pts += 1; tabla[p.Visitante].racha.push('E'); } 
       }
     });
 
@@ -220,23 +236,19 @@ export default function Home() {
             {datos.map((eq, i) => {
               let bordeColor = 'transparent';
               
-              // REGLAS DE COLORES 2018
               if (temporada === '2018' && esAcumulado) {
-                if (i < 4) bordeColor = '#3db4dc'; // Play-off / Libertadores
-                else if (i < 8) bordeColor = '#e1c340'; // Sudamericana
-                else if (i >= datos.length - 2) bordeColor = '#d32f2f'; // Descenso
+                if (i < 4) bordeColor = '#3db4dc'; 
+                else if (i < 8) bordeColor = '#e1c340'; 
+                else if (i >= datos.length - 2) bordeColor = '#d32f2f'; 
               } 
-              // REGLAS DE COLORES 2013 - ACUMULADO (FECHAS 30 O LIGUILLAS)
               else if (temporada === '2013' && esAcumulado && !zona) {
-                if (i < 3) bordeColor = '#3db4dc'; // Libertadores (Finalistas + 3ro)
-                else if (i >= 3 && i < 7) bordeColor = '#e1c340'; // Sudamericana (4to al 7mo)
-                else if (i >= datos.length - 2) bordeColor = '#d32f2f'; // Descenso (2 últimos)
+                if (i < 3) bordeColor = '#3db4dc'; 
+                else if (i >= 3 && i < 7) bordeColor = '#e1c340'; 
+                else if (i >= datos.length - 2) bordeColor = '#d32f2f'; 
               }
-              // REGLAS DE COLORES 2013 - TABLAS DE LIGUILLA INDIVIDUALES
               else if (temporada === '2013' && esAcumulado && zona) {
-                if (i === 0) bordeColor = '#3db4dc'; // Ganador de liguilla va a la final
+                if (i === 0) bordeColor = '#3db4dc'; 
               }
-              // REGLA POR DEFECTO PARA LÍDERES
               else if (i === 0) {
                 bordeColor = '#3db4dc';
               }
@@ -478,6 +490,7 @@ export default function Home() {
                   .filter(eq => {
                     if (temporada === '2026') return partidos2026JSON.some(p => p.Local === eq || p.Visitante === eq);
                     if (temporada === '2018') return equipo_A_2018.includes(eq) || equipo_B_2018.includes(eq);
+                    if (temporada === '2013') return liguillaA_2013.includes(eq) || liguillaB_2013.includes(eq);
                     return true; 
                   })
                   .map(eq => (
