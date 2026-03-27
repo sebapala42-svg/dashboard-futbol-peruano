@@ -43,6 +43,11 @@ const listaPartidos2018 = Array.isArray(partidosJSON) ? partidosJSON : (partidos
 
 export default function Home() {
   const [temporada, setTemporada] = useState('2026');
+  const listaPartidos = useMemo(() => {
+    if (temporada === '2018') return listaPartidos2018;
+    if (temporada === '2013') return Array.isArray(partidos2013JSON) ? partidos2013JSON : [];
+    return partidos2026JSON;
+  }, [temporada]);
   const [fecha, setFecha] = useState(8); 
   const [tab, setTab] = useState('fixture');
   const [equipoSeleccionado, setEquipoSeleccionado] = useState(null);
@@ -303,6 +308,59 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-[#0b4026] font-sans selection:bg-[#8cc63f] selection:text-black">
       {/* Título Principal */}
+    {tab === 'fixture' && (
+        <main style={{ display: 'grid', gridTemplateColumns: '64% 34%', gap: '2%', maxWidth: '1250px', margin: '0 auto', padding: '20px', alignItems: 'start' }}>
+          
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            {/* Tablas específicas por temporada */}
+            {temporada === '2018' && fecha <= 14 && (
+              <>
+                <TablaComponent titulo="TORNEO DE VERANO" zona="ZONA A" datos={generarTabla(partidosValidos.filter(p => p.Torneo === 'Verano'), equipo_A_2018)} />
+                <TablaComponent titulo="TORNEO DE VERANO" zona="ZONA B" datos={generarTabla(partidosValidos.filter(p => p.Torneo === 'Verano'), equipo_B_2018)} />
+              </>
+            )}
+
+            {/* Lógica de Liguillas 2013 o Tabla Acumulada */}
+            {temporada === '2013' && fecha > 30 && fecha <= 44 ? (
+              <>
+                <TablaComponent titulo="LIGUILLA A" datos={generarTabla(partidosValidos, liguillaA_2013, true)} esAcumulado={true} />
+                <TablaComponent titulo="LIGUILLA B" datos={generarTabla(partidosValidos, liguillaB_2013, true)} esAcumulado={true} />
+              </>
+            ) : (
+              <TablaComponent 
+                titulo={fecha > 44 ? "TABLA FINAL ACUMULADA" : `TABLA ACUMULADA (HASTA LA FECHA ${fecha})`} 
+                datos={generarTabla(partidosValidos, null, true)} 
+                esAcumulado={true} 
+              />
+            )}
+          </div>
+
+          {/* COLUMNA DERECHA: Resultados de la fecha */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+             <div className="flex flex-col gap-[10px]">
+                {/* Selector de fecha dinámico según temporada */}
+                <select value={fecha} onChange={(e) => setFecha(Number(e.target.value))} className="...">
+                   {[...Array(temporada === '2018' ? 44 : 17)].map((_, i) => (
+                     <option key={i+1} value={i+1}>FECHA {i+1}</option>
+                   ))}
+                </select>
+
+                <div className="bg-[#112d1e] border border-[#1a4a2e] rounded-lg overflow-hidden shadow-lg">
+                  {listaPartidos.filter(p => p.Fecha_Global === fecha).map((p, idx) => (
+                    // ... Tu render de partidos (Local vs Visitante)
+                    <div key={idx}>{/* p.Local vs p.Visitante */}</div>
+                  ))}
+                  {listaPartidos.filter(p => p.Fecha_Global === fecha).length === 0 && (
+                    <div className="p-4 text-center text-white text-xs">No hay partidos en esta fecha.</div>
+                  )}
+                </div>
+             </div>
+          </div>
+        </main>
+      )}
+    </div>
+  );
+}
       <div className="pt-6 pb-2 relative">
         <h2 className="text-center text-[24px] font-bold m-0 flex flex-col items-center justify-center" style={{ color: '#ffffff' }}>
           LIGA PROFESIONAL PERUANA {temporada}
