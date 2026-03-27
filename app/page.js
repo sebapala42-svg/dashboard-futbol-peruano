@@ -517,29 +517,29 @@ export default function Home() {
               <p className="text-center text-[#87b897] text-[12px] mb-8">Pulsar en el equipo para ver su info detallada</p>
               
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
-                {Object.keys(logos).sort().map(eq => {
-                  const esDel2026 = partidos2026JSON.some(p => p.Local === eq || p.Visitante === eq);
-                  const esDel2018 = equipo_A_2018.includes(eq) || equipo_B_2018.includes(eq);
-                  if (temporada === '2026' && !esDel2026) return null;
-                  if (temporada === '2018' && !esDel2018) return null;
-
-                  return (
-                    <button 
-                      key={eq} 
-                      onClick={() => setEquipoSeleccionado(eq)} 
-                      className="p-4 flex flex-col items-center justify-center bg-[#112d1e] border border-[#1a4a2e] rounded-[8px] hover:bg-[#153625] transition-colors cursor-pointer group shadow-sm"
-                    >
-                      <img src={logos[eq]} style={{ width: '40px', height: '40px', objectFit: 'contain', marginBottom: '10px' }} alt={eq} />
-                      <span 
-                        className="font-bold text-[13px] text-center uppercase leading-tight group-hover:text-[#8cc63f]"
-                        style={{ color: '#ffffff' }}
-                      >
-                        {eq}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
+                {Object.keys(logos)
+                  .sort()
+                  .filter(eq => {
+                    if (temporada === '2026') return partidos2026JSON.some(p => p.Local === eq || p.Visitante === eq);
+                    if (temporada === '2018') return equipo_A_2018.includes(eq) || equipo_B_2018.includes(eq);
+                    return true; 
+                  })
+                  .map(eq => (
+                    <button 
+                      key={eq} 
+                      onClick={() => setEquipoSeleccionado(eq)} 
+                      className="p-4 flex flex-col items-center justify-center bg-[#112d1e] border border-[#1a4a2e] rounded-[8px] hover:bg-[#153625] transition-colors cursor-pointer group shadow-sm"
+                    >
+                      <img src={logos[eq]} style={{ width: '40px', height: '40px', objectFit: 'contain', marginBottom: '10px' }} alt={eq} />
+                      <span 
+                        className="font-bold text-[13px] text-center uppercase leading-tight group-hover:text-[#8cc63f]"
+                        style={{ color: '#ffffff' }}
+                      >
+                        {eq}
+                      </span>
+                    </button>
+                  ))}
+              </div>
             </div>
           ) : (
             <div>
