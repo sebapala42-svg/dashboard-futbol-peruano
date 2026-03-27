@@ -293,12 +293,12 @@ export default function Home() {
         <h2 className="text-center text-[24px] font-bold m-0 flex flex-col items-center justify-center" style={{ color: '#ffffff' }}>
           LIGA PROFESIONAL PERUANA {temporada}
         </h2>
-        {/* BOTON DE ESCAPE AL PRESENTE (Aparece solo si estás en 2018) */}
+        {/* BOTON DE ESCAPE AL PRESENTE */}
         {temporada !== '2026' && (
           <div className="absolute right-4 top-6">
             <button 
               onClick={() => { setTemporada('2026'); setFecha(8); setTab('fixture'); setEquipoSeleccionado(null); }}
-              className="bg-[#112d1e] border border-[#fbbf24] text-[#fbbf24] text-[10px] font-bold px-3 py-1.5 rounded-full hover:bg-[#fbbf24] hover:text-[#0b4026] transition-colors shadow-lg"
+              className="bg-[#112d1e] border border-[#fbbf24] text-[#fbbf24] text-[10px] font-bold px-3 py-1.5 rounded-full hover:bg-[#fbbf24] hover:text-[#0b4026] transition-colors shadow-lg cursor-pointer"
             >
               ⬅️ VOLVER AL 2026
             </button>
@@ -489,12 +489,11 @@ export default function Home() {
                       <img src={logos[row.Campeón] || 'https://cdn-icons-png.flaticon.com/128/33/33736.png'} style={{ width: '16px', height: '16px', objectFit: 'contain' }} />
                       <span style={{ color: '#ffffff' }}>{row.Campeón}</span>
                     </div>
-                    {/* BOTON VER AÑO (Solo para 2018 por ahora) */}
+                    {/* BOTON VER AÑO (CORREGIDO A VERDE Y LETRA NEGRA) */}
                     {row.Año === '2018' && (
                       <button 
                         onClick={() => { setTemporada('2018'); setFecha(44); setTab('fixture'); setEquipoSeleccionado(null); window.scrollTo(0,0); }}
-                        // ESTE ES EL BOTON QUE VAMOS A AJUSTAR
-                        className="bg-[#1a4a2e] border border-[#8cc63f] text-white hover:bg-[#8cc63f] hover:text-[#0b4026] text-[10px] font-bold px-2 py-1 rounded transition-colors"
+                        className="bg-[#8cc63f] text-black font-bold text-[10px] px-3 py-1 rounded border-none outline-none cursor-pointer"
                       >
                         VER AÑO
                       </button>
