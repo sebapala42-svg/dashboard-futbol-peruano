@@ -48,18 +48,7 @@ export default function Home() {
     if (temporada === '2018') return listaPartidos2018;
     if (temporada === '2013') {
       const raw2013 = Array.isArray(partidos2013JSON) ? partidos2013JSON : [];
-      return raw2013.map(p => {
-        let gl = p[3];
-        let gv = p[4];
-        
-        // CORRECCIÓN ADMINISTRATIVA MESA 2013: Garcilaso vs León de Huánuco (Fecha 5)
-        if (p[0] === 5 && p[1] === 'Cusco (Garcilaso)' && p[2] === 'Leon de Huanuco') {
-          gl = 0;
-          gv = 3;
-        }
-
-        return { Fecha_Global: p[0], Torneo: 'Descentralizado', Local: p[1], Visitante: p[2], GL: gl, GV: gv };
-      });
+      return raw2013.map(p => ({ Fecha_Global: p[0], Torneo: 'Descentralizado', Local: p[1], Visitante: p[2], GL: p[3], GV: p[4] }));
     }
     return partidos2026JSON;
   }, [temporada]);
@@ -95,12 +84,12 @@ export default function Home() {
     'Union Comercio': 'https://tmssl.akamaized.net//images/wappen/head/31337.png',
     'Ayacucho FC': 'https://tmssl.akamaized.net//images/wappen/head/21178.png',
     'Binacional': 'https://tmssl.akamaized.net//images/wappen/head/41054.png',
-    // EQUIPOS 2013 FALTANTES (Placeholders para que aparezcan en la grilla)
-    'Leon de Huanuco': 'https://cdn-icons-png.flaticon.com/128/33/33736.png',
-    'Pacifico FC': 'https://cdn-icons-png.flaticon.com/128/33/33736.png',
-    'Jose Galvez': 'https://cdn-icons-png.flaticon.com/128/33/33736.png',
-    'Juan Aurich': 'https://cdn-icons-png.flaticon.com/128/33/33736.png',
-    'Cesar Vallejo': 'https://cdn-icons-png.flaticon.com/128/33/33736.png'
+    // LOGOS 2013 AGREGADOS
+    'Leon de Huanuco': 'https://tmssl.akamaized.net//images/wappen/big/25774.png?lm=1424441686',
+    'Pacifico FC': 'https://tmssl.akamaized.net//images/wappen/head/37579.png?lm=1749433973',
+    'Jose Galvez': 'https://tmssl.akamaized.net//images/wappen/head/16700.png?lm=1699653454',
+    'Juan Aurich': 'https://tmssl.akamaized.net//images/wappen/head/4576.png?lm=1435783099',
+    'Cesar Vallejo': 'https://tmssl.akamaized.net//images/wappen/big/6889.png?lm=1435783460'
   };
 
   const info_clubes = {
@@ -167,7 +156,6 @@ export default function Home() {
     equiposActuales.forEach(eq => tabla[eq] = { equipo: eq, pj: 0, g: 0, e: 0, p: 0, gf: 0, gc: 0, pts: 0, racha: [] });
 
     partidos.forEach(p => {
-      // Sumamos al Local si pertenece a la tabla que estamos armando
       if (tabla[p.Local]) {
         tabla[p.Local].pj++;
         tabla[p.Local].gf += p.GL;
@@ -177,7 +165,6 @@ export default function Home() {
         else { tabla[p.Local].e++; tabla[p.Local].pts += 1; tabla[p.Local].racha.push('E'); } 
       }
       
-      // Sumamos al Visitante si pertenece a la tabla que estamos armando
       if (tabla[p.Visitante]) {
         tabla[p.Visitante].pj++;
         tabla[p.Visitante].gf += p.GV;
@@ -197,9 +184,16 @@ export default function Home() {
           if (['Dep. Municipal', 'UTC', 'Cantolao'].includes(t.equipo)) finalPts -= 2;
           if (t.equipo === 'Universitario') finalPts -= 1;
         }
-        if (temporada === '2013' && esAcumulado && fecha >= 31) {
-          if (t.equipo === 'U. San Martin') finalPts += 2; 
-          if (t.equipo === 'Alianza Lima') finalPts += 1;  
+        if (temporada === '2013') {
+          if (esAcumulado && fecha >= 31) {
+            if (t.equipo === 'U. San Martin') finalPts += 2; 
+            if (t.equipo === 'Alianza Lima') finalPts += 1;  
+          }
+          // SANCIÓN: A Garcilaso se le resta 1 punto y suma 3 goles en contra desde la Fecha 5
+          if (fecha >= 5 && t.equipo === 'Cusco (Garcilaso)') {
+            finalPts -= 1;
+            t.gc += 3;
+          }
         }
         return { ...t, pts: finalPts, dif: t.gf - t.gc, ultimas: t.racha.slice(-5).reverse() };
       })
@@ -293,7 +287,8 @@ export default function Home() {
       )}
       {temporada === '2013' && esAcumulado && fecha >= 44 && !zona && (
         <div className="text-[11px] text-[#87b897] text-left mx-[10px] my-[10px] p-[5px] bg-[#0d2418] rounded-[4px] border border-[#1a4a2e]">
-          * Nota (2013): Garcilaso y Universitario (ganadores de Liguilla) a Libertadores. El 3° de esta tabla acumulada a Libertadores. Del 4° al 7° a Sudamericana. Los dos últimos descienden (Comercio y Pacífico jugaron partido extra de desempate).
+          * Nota (2013): Garcilaso y Universitario (ganadores de Liguilla) a Libertadores. El 3° de esta tabla acumulada a Libertadores. Del 4° al 7° a Sudamericana. Los dos últimos descienden (Comercio y Pacífico jugaron partido extra de desempate). <br/>
+          * Sanción: Cusco (Garcilaso) perdió 1 punto y se le sumaron 3 goles en contra por infracción en la Fecha 5 ante León de Huánuco (el resultado de 0-0 se mantuvo en cancha para León).
         </div>
       )}
     </div>
