@@ -2,7 +2,6 @@
 import React, { useState, useMemo } from 'react';
 import partidosJSON from './torneo_2018.json';
 
-// --- TRUCO SALVAVIDAS ---
 const listaPartidos = Array.isArray(partidosJSON) 
   ? partidosJSON 
   : (partidosJSON.BaseDatos || Object.values(partidosJSON)[0] || []);
@@ -12,7 +11,6 @@ export default function Home() {
   const [tab, setTab] = useState('fixture');
   const [equipoSeleccionado, setEquipoSeleccionado] = useState(null);
 
-  // --- DICCIONARIO DE LOGOS (SEBA) ---
   const logos = {
     'Universitario': 'https://tmssl.akamaized.net//images/wappen/head/6593.png',
     'Alianza Lima': 'https://tmssl.akamaized.net//images/wappen/head/184.png?lm=1755275805',
@@ -126,7 +124,6 @@ export default function Home() {
       .sort((a, b) => b.pts - a.pts || b.dif - a.dif || b.gf - a.gf);
   };
 
-  // Renderizador de Tabla Reutilizable
   const TablaComponent = ({ titulo, zona, datos, esAcumulado, compactLogo = false }) => (
     <div className="bg-[#112d1e] border border-[#1a4a2e] rounded-[8px] overflow-hidden shadow-lg mb-[15px] pb-1">
       <div className="text-center text-white font-bold text-[14px] uppercase py-[10px]">
@@ -182,7 +179,7 @@ export default function Home() {
                 <td className="py-[6px] px-[4px]">
                   <div className="flex gap-[2px] justify-center">
                     {eq.ultimas.map((r, idx) => (
-                    <span key={idx} 
+                      <span key={idx} 
                             className="inline-flex items-center justify-center text-white text-[8.5px] font-bold rounded-[2px] px-[4px] py-[1px]"
                             style={{ backgroundColor: r === 'V' ? '#8cc63f' : r === 'E' ? '#e1c340' : '#d32f2f' }}>
                         {r}
@@ -204,16 +201,18 @@ export default function Home() {
   );
 
   return (
-    <div className="min-h-screen bg-[#0b4026] text-white font-sans selection:bg-[#8cc63f] selection:text-black">
-      {/* Título */}
+    <div className="min-h-screen bg-[#0b4026] font-sans selection:bg-[#8cc63f] selection:text-black">
+      {/* Título Principal */}
       <div className="pt-6 pb-2">
-        <h2 className="text-center text-white text-[24px] font-bold m-0 flex items-center justify-center gap-2">
+        <h2 className="text-center text-[24px] font-bold m-0 flex items-center justify-center gap-2" style={{ color: '#ffffff' }}>
           <img src="https://tmssl.akamaized.net//images/logo/header/per1.png" className="w-8 h-8 object-contain" alt="Liga 1"/>
           LIGA PROFESIONAL PERUANA 2018
         </h2>
       </div>
 
-      {/* TABS CORREGIDOS: Estilo Promiedos limpio, fondo transparente, línea amarilla (Basado en imagen 2) */}
+      {/* =========================================================================
+          TABS CORREGIDOS: Fondo verde transparente, texto blanco forzado y línea amarilla
+          ========================================================================= */}
       <nav className="w-full mb-6 mt-4 border-b border-[#1a4a2e]">
         <div className="max-w-5xl mx-auto flex justify-center">
           {[
@@ -224,7 +223,12 @@ export default function Home() {
             <button 
               key={t.id} 
               onClick={() => { setTab(t.id); setEquipoSeleccionado(null); }} 
-              className={`px-[30px] py-[12px] font-bold text-[13px] uppercase transition-all bg-transparent border-none outline-none cursor-pointer ${tab === t.id ? 'text-white border-b-[3px] border-[#fbbf24]' : 'text-[#87b897] hover:text-white border-b-[3px] border-transparent'}`}>
+              className="px-[30px] py-[12px] font-bold text-[13px] uppercase transition-all bg-transparent border-none outline-none cursor-pointer"
+              style={{ 
+                color: tab === t.id ? '#ffffff' : '#87b897', 
+                borderBottom: tab === t.id ? '3px solid #fbbf24' : '3px solid transparent' 
+              }}
+            >
               {t.label}
             </button>
           ))}
@@ -254,10 +258,10 @@ export default function Home() {
           {/* COLUMNA DERECHA */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
             <div className="flex flex-col gap-[10px]">
-              <div className="text-center text-white font-bold text-[14px] uppercase mb-[-5px]">TEMPORADA 2018</div>
-              <div className="bg-[#0d2418] border border-[#8cc63f] rounded-[4px]">
-                <select value={fecha} onChange={(e) => setFecha(Number(e.target.value))} className="w-full bg-transparent text-white font-bold text-[13px] px-[10px] py-[8px] outline-none appearance-none text-center cursor-pointer">
-                  {[...Array(44)].map((_, i) => <option key={i+1} value={i+1} className="bg-[#0d2418]">FECHA {i+1}</option>)}
+              <div className="text-center font-bold text-[14px] uppercase mb-[-5px]" style={{ color: '#8cc63f' }}>TEMPORADA 2018</div>
+              <div className="bg-transparent border border-[#8cc63f] rounded-[4px]">
+                <select value={fecha} onChange={(e) => setFecha(Number(e.target.value))} className="w-full bg-transparent font-bold text-[13px] px-[10px] py-[8px] outline-none appearance-none text-center cursor-pointer border-none" style={{ color: '#ffffff' }}>
+                  {[...Array(44)].map((_, i) => <option key={i+1} value={i+1} className="bg-[#0b4026]">FECHA {i+1}</option>)}
                 </select>
               </div>
               <div className="bg-[#112d1e] border border-[#1a4a2e] rounded-lg overflow-hidden shadow-lg">
@@ -265,26 +269,26 @@ export default function Home() {
                   {listaPartidos.filter(p => p.Fecha_Global === fecha).map((p, idx) => (
                     <div key={idx} className={`flex justify-between items-center py-[8px] px-[10px] border-b border-[#1a4a2e] hover:bg-[#1c4531] transition-colors ${idx % 2 === 0 ? 'bg-[#112d1e]' : 'bg-[#153625]'}`}>
                       <span className="text-white text-[10px] font-bold w-[35px]">Final</span>
-                      <div className="flex items-center w-[85%] justify-center gap-1">
-                        <span className="text-right w-[40%] text-[12px] text-white font-bold truncate">{p.Local}</span>
-                        <img src={logos[p.Local] || 'https://cdn-icons-png.flaticon.com/128/33/33736.png'} style={{ width: '18px', height: '18px', minWidth: '18px', objectFit: 'contain' }} />
-                        <div className="flex items-center gap-[1px]">
-                          <div className="bg-[#0d2418] border border-[#1a4a2e] rounded font-black text-white text-[14px] w-[22px] h-[22px] flex items-center justify-center">{p.GL !== null ? p.GL : '-'}</div>
-                          <div className="text-[#8cc63f] font-bold text-[14px]mx-[1px]">-</div>
-                          <div className="bg-[#0d2418] border border-[#1a4a2e] rounded font-black text-white text-[14px] w-[22px] h-[22px] flex items-center justify-center">{p.GV !== null ? p.GV : '-'}</div>
+                      <div className="flex items-center w-[85%] justify-center">
+                        <span className="text-right w-[40%] text-[12px] font-bold truncate" style={{ color: '#ffffff' }}>{p.Local}</span>
+                        <img src={logos[p.Local] || 'https://cdn-icons-png.flaticon.com/128/33/33736.png'} style={{ width: '18px', height: '18px', minWidth: '18px', objectFit: 'contain', margin: '0 5px' }} />
+                        <div className="flex items-center justify-center gap-[2px] mx-[5px]">
+                          <div className="bg-[#0d2418] border border-[#1a4a2e] rounded-[4px] font-bold text-[14px] w-[25px] h-[25px] flex items-center justify-center" style={{ color: '#ffffff' }}>{p.GL !== null ? p.GL : '-'}</div>
+                          <div className="font-bold text-[14px] mx-[2px]" style={{ color: '#8cc63f' }}>-</div>
+                          <div className="bg-[#0d2418] border border-[#1a4a2e] rounded-[4px] font-bold text-[14px] w-[25px] h-[25px] flex items-center justify-center" style={{ color: '#ffffff' }}>{p.GV !== null ? p.GV : '-'}</div>
                         </div>
-                        <img src={logos[p.Visitante] || 'https://cdn-icons-png.flaticon.com/128/33/33736.png'} style={{ width: '18px', height: '18px', minWidth: '18px', objectFit: 'contain' }} />
-                        <span className="text-left w-[40%] text-[12px] text-white font-bold truncate">{p.Visitante}</span>
+                        <img src={logos[p.Visitante] || 'https://cdn-icons-png.flaticon.com/128/33/33736.png'} style={{ width: '18px', height: '18px', minWidth: '18px', objectFit: 'contain', margin: '0 5px' }} />
+                        <span className="text-left w-[40%] text-[12px] font-bold truncate" style={{ color: '#ffffff' }}>{p.Visitante}</span>
                       </div>
                     </div>
                   ))}
-                  {listaPartidos.filter(p => p.Fecha_Global === fecha).length === 0 && <div className="text-center text-[12px] p-[15px]">No hay partidos registrados.</div>}
+                  {listaPartidos.filter(p => p.Fecha_Global === fecha).length === 0 && <div className="text-center text-[12px] p-[15px]" style={{ color: '#ffffff' }}>No hay partidos registrados.</div>}
                 </div>
               </div>
             </div>
 
-            <div className="bg-[#112d1e] border border-[#1a4a2e] rounded-lg p-3 text-center shadow-lg">
-               <div className="text-center text-white font-bold text-[14px] uppercase mb-[10px]">GOLEADORES (Mock)</div>
+            <div className="bg-[#112d1e] border border-[#1a4a2e] rounded-[8px] p-[10px] px-[15px] shadow-lg">
+               <div className="text-center font-bold text-[14px] uppercase mb-[10px]" style={{ color: '#ffffff' }}>GOLEADORES</div>
                <table className="w-full text-[12px] text-white font-sans border-collapse mt-[5px]">
                  <thead><tr><th className="bg-[#0d2418] text-[#a1b5a8] border-b border-[#1a4a2e] py-[6px] px-[4px] font-normal text-[11px] text-left">Jugador</th><th className="bg-[#0d2418] text-[#a1b5a8] border-b border-[#1a4a2e] py-[6px] px-[4px] font-normal text-[11px] text-center w-[40px]">Goles</th></tr></thead>
                  <tbody>{[
@@ -292,7 +296,13 @@ export default function Home() {
                     { n: "Tulio Etchemaite", eq: "Sport Rosario", g: 5 }, { n: "Neumann", eq: "Sport Huancayo", g: 5 },
                     { n: "Luis Tejada", eq: "Sport Boys", g: 5 }, { n: "Jeremias Bogado", eq: "Comerciantes Unidos", g: 4 }
                   ].map((g, i) => (
-                    <tr key={i} className={`border-b border-[#1a4a2e]/50 ${i % 2 === 0 ? 'bg-[#112d1e]' : 'bg-[#153625]'}`}><td className="py-[6px] px-[4px] text-left flex items-center gap-1"><img src={logos[g.eq]} style={{ width: '13px', height: '13px', objectFit: 'contain' }} /><span className="text-white">{g.n}</span></td><td className="py-[6px] px-[4px] text-center font-bold text-white">{g.g}</td></tr>
+                    <tr key={i} className={`hover:bg-[#1c4531] transition-colors ${i % 2 === 0 ? 'bg-[#112d1e]' : 'bg-[#153625]'}`}>
+                      <td className="py-[6px] px-[4px] text-left flex items-center">
+                        <img src={logos[g.eq] || 'https://cdn-icons-png.flaticon.com/128/33/33736.png'} style={{ width: '15px', height: '15px', minWidth: '15px', objectFit: 'contain', marginRight: '6px' }} />
+                        <span style={{ color: '#ffffff' }}>{g.n}</span>
+                      </td>
+                      <td className="py-[6px] px-[4px] text-center font-bold" style={{ color: '#ffffff' }}>{g.g}</td>
+                    </tr>
                   ))}</tbody>
                </table>
             </div>
@@ -304,20 +314,23 @@ export default function Home() {
       {tab === 'equipos' && (
         <main className="max-w-[1250px] mx-auto p-4 animate-in fade-in">
           {!equipoSeleccionado ? (
-            <div className="bg-[#0d2418] border border-[#1a4a2e] rounded-lg p-6 max-w-5xl mx-auto shadow-xl">
-              <h3 className="text-center text-white text-[18px] font-bold mb-1 uppercase tracking-widest">EQUIPOS LIGA 1</h3>
+            <div className="max-w-5xl mx-auto">
+              <h3 className="text-center font-bold mb-1 uppercase tracking-widest text-[18px]" style={{ color: '#ffffff' }}>EQUIPOS LIGA 1</h3>
               <p className="text-center text-[#87b897] text-[12px] mb-8">Pulsar en el equipo para ver su info detallada</p>
               
-              {/* GRILLA DE EQUIPOS CORREGIDA (como la imagen 20/21): Líneas finas, Logo arriba, Texto blanco abajo, Más Juntos (gap-3) */}
+              {/* EQUIPOS CORREGIDOS: Con cajas (bg-[#112d1e]), más juntos (gap-3), texto forzado a blanco */}
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
                 {Object.keys(logos).sort().map(eq => (
                   <button 
                     key={eq} 
                     onClick={() => setEquipoSeleccionado(eq)} 
-                    className="p-5 flex flex-col items-center justify-center bg-[#112d1e] border border-[#1a4a2e] rounded-[8px] hover:bg-[#153625] transition-colors cursor-pointer group shadow-lg"
+                    className="p-4 flex flex-col items-center justify-center bg-[#112d1e] border border-[#1a4a2e] rounded-[8px] hover:bg-[#153625] transition-colors cursor-pointer group shadow-sm"
                   >
-                    <img src={logos[eq]} style={{ width: '40px', height: '40px', objectFit: 'contain', marginBottom: '12px' }} alt={eq} />
-                    <span className="text-white font-bold text-[13px] text-center uppercase leading-tight group-hover:text-[#8cc63f]">
+                    <img src={logos[eq]} style={{ width: '40px', height: '40px', objectFit: 'contain', marginBottom: '10px' }} alt={eq} />
+                    <span 
+                      className="font-bold text-[13px] text-center uppercase leading-tight group-hover:text-[#8cc63f]"
+                      style={{ color: '#ffffff' }}
+                    >
                       {eq}
                     </span>
                   </button>
@@ -326,12 +339,12 @@ export default function Home() {
             </div>
           ) : (
             <div>
-              <button onClick={() => setEquipoSeleccionado(null)} className="mb-4 bg-[#0d2418] border border-[#1a4a2e] text-white text-[11px] font-bold px-3 py-1.5 rounded hover:bg-[#1c4531]">
+              <button onClick={() => setEquipoSeleccionado(null)} className="mb-4 bg-[#0d2418] border border-[#1a4a2e] text-[11px] font-bold px-3 py-1.5 rounded hover:bg-[#1c4531] cursor-pointer" style={{ color: '#ffffff' }}>
                 ⬅️ VOLVER
               </button>
               <div className="text-center mb-6">
                 <img src={logos[equipoSeleccionado]} style={{ width: '60px', height: '60px', objectFit: 'contain', margin: '0 auto 10px auto' }} />
-                <h2 className="text-[20px] font-bold text-white uppercase">{equipoSeleccionado}</h2>
+                <h2 className="text-[20px] font-bold uppercase" style={{ color: '#ffffff' }}>{equipoSeleccionado}</h2>
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '60% 35%', gap: '5%' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
@@ -340,9 +353,9 @@ export default function Home() {
                 </div>
                 <div>
                   <div className="bg-[#112d1e] border border-[#1a4a2e] rounded p-4 sticky top-20 shadow-lg">
-                    <div className="text-center text-white font-bold text-[14px] uppercase mb-[15px]">INFO DEL CLUB</div>
-                    <div className="bg-[#0d2418] border border-[#1a4a2e] rounded p-[10px] mb-[10px] flex justify-between text-[12px]"><span className="text-[#a1b5a8] font-bold uppercase">Apodo</span><span className="text-white font-bold">{info_clubes[equipoSeleccionado]?.Apodo || '-'}</span></div>
-                    <div className="bg-[#0d2418] border border-[#1a4a2e] rounded p-[10px] mb-[10px] flex justify-between text-[12px]"><span className="text-[#a1b5a8] font-bold uppercase">Fundación</span><span className="text-white font-bold">{info_clubes[equipoSeleccionado]?.Fundación || '-'}</span></div>
+                    <div className="text-center font-bold text-[14px] uppercase mb-[15px]" style={{ color: '#ffffff' }}>INFO DEL CLUB</div>
+                    <div className="bg-[#0d2418] border border-[#1a4a2e] rounded p-[10px] mb-[10px] flex justify-between text-[12px]"><span className="text-[#a1b5a8] font-bold uppercase">Apodo</span><span className="font-bold" style={{ color: '#ffffff' }}>{info_clubes[equipoSeleccionado]?.Apodo || '-'}</span></div>
+                    <div className="bg-[#0d2418] border border-[#1a4a2e] rounded p-[10px] mb-[10px] flex justify-between text-[12px]"><span className="text-[#a1b5a8] font-bold uppercase">Fundación</span><span className="font-bold" style={{ color: '#ffffff' }}>{info_clubes[equipoSeleccionado]?.Fundación || '-'}</span></div>
                     <div className="bg-[#0d2418] border border-[#1a4a2e] rounded p-[10px] flex flex-col text-[12px] text-center"><span className="text-[#a1b5a8] font-bold uppercase mb-1">Estadio</span><span className="text-[#8cc63f] font-bold text-xs leading-relaxed">{info_clubes[equipoSeleccionado]?.Estadio || 'Estadio Local'}</span></div>
                   </div>
                 </div>
@@ -356,20 +369,20 @@ export default function Home() {
       {tab === 'campeones' && (
         <main style={{ display: 'grid', gridTemplateColumns: '60% 35%', gap: '5%', maxWidth: '1250px', margin: '0 auto', padding: '20px', alignItems: 'start' }}>
           <div className="bg-[#112d1e] border border-[#1a4a2e] rounded shadow-lg overflow-hidden">
-            <div className="bg-[#0d2418] p-3 text-center border-b border-[#1a4a2e]"><h3 className="text-[14px] font-bold text-white uppercase">Historial de Campeones</h3></div>
-            <table className="w-full text-[12px] text-white border-collapse font-sans">
+            <div className="bg-[#0d2418] p-3 text-center border-b border-[#1a4a2e]"><h3 className="text-[14px] font-bold uppercase" style={{ color: '#ffffff' }}>Historial de Campeones</h3></div>
+            <table className="w-full text-[12px] border-collapse font-sans">
               <thead><tr><th className="bg-[#0d2418] text-[#a1b5a8] py-[8px] px-[10px] text-left border-b border-[#1a4a2e] font-normal w-[80px]">Torneo</th><th className="bg-[#0d2418] text-[#a1b5a8] py-[8px] px-[10px] text-left border-b border-[#1a4a2e] font-normal">Campeón</th></tr></thead>
               <tbody>{historial_datos.map((row, i) => (
-                <tr key={i} className={`hover:bg-[#1c4531] border-b border-[#1a4a2e]/30 ${i % 2 === 0 ? 'bg-[#112d1e]' : 'bg-[#153625]'}`}><td className="py-[10px] px-[10px] font-black text-white">{row.Año}</td><td className="py-[10px] px-[10px] text-left font-bold flex items-center gap-2"><img src={logos[row.Campeón] || 'https://cdn-icons-png.flaticon.com/128/33/33736.png'} style={{ width: '16px', height: '16px', objectFit: 'contain' }} /><span>{row.Campeón}</span></td></tr>
+                <tr key={i} className={`hover:bg-[#1c4531] border-b border-[#1a4a2e]/30 ${i % 2 === 0 ? 'bg-[#112d1e]' : 'bg-[#153625]'}`}><td className="py-[10px] px-[10px] font-black" style={{ color: '#ffffff' }}>{row.Año}</td><td className="py-[10px] px-[10px] text-left font-bold flex items-center gap-2"><img src={logos[row.Campeón] || 'https://cdn-icons-png.flaticon.com/128/33/33736.png'} style={{ width: '16px', height: '16px', objectFit: 'contain' }} /><span style={{ color: '#ffffff' }}>{row.Campeón}</span></td></tr>
               ))}</tbody>
             </table>
           </div>
           <div className="bg-[#112d1e] border border-[#1a4a2e] rounded shadow-lg overflow-hidden sticky top-20">
-            <div className="bg-[#0d2418] p-3 text-center border-b border-[#1a4a2e]"><h3 className="text-[14px] font-bold text-white uppercase">Ranking de Ligas</h3></div>
-            <table className="w-full text-[12px] text-white border-collapse font-sans">
+            <div className="bg-[#0d2418] p-3 text-center border-b border-[#1a4a2e]"><h3 className="text-[14px] font-bold uppercase" style={{ color: '#ffffff' }}>Ranking de Ligas</h3></div>
+            <table className="w-full text-[12px] border-collapse font-sans">
               <thead><tr><th className="bg-[#0d2418] text-[#a1b5a8] py-[8px] px-[10px] text-left border-b border-[#1a4a2e] font-normal">Equipo</th><th className="bg-[#0d2418] text-[#a1b5a8] py-[8px] px-[10px] text-center border-b border-[#1a4a2e] font-normal w-[60px]">Títulos</th></tr></thead>
               <tbody>{ranking_datos.map((row, i) => (
-                <tr key={i} className={`hover:bg-[#1c4531] border-b border-[#1a4a2e]/30 ${i % 2 === 0 ? 'bg-[#112d1e]' : 'bg-[#153625]'}`}><td className="py-[10px] px-[10px] text-left flex items-center gap-2"><img src={logos[row.Equipo] || 'https://cdn-icons-png.flaticon.com/128/33/33736.png'} style={{ width: '16px', height: '16px', objectFit: 'contain' }} /><span>{row.Equipo}</span></td><td className="py-[10px] px-[10px] text-center font-bold text-[#8cc63f] text-sm">{row.Títulos}</td></tr>
+                <tr key={i} className={`hover:bg-[#1c4531] border-b border-[#1a4a2e]/30 ${i % 2 === 0 ? 'bg-[#112d1e]' : 'bg-[#153625]'}`}><td className="py-[10px] px-[10px] text-left flex items-center gap-2"><img src={logos[row.Equipo] || 'https://cdn-icons-png.flaticon.com/128/33/33736.png'} style={{ width: '16px', height: '16px', objectFit: 'contain' }} /><span style={{ color: '#ffffff' }}>{row.Equipo}</span></td><td className="py-[10px] px-[10px] text-center font-bold text-[#8cc63f] text-sm">{row.Títulos}</td></tr>
               ))}</tbody>
             </table>
           </div>
