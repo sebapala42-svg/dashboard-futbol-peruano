@@ -201,7 +201,6 @@ export default function Home() {
           }
           if (fecha >= 5 && t.equipo === 'Cusco (Garcilaso)') {
             finalPts -= 1;
-            t.gc += 3;
           }
         }
         return { ...t, pts: finalPts, dif: t.gf - t.gc, ultimas: t.racha.slice(-5).reverse() };
@@ -473,26 +472,6 @@ export default function Home() {
                   {listaPartidos.filter(p => p.Fecha_Global === fecha).length === 0 && <div className="text-center text-[12px] p-[15px]" style={{ color: '#ffffff' }}>No hay partidos registrados para esta fecha.</div>}
                 </div>
               </div>
-            </div>
-
-            <div className="bg-[#112d1e] border border-[#1a4a2e] rounded-[8px] p-[10px] px-[15px] shadow-lg">
-               <div className="text-center font-bold text-[14px] uppercase mb-[10px]" style={{ color: '#ffffff' }}>GOLEADORES (Mock)</div>
-               <table className="w-full text-[12px] text-white font-sans border-collapse mt-[5px]">
-                 <thead><tr><th className="bg-[#0d2418] text-[#a1b5a8] border-b border-[#1a4a2e] py-[6px] px-[4px] font-normal text-[11px] text-left">Jugador</th><th className="bg-[#0d2418] text-[#a1b5a8] border-b border-[#1a4a2e] py-[6px] px-[4px] font-normal text-[11px] text-center w-[40px]">Goles</th></tr></thead>
-                 <tbody>{[
-                    { n: temporada === '2018' ? "E. Herrera" : "Cauteruccio", eq: "Sporting Cristal", g: 8 },
-                    { n: "Mauricio Montes", eq: "Ayacucho FC", g: 6 },
-                    { n: "Tulio Etchemaite", eq: "Sport Rosario", g: 5 },
-                 ].map((g, i) => (
-                    <tr key={i} className={`hover:bg-[#1c4531] transition-colors ${i % 2 === 0 ? 'bg-[#112d1e]' : 'bg-[#153625]'}`}>
-                      <td className="py-[6px] px-[4px] text-left flex items-center">
-                        <img src={logos[g.eq] || 'https://cdn-icons-png.flaticon.com/128/33/33736.png'} style={{ width: '15px', height: '15px', minWidth: '15px', objectFit: 'contain', marginRight: '6px' }} />
-                        <span style={{ color: '#ffffff' }}>{g.n}</span>
-                      </td>
-                      <td className="py-[6px] px-[4px] text-center font-bold" style={{ color: '#ffffff' }}>{g.g}</td>
-                    </tr>
-                 ))}</tbody>
-               </table>
             </div>
           </div>
         </main>
