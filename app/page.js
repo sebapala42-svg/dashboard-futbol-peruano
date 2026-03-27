@@ -46,13 +46,7 @@ export default function Home() {
   const [fecha, setFecha] = useState(8); 
   const [tab, setTab] = useState('fixture');
   const [equipoSeleccionado, setEquipoSeleccionado] = useState(null);
-
- const listaPartidos = useMemo(() => {
-  if (temporada === '2013') return partidos2013JSON.map(p => ({ Fecha_Global: p[0], Local: p[1], Visitante: p[2], GL: p[3], GV: p[4] }));
-  if (temporada === '2018') return listaPartidos2018;
-  return partidos2026JSON;
-}, [temporada]);
-
+  
   const logos = {
     'Alianza Lima': 'https://tmssl.akamaized.net//images/wappen/head/184.png?lm=1755275805',
     'Universitario': 'https://tmssl.akamaized.net//images/wappen/head/6593.png',
@@ -170,11 +164,26 @@ export default function Home() {
           if (['Dep. Municipal', 'UTC', 'Cantolao'].includes(t.equipo)) finalPts -= 2;
           if (t.equipo === 'Universitario') finalPts -= 1;
         }
+        // --- BONIFICACIONES 2013 (Torneo Reservas) ---
+    // Se sumaron en la Fecha 31 al empezar las liguillas
+    if (temporada === '2013' && esAcumulado && fecha >= 31) {
+      if (t.equipo === 'U. San Martin') finalPts += 2; // Campeón Reservas
+      if (t.equipo === 'Alianza Lima') finalPts += 1;  // Subcampeón Reservas
+    }
         return { ...t, pts: finalPts, dif: t.gf - t.gc, ultimas: t.racha.slice(-5).reverse() };
       })
       .sort((a, b) => b.pts - a.pts || b.dif - a.dif || b.gf - a.gf);
   };
+// --- GRUPOS LIGUILLAS 2013 ---
+  const liguillaA_2013 = [
+    'Cusco (Garcilaso)', 'Sporting Cristal', 'Alianza Lima', 'Cesar Vallejo', 
+    'Sport Huancayo', 'FBC Melgar', 'Pacifico FC', 'Union Comercio'
+  ];
 
+  const liguillaB_2013 = [
+    'Universitario', 'UTC', 'Ayacucho FC', 'Juan Aurich', 
+    'Cienciano', 'Leon de Huanuco', 'U. San Martin', 'Jose Galvez'
+  ];
   const TablaComponent = ({ titulo, zona, datos, esAcumulado, compactLogo = false }) => (
     <div className="bg-[#112d1e] border border-[#1a4a2e] rounded-[8px] overflow-hidden shadow-lg mb-[15px] pb-1">
       <div className="text-center text-white font-bold text-[14px] uppercase py-[10px]">
@@ -336,6 +345,7 @@ export default function Home() {
 
       {/* ======================= FIXTURE Y TABLAS ======================= */}
       {tab === 'fixture' && (
+        
         <main style={{ display: 'grid', gridTemplateColumns: '64% 34%', gap: '2%', maxWidth: '1250px', margin: '0 auto', padding: '20px', alignItems: 'start' }}>
           {/* COLUMNA IZQUIERDA */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
@@ -356,6 +366,32 @@ export default function Home() {
             )}
             <TablaComponent titulo={`TABLA ACUMULADA (HASTA LA FECHA ${fecha})`} datos={generarTabla(partidosValidos, null, true)} esAcumulado={true} />
           </div>
+          <main className="grid grid-cols-1 md:grid-cols-[1fr_400px] gap-6 max-w-[1250px] mx-auto px-4">
+    <div>
+      {/* SI ES 2013 Y FECHA > 30, MOSTRAR LIGUILLAS */}
+      {temporada === '2013' && fecha > 30 && fecha <= 44 ? (
+        <>
+          <TablaComponent 
+            titulo="LIGUILLA A" 
+            datos={generarTabla(partidosValidos, liguillaA_2013, true)} 
+            esAcumulado={true} 
+          />
+          <div className="my-6"></div> {/* Espacio entre tablas */}
+          <TablaComponent 
+            titulo="LIGUILLA B" 
+            datos={generarTabla(partidosValidos, liguillaB_2013, true)} 
+            esAcumulado={true} 
+          />
+        </>
+      ) : (
+        /* CASO NORMAL: UNA SOLA TABLA */
+        <TablaComponent 
+          titulo={fecha > 44 ? "TABLA FINAL ACUMULADA" : `TABLA ACUMULADA ${temporada}`} 
+          datos={generarTabla(temporada === '2013' && fecha > 44 ? listaPartidos.filter(p => p.Fecha_Global <= 44) : partidosValidos, null, true)} 
+          esAcumulado={true} 
+        />
+      )}
+    </div>                                                                                           
 
           {/* COLUMNA DERECHA */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
