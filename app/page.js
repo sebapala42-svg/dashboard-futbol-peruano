@@ -41,7 +41,6 @@ const partidos2026JSON = [
 const listaPartidos2018 = Array.isArray(partidosJSON) ? partidosJSON : (partidosJSON.BaseDatos || Object.values(partidosJSON)[0] || []);
 
 export default function Home() {
-  // ESTADOS INICIALES: 2026 y Fecha 8 por defecto
   const [temporada, setTemporada] = useState('2026');
   const [fecha, setFecha] = useState(8); 
   const [tab, setTab] = useState('fixture');
@@ -424,7 +423,6 @@ export default function Home() {
               
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
                 {Object.keys(logos).sort().map(eq => {
-                  // Ocultar equipos que no son de la temporada actual (simplificado para UI)
                   const esDel2026 = partidos2026JSON.some(p => p.Local === eq || p.Visitante === eq);
                   const esDel2018 = equipo_A_2018.includes(eq) || equipo_B_2018.includes(eq);
                   if (temporada === '2026' && !esDel2026) return null;
@@ -495,6 +493,7 @@ export default function Home() {
                     {row.Año === '2018' && (
                       <button 
                         onClick={() => { setTemporada('2018'); setFecha(44); setTab('fixture'); setEquipoSeleccionado(null); window.scrollTo(0,0); }}
+                        // ESTE ES EL BOTON QUE VAMOS A AJUSTAR
                         className="bg-[#1a4a2e] border border-[#8cc63f] text-white hover:bg-[#8cc63f] hover:text-[#0b4026] text-[10px] font-bold px-2 py-1 rounded transition-colors"
                       >
                         VER AÑO
