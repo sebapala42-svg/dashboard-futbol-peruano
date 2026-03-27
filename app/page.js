@@ -358,9 +358,7 @@ export default function Home() {
           </div>
         </main>
       )}
-    </div>
-  );
-}
+    
       <div className="pt-6 pb-2 relative">
         <h2 className="text-center text-[24px] font-bold m-0 flex flex-col items-center justify-center" style={{ color: '#ffffff' }}>
           LIGA PROFESIONAL PERUANA {temporada}
@@ -400,6 +398,9 @@ export default function Home() {
           ))}
         </div>
       </nav>
+</div>
+  );
+}
 
       {/* ======================= FIXTURE Y TABLAS ======================= */}
       {tab === 'fixture' && (
