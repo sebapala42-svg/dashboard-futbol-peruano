@@ -68,14 +68,13 @@ export default function Home() {
   const [tab, setTab] = useState('fixture');
   const [equipoSeleccionado, setEquipoSeleccionado] = useState(null);
   
-  // ANIMACIÓN FADE-IN
-  const [isAnimating, setIsAnimating] = useState(false);
+  // ANIMACIÓN FADE-IN (Optimizada)
+  const [animKey, setAnimKey] = useState(0);
 
   useEffect(() => {
-    setIsAnimating(true);
-    const timer = setTimeout(() => setIsAnimating(false), 300);
-    return () => clearTimeout(timer);
-  }, [tab, equipoSeleccionado, temporada, fecha]);
+    // Al cambiar la clave, React vuelve a renderizar el contenedor con la animación css limpia
+    setAnimKey(prev => prev + 1);
+  }, [tab, temporada]);
   
   const logos = {
     'Alianza Lima': 'https://tmssl.akamaized.net//images/wappen/head/184.png?lm=1755275805',
@@ -361,8 +360,16 @@ export default function Home() {
         />
       </header>
 
-      {/* CONTENEDOR DE ANIMACIÓN */}
-      <div className={`transition-opacity duration-300 ease-in-out ${isAnimating ? 'opacity-0' : 'opacity-100'}`}>
+      {/* ESTILO DE LA ANIMACIÓN CSS */}
+      <style>{`
+        @keyframes suaveFade {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+      `}</style>
+
+      {/* CONTENEDOR PRINCIPAL QUE SOLO SE ANIMA AL CAMBIAR AÑO O TAB */}
+      <div key={animKey} style={{ animation: 'suaveFade 0.5s ease-out' }}>
         
         {/* ======================= TÍTULO PRINCIPAL ======================= */}
         <div className="pt-2 pb-2 relative mt-4">
@@ -470,7 +477,7 @@ export default function Home() {
                   <div className="flex flex-col max-h-[550px] overflow-y-auto custom-scrollbar">
                     {listaPartidos.filter(p => p.Fecha_Global === fecha).map((p, idx) => (
                       <div key={idx} className={`flex justify-between items-center py-[8px] px-[10px] border-b border-[#d1e0d7] hover:bg-[#f8fbf9] transition-colors ${idx % 2 === 0 ? 'bg-transparent' : 'bg-[#fcfdfc]'}`}>
-                        <span className="text-[#0b4026] text-[10px] font-bold w-[35px]">Final</span>
+                        <span className="text-[#4b6b58] text-[10px] font-bold w-[35px]">F{p.Fecha_Global}</span>
                         <div className="flex items-center w-[85%] justify-center">
                           <span className="text-right w-[40%] text-[12px] font-bold truncate" style={{ color: '#0b4026' }}>{p.Local}</span>
                           <img src={logos[p.Local] || 'https://cdn-icons-png.flaticon.com/128/33/33736.png'} style={{ width: '18px', height: '18px', minWidth: '18px', objectFit: 'contain', margin: '0 5px' }} />
