@@ -45,7 +45,7 @@ export default function Home() {
   const [temporada, setTemporada] = useState('2026');
   
   const listaPartidos = useMemo(() => {
-    if (temporada === '2018' && listaPartidos2018) return listaPartidos2018;
+    if (temporada === '2018') return listaPartidos2018;
     if (temporada === '2013') {
       const raw2013 = Array.isArray(partidos2013JSON) ? partidos2013JSON : [];
       return raw2013.map(p => {
@@ -219,19 +219,19 @@ export default function Home() {
         </div>
       )}
       {datos.length === 0 ? <div className="text-center text-[#4b6b58] p-3 text-[12px]">Sin datos para esta fecha o temporada.</div> : (
-        <table className="w-full text-[12px] text-center text-[#0b4026] font-sans border-collapse mt-1">
+        <table className="w-full text-[12px] font-sans border-collapse mt-1">
           <thead>
             <tr>
-              <th className="bg-[#e5eee9] text-[#4b6b58] border-b border-[#d1e0d7] py-[6px] px-[4px] font-normal text-[11px] w-[30px]">#</th>
-              <th className="bg-[#e5eee9] text-[#4b6b58] border-b border-[#d1e0d7] py-[6px] px-[4px] font-normal text-[11px] text-left">Equipos</th>
-              <th className="bg-[#e5eee9] text-[#4b6b58] border-b border-[#d1e0d7] py-[6px] px-[4px] font-normal text-[11px]">PTS</th>
-              <th className="bg-[#e5eee9] text-[#4b6b58] border-b border-[#d1e0d7] py-[6px] px-[4px] font-normal text-[11px]">J</th>
-              <th className="bg-[#e5eee9] text-[#4b6b58] border-b border-[#d1e0d7] py-[6px] px-[4px] font-normal text-[11px]">Gol</th>
-              <th className="bg-[#e5eee9] text-[#4b6b58] border-b border-[#d1e0d7] py-[6px] px-[4px] font-normal text-[11px]">+/-</th>
-              <th className="bg-[#e5eee9] text-[#4b6b58] border-b border-[#d1e0d7] py-[6px] px-[4px] font-normal text-[11px]">G</th>
-              <th className="bg-[#e5eee9] text-[#4b6b58] border-b border-[#d1e0d7] py-[6px] px-[4px] font-normal text-[11px]">E</th>
-              <th className="bg-[#e5eee9] text-[#4b6b58] border-b border-[#d1e0d7] py-[6px] px-[4px] font-normal text-[11px]">P</th>
-              <th className="bg-[#e5eee9] text-[#4b6b58] border-b border-[#d1e0d7] py-[6px] px-[4px] font-normal text-[11px]">Últimas</th>
+              <th className="bg-[#e5eee9] text-black border-b border-[#d1e0d7] py-[8px] px-[4px] font-bold text-[11px] w-[30px] text-center">#</th>
+              <th className="bg-[#e5eee9] text-black border-b border-r border-[#d1e0d7] py-[8px] px-[4px] font-bold text-[11px] text-left">Equipos</th>
+              <th className="bg-[#e5eee9] text-black border-b border-[#d1e0d7] py-[8px] px-[4px] font-bold text-[11px] text-center">PTS</th>
+              <th className="bg-[#e5eee9] text-[#6b7280] border-b border-[#d1e0d7] py-[8px] px-[4px] font-normal text-[11px] text-center">J</th>
+              <th className="bg-[#e5eee9] text-[#6b7280] border-b border-[#d1e0d7] py-[8px] px-[4px] font-normal text-[11px] text-center">Gol</th>
+              <th className="bg-[#e5eee9] text-[#6b7280] border-b border-[#d1e0d7] py-[8px] px-[4px] font-normal text-[11px] text-center">+/-</th>
+              <th className="bg-[#e5eee9] text-[#6b7280] border-b border-[#d1e0d7] py-[8px] px-[4px] font-normal text-[11px] text-center">G</th>
+              <th className="bg-[#e5eee9] text-[#6b7280] border-b border-[#d1e0d7] py-[8px] px-[4px] font-normal text-[11px] text-center">E</th>
+              <th className="bg-[#e5eee9] text-[#6b7280] border-b border-[#d1e0d7] py-[8px] px-[4px] font-normal text-[11px] text-center">P</th>
+              <th className="bg-[#e5eee9] text-[#6b7280] border-b border-[#d1e0d7] py-[8px] px-[4px] font-normal text-[11px] text-center">Últimas</th>
             </tr>
           </thead>
           <tbody>
@@ -257,27 +257,23 @@ export default function Home() {
 
               return (
                 <tr key={eq.equipo} className={`hover:bg-[#f8fbf9] transition-colors ${i % 2 === 0 ? 'bg-transparent' : 'bg-[#fcfdfc]'}`}>
-                  <td className="py-[6px] px-[4px] font-bold border-l-[3px]" style={{ borderLeftColor: bordeColor }}>{i + 1}</td>
-                  <td className="py-[6px] px-[4px] text-left font-bold flex items-center">
-                    <img src={logos[eq.equipo] || 'https://cdn-icons-png.flaticon.com/128/33/33736.png'} 
-                         style={{ width: compactLogo ? '13px' : '15px', height: compactLogo ? '13px' : '15px', minWidth: compactLogo ? '13px' : '15px', objectFit: 'contain', marginRight: '6px' }} 
-                         alt={eq.equipo} />
-                    <span>{eq.equipo}</span>
-                  </td>
-                  {/* === COLUMNA DE PUNTOS ENMARCADA === */}
-                  <td className="py-[8px] px-[4px] text-center">
-                    <div className="bg-[#082819] border border-[#d1e0d7] rounded-[4px] font-bold text-[14px] text-white py-[4px] px-[6px] inline-block min-w-[35px]">
-                      {eq.pts}
+                  <td className="py-[6px] px-[4px] font-bold border-l-[3px] text-center text-black" style={{ borderLeftColor: bordeColor }}>{i + 1}</td>
+                  <td className="py-[6px] px-[4px] border-r border-[#d1e0d7]">
+                    <div className="flex items-center text-left font-bold text-black">
+                      <img src={logos[eq.equipo] || 'https://cdn-icons-png.flaticon.com/128/33/33736.png'} 
+                           style={{ width: compactLogo ? '13px' : '15px', height: compactLogo ? '13px' : '15px', minWidth: compactLogo ? '13px' : '15px', objectFit: 'contain', marginRight: '6px' }} 
+                           alt={eq.equipo} />
+                      <span>{eq.equipo}</span>
                     </div>
                   </td>
-                  {/* ================================= */}
-                  <td className="py-[6px] px-[4px] text-[#4b6b58]">{eq.pj}</td>
-                  <td className="py-[6px] px-[4px] text-[#4b6b58]">{eq.gf}:{eq.gc}</td>
-                  <td className="py-[6px] px-[4px] text-[#4b6b58]">{eq.dif}</td>
-                  <td className="py-[6px] px-[4px] text-[#4b6b58]">{eq.g}</td>
-                  <td className="py-[6px] px-[4px] text-[#4b6b58]">{eq.e}</td>
-                  <td className="py-[6px] px-[4px] text-[#4b6b58]">{eq.p}</td>
-                  <td className="py-[6px] px-[4px]">
+                  <td className="py-[6px] px-[4px] font-bold text-[13px] text-black text-center">{eq.pts}</td>
+                  <td className="py-[6px] px-[4px] text-[#6b7280] text-center font-normal">{eq.pj}</td>
+                  <td className="py-[6px] px-[4px] text-[#6b7280] text-center font-normal">{eq.gf}:{eq.gc}</td>
+                  <td className="py-[6px] px-[4px] text-[#6b7280] text-center font-normal">{eq.dif}</td>
+                  <td className="py-[6px] px-[4px] text-[#6b7280] text-center font-normal">{eq.g}</td>
+                  <td className="py-[6px] px-[4px] text-[#6b7280] text-center font-normal">{eq.e}</td>
+                  <td className="py-[6px] px-[4px] text-[#6b7280] text-center font-normal">{eq.p}</td>
+                  <td className="py-[6px] px-[4px] text-center">
                     <div className="flex gap-[2px] justify-center">
                       {eq.ultimas.map((r, idx) => (
                         <span key={idx} 
@@ -362,17 +358,17 @@ export default function Home() {
       <div className="pt-2 pb-2 relative mt-4">
         <h2 className="text-center text-[24px] font-bold m-0 flex flex-col items-center justify-center" style={{ color: '#0b4026' }}>
           LIGA PROFESIONAL PERUANA {temporada}
-          {temporada !== '2026' && (
-            <div className="absolute right-4 top-2">
-              <button 
-                onClick={() => { setTemporada('2026'); setFecha(8); setTab('fixture'); setEquipoSeleccionado(null); }}
-                className="bg-white border border-[#fbbf24] text-[#fbbf24] text-[10px] font-bold px-3 py-1.5 rounded-full hover:bg-[#fbbf24] hover:text-white transition-colors shadow-lg cursor-pointer"
-              >
-                ⬅️ VOLVER AL 2026
-              </button>
-            </div>
-          )}
         </h2>
+        {temporada !== '2026' && (
+          <div className="absolute right-4 top-2">
+            <button 
+              onClick={() => { setTemporada('2026'); setFecha(8); setTab('fixture'); setEquipoSeleccionado(null); }}
+              className="bg-white border border-[#fbbf24] text-[#fbbf24] text-[10px] font-bold px-3 py-1.5 rounded-full hover:bg-[#fbbf24] hover:text-white transition-colors shadow-lg cursor-pointer"
+            >
+              ⬅️ VOLVER AL 2026
+            </button>
+          </div>
+        )}
       </div>
 
       {/* ======================= MENÚ DE NAVEGACIÓN (TABS) ======================= */}
