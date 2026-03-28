@@ -45,7 +45,7 @@ export default function Home() {
   const [temporada, setTemporada] = useState('2026');
   
   const listaPartidos = useMemo(() => {
-    if (temporada === '2018') return listaPartidos2018;
+    if (temporada === '2018' && listaPartidos2018) return listaPartidos2018;
     if (temporada === '2013') {
       const raw2013 = Array.isArray(partidos2013JSON) ? partidos2013JSON : [];
       return raw2013.map(p => {
@@ -264,7 +264,13 @@ export default function Home() {
                          alt={eq.equipo} />
                     <span>{eq.equipo}</span>
                   </td>
-                  <td className="py-[6px] px-[4px] font-bold text-[13px] text-[#0b4026]">{eq.pts}</td>
+                  {/* === COLUMNA DE PUNTOS ENMARCADA === */}
+                  <td className="py-[8px] px-[4px] text-center">
+                    <div className="bg-[#082819] border border-[#d1e0d7] rounded-[4px] font-bold text-[14px] text-white py-[4px] px-[6px] inline-block min-w-[35px]">
+                      {eq.pts}
+                    </div>
+                  </td>
+                  {/* ================================= */}
                   <td className="py-[6px] px-[4px] text-[#4b6b58]">{eq.pj}</td>
                   <td className="py-[6px] px-[4px] text-[#4b6b58]">{eq.gf}:{eq.gc}</td>
                   <td className="py-[6px] px-[4px] text-[#4b6b58]">{eq.dif}</td>
@@ -356,17 +362,17 @@ export default function Home() {
       <div className="pt-2 pb-2 relative mt-4">
         <h2 className="text-center text-[24px] font-bold m-0 flex flex-col items-center justify-center" style={{ color: '#0b4026' }}>
           LIGA PROFESIONAL PERUANA {temporada}
+          {temporada !== '2026' && (
+            <div className="absolute right-4 top-2">
+              <button 
+                onClick={() => { setTemporada('2026'); setFecha(8); setTab('fixture'); setEquipoSeleccionado(null); }}
+                className="bg-white border border-[#fbbf24] text-[#fbbf24] text-[10px] font-bold px-3 py-1.5 rounded-full hover:bg-[#fbbf24] hover:text-white transition-colors shadow-lg cursor-pointer"
+              >
+                ⬅️ VOLVER AL 2026
+              </button>
+            </div>
+          )}
         </h2>
-        {temporada !== '2026' && (
-          <div className="absolute right-4 top-2">
-            <button 
-              onClick={() => { setTemporada('2026'); setFecha(8); setTab('fixture'); setEquipoSeleccionado(null); }}
-              className="bg-white border border-[#fbbf24] text-[#fbbf24] text-[10px] font-bold px-3 py-1.5 rounded-full hover:bg-[#fbbf24] hover:text-white transition-colors shadow-lg cursor-pointer"
-            >
-              ⬅️ VOLVER AL 2026
-            </button>
-          </div>
-        )}
       </div>
 
       {/* ======================= MENÚ DE NAVEGACIÓN (TABS) ======================= */}
