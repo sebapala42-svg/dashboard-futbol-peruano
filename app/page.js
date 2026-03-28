@@ -224,7 +224,7 @@ export default function Home() {
             <tr>
               <th className="bg-[#e5eee9] text-black border-b border-[#d1e0d7] py-[8px] px-[4px] font-bold text-[11px] w-[30px] text-center">#</th>
               <th className="bg-[#e5eee9] text-black border-b border-r border-[#d1e0d7] py-[8px] px-[4px] font-bold text-[11px] text-left">Equipos</th>
-              <th className="bg-[#e5eee9] text-black border-b border-[#d1e0d7] py-[8px] px-[4px] font-bold text-[11px] text-center">PTS</th>
+              <th className="bg-[#e5eee9] text-black border-b border-r border-[#d1e0d7] py-[8px] px-[4px] font-bold text-[11px] text-center">PTS</th>
               <th className="bg-[#e5eee9] text-[#6b7280] border-b border-[#d1e0d7] py-[8px] px-[4px] font-normal text-[11px] text-center">J</th>
               <th className="bg-[#e5eee9] text-[#6b7280] border-b border-[#d1e0d7] py-[8px] px-[4px] font-normal text-[11px] text-center">Gol</th>
               <th className="bg-[#e5eee9] text-[#6b7280] border-b border-[#d1e0d7] py-[8px] px-[4px] font-normal text-[11px] text-center">+/-</th>
@@ -266,7 +266,7 @@ export default function Home() {
                       <span>{eq.equipo}</span>
                     </div>
                   </td>
-                  <td className="py-[6px] px-[4px] font-bold text-[13px] text-black text-center">{eq.pts}</td>
+                  <td className="py-[6px] px-[4px] font-bold text-[13px] text-black text-center border-r border-[#d1e0d7]">{eq.pts}</td>
                   <td className="py-[6px] px-[4px] text-[#6b7280] text-center font-normal">{eq.pj}</td>
                   <td className="py-[6px] px-[4px] text-[#6b7280] text-center font-normal">{eq.gf}:{eq.gc}</td>
                   <td className="py-[6px] px-[4px] text-[#6b7280] text-center font-normal">{eq.dif}</td>
