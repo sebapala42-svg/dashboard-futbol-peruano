@@ -197,7 +197,7 @@ export default function Home() {
   const liguillaB_2013 = ['Universitario', 'UTC', 'Ayacucho FC', 'Juan Aurich', 'Cienciano', 'Leon de Huanuco', 'U. San Martin', 'Jose Galvez'];
 
   const partidosValidos = useMemo(() => {
-    return listaPartidos.filter(p => p.Fecha_Global <= fecha);
+    return listaPartidos.filter(p => p.Fecha_Global <= fecha && p.Torneo !== 'Final');
   }, [listaPartidos, fecha]);
 
   const partidosJugadosEquipo = useMemo(() => {
@@ -245,7 +245,7 @@ export default function Home() {
         } else {
           ptsLocal = 3; ptsVisita = 0; rLocal = 'V'; rVisita = 'D';
         }
-        gl = 0; gv = 0; // 0 goles para ambos en este caso especial
+        gl = 0; gv = 0; 
       } else {
         if (gl > gv) { ptsLocal = 3; rLocal = 'V'; rVisita = 'D'; }
         else if (gl < gv) { ptsVisita = 3; rVisita = 'V'; rLocal = 'D'; }
@@ -279,7 +279,6 @@ export default function Home() {
       .map(t => {
         let finalPts = t.pts;
         
-        // REGLAS 2018
         if (temporada === '2018' && esAcumulado && fecha >= 44) {
           if (t.equipo === 'Sporting Cristal') finalPts += 2;
           if (t.equipo === 'Sport Rosario') finalPts -= 7;
@@ -287,7 +286,6 @@ export default function Home() {
           if (t.equipo === 'Universitario') finalPts -= 1;
         }
         
-        // REGLAS 2013
         if (temporada === '2013') {
           if (esAcumulado && fecha >= 31) {
             if (t.equipo === 'U. San Martin') finalPts += 2; 
@@ -298,7 +296,6 @@ export default function Home() {
           }
         }
         
-        // REGLAS 2023 (Castigos en Mesa Acumulado Final)
         if (temporada === '2023' && esAcumulado && fecha >= 38) {
           if (t.equipo === 'Deportivo Garcilaso') finalPts -= 1;
           if (t.equipo === 'Sport Boys') finalPts -= 4;
@@ -353,6 +350,11 @@ export default function Home() {
               else if (temporada === '2013' && esAcumulado && zona) {
                 if (i === 0) bordeColor = '#3db4dc'; 
               }
+              else if (temporada === '2023' && esAcumulado) {
+                if (i < 4) bordeColor = '#3db4dc'; // Libertadores
+                else if (i >= 4 && i < 8) bordeColor = '#e1c340'; // Sudamericana
+                else if (i >= datos.length - 3) bordeColor = '#d32f2f'; // Descenso
+              }
               else if (i === 0) {
                 bordeColor = '#3db4dc';
               }
@@ -396,6 +398,7 @@ export default function Home() {
       {/* NOTAS AL PIE SEGÚN TEMPORADA */}
       {temporada === '2023' && esAcumulado && fecha >= 38 && (
         <div className="text-[11px] text-left mx-[10px] my-[10px] p-[5px] bg-[#e5eee9] rounded-[4px] border border-[#d1e0d7]" style={{ color: '#6b7280' }}>
+          <strong>Clasificación:</strong> Del 1° al 4° a Copa Libertadores. Del 5° al 8° a Copa Sudamericana. Descienden los 3 últimos (17°, 18° y 19°).<br/>
           * Resoluciones FPF aplicadas en la Tabla Final Acumulada 2023: D. Municipal (-5), Sport Boys (-4), D. Garcilaso (-1). 
         </div>
       )}
@@ -532,7 +535,11 @@ export default function Home() {
               <TablaComponent titulo="TORNEO CLAUSURA 2023" zona="ZONA ÚNICA" datos={generarTabla(partidosValidos.filter(p => p.Torneo === 'Clausura'))} />
             )}
             {temporada === '2023' && (
-              <TablaComponent titulo={`TABLA ACUMULADA (HASTA LA SEMANA ${fecha})`} datos={generarTabla(partidosValidos, null, true)} esAcumulado={true} />
+              <TablaComponent 
+                titulo={`TABLA ACUMULADA (HASTA LA SEMANA ${Math.min(fecha, 38)})`} 
+                datos={generarTabla(partidosValidos.filter(p => p.Fecha_Global <= 38), null, true)} 
+                esAcumulado={true} 
+              />
             )}
 
             {/* RENDERIZADO OTROS AÑOS */}
@@ -581,7 +588,7 @@ export default function Home() {
                   ◀
                 </button>
                 <select value={fecha} onChange={(e) => setFecha(Number(e.target.value))} className="w-full bg-transparent font-bold text-[13px] px-[10px] py-[8px] outline-none appearance-none text-center cursor-pointer border-none" style={{ color: '#000000' }}>
-                  {[...Array(temporada === '2023' ? 38 : (temporada === '2013' ? 48 : (temporada === '2018' ? 44 : 17)))].map((_, i) => {
+                  {[...Array(temporada === '2023' ? 40 : (temporada === '2013' ? 48 : (temporada === '2018' ? 44 : 17)))].map((_, i) => {
                     let etiqueta = `FECHA ${i+1}`;
                     if (temporada === '2023') {
                         if (i < 19) {
@@ -593,18 +600,22 @@ export default function Home() {
                             16: 'Jornada 16', 17: 'Jornada 17', 18: 'Jornada 18', 19: 'Jornada 19'
                           };
                           etiqueta = `Semana ${i+1} (${nombresJornadas[i+1]})`;
-                        } else {
+                        } else if (i < 38) {
                           etiqueta = `CLAUSURA F${i-18}`;
+                        } else if (i === 38) {
+                          etiqueta = `FINAL (IDA)`;
+                        } else if (i === 39) {
+                          etiqueta = `FINAL (VUELTA)`;
                         }
                     }
                     return <option key={i+1} value={i+1} className="bg-white">{etiqueta}</option>
                   })}
                 </select>
                 <button 
-                  onClick={() => setFecha(prev => Math.min(temporada === '2023' ? 38 : (temporada === '2013' ? 48 : (temporada === '2018' ? 44 : 17)), prev + 1))} 
+                  onClick={() => setFecha(prev => Math.min(temporada === '2023' ? 40 : (temporada === '2013' ? 48 : (temporada === '2018' ? 44 : 17)), prev + 1))} 
                   className="text-[#8cc63f] hover:text-[#000000] font-bold text-[14px] px-2 py-1 bg-transparent border-none outline-none cursor-pointer transition-colors"
-                  style={{ opacity: fecha === (temporada === '2023' ? 38 : (temporada === '2013' ? 48 : (temporada === '2018' ? 44 : 17))) ? 0.3 : 1, cursor: fecha === (temporada === '2023' ? 38 : (temporada === '2013' ? 48 : (temporada === '2018' ? 44 : 17))) ? 'default' : 'pointer' }}
-                  disabled={fecha === (temporada === '2023' ? 38 : (temporada === '2013' ? 48 : (temporada === '2018' ? 44 : 17)))}
+                  style={{ opacity: fecha === (temporada === '2023' ? 40 : (temporada === '2013' ? 48 : (temporada === '2018' ? 44 : 17))) ? 0.3 : 1, cursor: fecha === (temporada === '2023' ? 40 : (temporada === '2013' ? 48 : (temporada === '2018' ? 44 : 17))) ? 'default' : 'pointer' }}
+                  disabled={fecha === (temporada === '2023' ? 40 : (temporada === '2013' ? 48 : (temporada === '2018' ? 44 : 17)))}
                 >
                   ▶
                 </button>
@@ -630,8 +641,8 @@ export default function Home() {
                       <div key={idx} className={`flex justify-between items-center py-[8px] px-[10px] border-t border-[#d1e0d7] hover:bg-[#f8fbf9] transition-colors ${idx % 2 === 0 ? 'bg-transparent' : 'bg-[#fcfdfc]'}`}>
                         <div className="flex flex-col justify-center items-center w-[35px]">
                           <span className="text-[10px] font-bold" style={{ color: '#6b7280' }}>
-                            {temporada === '2023' && p.Torneo === 'Clausura' 
-                              ? `F${p.Jornada_Oficial - 19}` 
+                            {temporada === '2023' && (p.Torneo === 'Clausura' || p.Torneo === 'Final') 
+                              ? (p.Torneo === 'Final' ? 'FINAL' : `F${p.Jornada_Oficial - 19}`)
                               : (p.Jornada_Oficial ? `F${p.Jornada_Oficial}` : `F${p.Fecha_Global}`)}
                           </span>
                         </div>
