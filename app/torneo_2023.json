@@ -1,260 +1,175 @@
 [
-  // --- FEBRERO ---
-  // JORNADA 3 (El inicio real - Los Walkovers)
-  [3, "Cusco", "Sport Huancayo", 0, 3], // W.O. Cusco
-  [3, "Atlético Grau", "Melgar", 3, 0], // W.O. Melgar
-  [3, "UTC", "Cienciano", 3, 0], // W.O. Cienciano
-  [3, "Universitario", "Cantolao", 4, 0],
-  [3, "Deportivo Garcilaso", "Binacional", 3, 0], // W.O. Binacional
-  [3, "Sporting Cristal", "Alianza Lima", 3, 0], // W.O. Alianza Lima
-  [3, "Sport Boys", "Comercio", 2, 1],
-  [3, "César Vallejo", "Alianza Atlético", 2, 2],
-  [3, "Municipal", "Carlos Mannucci", 0, 3], // W.O. Municipal
-
-  // JORNADA 4
-  [4, "Cienciano", "Cusco", 2, 0],
-  [4, "Cantolao", "César Vallejo", 1, 2],
-  [4, "Binacional", "Atlético Grau", 2, 4],
-  [4, "ADT", "Deportivo Garcilaso", 1, 2],
-  [4, "Alianza Atlético", "UTC", 2, 0],
-  [4, "Comercio", "Universitario", 1, 0],
-  [4, "Carlos Mannucci", "Sporting Cristal", 1, 1],
-  [4, "Alianza Lima", "Sport Boys", 2, 0],
-  [4, "Melgar", "Municipal", 0, 2],
-
-  // JORNADA 5
-  [5, "Sporting Cristal", "Melgar", 1, 0],
-  [5, "César Vallejo", "Comercio", 3, 1],
-  [5, "Sport Huancayo", "Cienciano", 1, 3],
-  [5, "Sport Boys", "Carlos Mannucci", 0, 1],
-  [5, "Atlético Grau", "ADT", 1, 1],
-  [5, "Universitario", "Alianza Lima", 1, 2],
-  [5, "Cusco", "Alianza Atlético", 2, 1],
-  [5, "Municipal", "Binacional", 2, 0],
-  [5, "UTC", "Cantolao", 1, 0],
-
-  // JORNADA 6 (Partidos jugados en Febrero)
-  [6, "Alianza Atlético", "Sport Huancayo", 4, 2],
-  [6, "Deportivo Garcilaso", "Atlético Grau", 2, 0],
-  [6, "Comercio", "UTC", 1, 0],
-  [6, "ADT", "Municipal", 3, 0],
-  [6, "Carlos Mannucci", "Universitario", 2, 0],
-  [6, "Cantolao", "Cusco", 2, 3]
-[
-  // --- JORNADA 1 (Jugada en Marzo) ---
-  [1, "Universitario", "Cienciano", 3, 0],
-  [1, "Sporting Cristal", "Cantolao", 2, 0],
-  [1, "César Vallejo", "Sport Huancayo", 0, 2],
-  [1, "Municipal", "Comercio", 2, 0],
-  [1, "Atlético Grau", "Alianza Lima", 1, 2],
-  [1, "ADT", "Melgar", 0, 0],
-  [1, "Sport Boys", "Alianza Atlético", 0, 1],
-  [1, "Deportivo Garcilaso", "Carlos Mannucci", 1, 2],
-  [1, "UTC", "Cusco", 0, 0],
-
-  // --- JORNADA 2 (Jugada en Mayo) ---
-  [2, "Sport Huancayo", "UTC", 5, 1],
-  [2, "Binacional", "ADT", 1, 0],
-  [2, "Comercio", "Sporting Cristal", 1, 6],
-  [2, "Carlos Mannucci", "Atlético Grau", 1, 0],
-  [2, "Alianza Atlético", "Universitario", 3, 1],
-  [2, "Cienciano", "César Vallejo", 1, 1],
-  [2, "Melgar", "Deportivo Garcilaso", 2, 4],
-  [2, "Alianza Lima", "Municipal", 2, 1],
-  [2, "Cantolao", "Sport Boys", 0, 0],
-
-  // --- JORNADA 3 (Los Walkovers - Febrero) ---
-  [3, "Cusco", "Sport Huancayo", 0, 3],
-  [3, "Atlético Grau", "Melgar", 3, 0],
-  [3, "UTC", "Cienciano", 3, 0],
-  [3, "Universitario", "Cantolao", 4, 0],
-  [3, "Deportivo Garcilaso", "Binacional", 3, 0],
-  [3, "Sporting Cristal", "Alianza Lima", 3, 0],
-  [3, "Sport Boys", "Comercio", 2, 1],
-  [3, "César Vallejo", "Alianza Atlético", 2, 2],
-  [3, "Municipal", "Carlos Mannucci", 0, 3],
-
-  // --- JORNADA 4 (Febrero) ---
-  [4, "Cienciano", "Cusco", 2, 0],
-  [4, "Cantolao", "César Vallejo", 1, 2],
-  [4, "Binacional", "Atlético Grau", 2, 4],
-  [4, "ADT", "Deportivo Garcilaso", 1, 2],
-  [4, "Alianza Atlético", "UTC", 2, 0],
-  [4, "Comercio", "Universitario", 1, 0],
-  [4, "Carlos Mannucci", "Sporting Cristal", 1, 1],
-  [4, "Alianza Lima", "Sport Boys", 2, 0],
-  [4, "Melgar", "Municipal", 0, 2],
-
-  // --- JORNADA 5 (Febrero) ---
-  [5, "Sporting Cristal", "Melgar", 1, 0],
-  [5, "César Vallejo", "Comercio", 3, 1],
-  [5, "Sport Huancayo", "Cienciano", 1, 3],
-  [5, "Sport Boys", "Carlos Mannucci", 0, 1],
-  [5, "Atlético Grau", "ADT", 1, 1],
-  [5, "Universitario", "Alianza Lima", 1, 2],
-  [5, "Cusco", "Alianza Atlético", 2, 1],
-  [5, "Municipal", "Binacional", 2, 0],
-  [5, "UTC", "Cantolao", 1, 0],
-
-  // --- JORNADA 6 (Febrero/Mayo) ---
-  [6, "Alianza Atlético", "Sport Huancayo", 4, 2],
-  [6, "Deportivo Garcilaso", "Atlético Grau", 2, 0],
-  [6, "Comercio", "UTC", 1, 0],
-  [6, "ADT", "Municipal", 3, 0],
-  [6, "Carlos Mannucci", "Universitario", 2, 0],
-  [6, "Cantolao", "Cusco", 2, 3],
-  [6, "Alianza Lima", "César Vallejo", 2, 0], // Jugado en mayo
-  [6, "Melgar", "Sport Boys", 2, 0], // Jugado en mayo
-  [6, "Binacional", "Sporting Cristal", 0, 1], // Jugado en mayo
-
-  // --- JORNADA 7 (Marzo/Mayo) ---
-  [7, "Sport Boys", "Binacional", 2, 2],
-  [7, "Sport Huancayo", "Cantolao", 4, 0],
-  [7, "Sporting Cristal", "ADT", 0, 0],
-  [7, "César Vallejo", "Carlos Mannucci", 2, 0],
-  [7, "UTC", "Alianza Lima", 0, 1],
-  [7, "Universitario", "Melgar", 1, 0],
-  [7, "Municipal", "Deportivo Garcilaso", 0, 3],
-  [7, "Cusco", "Comercio", 2, 1],
-  [7, "Cienciano", "Alianza Atlético", 5, 2], // Jugado en mayo
-
-  // --- JORNADA 8 (Marzo/Mayo) ---
-  [8, "ADT", "Sport Boys", 1, 0],
-  [8, "Alianza Lima", "Cusco", 2, 0],
-  [8, "Comercio", "Sport Huancayo", 2, 0],
-  [8, "Atlético Grau", "Municipal", 1, 1],
-  [8, "Cantolao", "Cienciano", 1, 0],
-  [8, "Deportivo Garcilaso", "Sporting Cristal", 4, 4],
-  [8, "Binacional", "Universitario", 1, 2],
-  [8, "Carlos Mannucci", "UTC", 0, 1], // Jugado en mayo
-  [8, "Melgar", "César Vallejo", 2, 2], // Jugado en mayo
-
-  // --- JORNADA 9 (Marzo) ---
-  [9, "Sport Boys", "Deportivo Garcilaso", 2, 1],
-  [9, "Alianza Atlético", "Cantolao", 2, 1],
-  [9, "UTC", "Melgar", 0, 0],
-  [9, "Cienciano", "Comercio", 3, 1],
-  [9, "Universitario", "ADT", 3, 1],
-  [9, "César Vallejo", "Binacional", 2, 0],
-  [9, "Sporting Cristal", "Atlético Grau", 2, 1],
-  [9, "Sport Huancayo", "Alianza Lima", 2, 1],
-  [9, "Cusco", "Carlos Mannucci", 3, 0],
-
-  // --- JORNADA 10 (Marzo/Abril) ---
-  [10, "Municipal", "Sporting Cristal", 1, 1],
-  [10, "ADT", "César Vallejo", 2, 0],
-  [10, "Deportivo Garcilaso", "Universitario", 0, 0],
-  [10, "Melgar", "Cusco", 1, 1],
-  [10, "Alianza Lima", "Cienciano", 2, 0],
-  [10, "Comercio", "Alianza Atlético", 3, 3],
-  [10, "Carlos Mannucci", "Sport Huancayo", 0, 0],
-  [10, "Atlético Grau", "Sport Boys", 3, 0],
-  [10, "Binacional", "UTC", 1, 1],
-
-  // --- JORNADA 11 (Abril) ---
-  [11, "Cusco", "Binacional", 2, 1],
-  [11, "Sport Boys", "Municipal", 0, 2],
-  [11, "UTC", "ADT", 1, 0],
-  [11, "Cienciano", "Carlos Mannucci", 1, 0],
-  [11, "Alianza Atlético", "Alianza Lima", 0, 1],
-  [11, "Sport Huancayo", "Melgar", 1, 1],
-  [11, "Universitario", "Atlético Grau", 2, 1],
-  [11, "Cantolao", "Comercio", 1, 2],
-  [11, "César Vallejo", "Deportivo Garcilaso", 3, 0],
-
-  // --- JORNADA 12 (Abril) ---
-  [12, "Sporting Cristal", "Sport Boys", 1, 1],
-  [12, "Melgar", "Cienciano", 1, 0],
-  [12, "Atlético Grau", "César Vallejo", 1, 1],
-  [12, "Alianza Lima", "Cantolao", 3, 0],
-  [12, "Deportivo Garcilaso", "UTC", 2, 2],
-  [12, "ADT", "Cusco", 0, 2],
-  [12, "Municipal", "Universitario", 1, 2],
-  [12, "Binacional", "Sport Huancayo", 5, 3],
-  [12, "Carlos Mannucci", "Alianza Atlético", 1, 0]
-
-// --- JORNADA 13 (Abril) ---
-  [13, "UTC", "Atlético Grau", 1, 1],
-  [13, "Cantolao", "Carlos Mannucci", 0, 2],
-  [13, "Sport Huancayo", "ADT", 1, 3],
-  [13, "Cienciano", "Binacional", 1, 1],
-  [13, "Comercio", "Alianza Lima", 1, 3],
-  [13, "Cusco", "Deportivo Garcilaso", 2, 1],
-  [13, "Alianza Atlético", "Melgar", 3, 3],
-  [13, "César Vallejo", "Municipal", 1, 1],
-  [13, "Universitario", "Sporting Cristal", 2, 0],
-
-  // --- JORNADA 14 (Abril) ---
-  [14, "Sporting Cristal", "César Vallejo", 1, 1],
-  [14, "Atlético Grau", "Cusco", 3, 0],
-  [14, "Sport Boys", "Universitario", 0, 3],
-  [14, "Deportivo Garcilaso", "Sport Huancayo", 1, 1],
-  [14, "Melgar", "Cantolao", 5, 0],
-  [14, "Binacional", "Alianza Atlético", 4, 2],
-  [14, "Municipal", "UTC", 2, 0],
-  [14, "ADT", "Cienciano", 3, 4],
-  [14, "Carlos Mannucci", "Comercio", 2, 0],
-
-  // --- JORNADA 15 (Mayo) ---
-  [15, "Cantolao", "Binacional", 1, 0],
-  [15, "Cusco", "Municipal", 1, 0],
-  [15, "Alianza Atlético", "ADT", 1, 1],
-  [15, "Sport Huancayo", "Atlético Grau", 1, 0],
-  [15, "Cienciano", "Deportivo Garcilaso", 0, 0],
-  [15, "UTC", "Sporting Cristal", 1, 1],
-  [15, "César Vallejo", "Sport Boys", 2, 0],
-  [15, "Alianza Lima", "Carlos Mannucci", 3, 0],
-  [15, "Comercio", "Melgar", 1, 1],
-
-  // --- JORNADA 16 (Mayo) ---
-  [16, "Melgar", "Alianza Lima", 2, 1],
-  [16, "Universitario", "César Vallejo", 4, 0],
-  [16, "ADT", "Cantolao", 1, 1],
-  [16, "Deportivo Garcilaso", "Alianza Atlético", 3, 2],
-  [16, "Sporting Cristal", "Cusco", 3, 2],
-  [16, "Atlético Grau", "Cienciano", 4, 0],
-  [16, "Municipal", "Sport Huancayo", 1, 2],
-  [16, "Sport Boys", "UTC", 3, 2],
-  [16, "Binacional", "Comercio", 5, 0],
-
-  // --- JORNADA 17 (Mayo) ---
-  [17, "Cantolao", "Deportivo Garcilaso", 1, 1],
-  [17, "Cienciano", "Municipal", 1, 0],
-  [17, "Alianza Atlético", "Atlético Grau", 3, 2],
-  [17, "Cusco", "Sport Boys", 2, 1],
-  [17, "Comercio", "ADT", 4, 3],
-  [17, "UTC", "Universitario", 1, 0],
-  [17, "Sport Huancayo", "Sporting Cristal", 1, 2],
-  [17, "Carlos Mannucci", "Melgar", 1, 2],
-  [17, "Alianza Lima", "Binacional", 6, 1],
-
-  // --- JORNADA 18 (Junio) ---
-  [18, "Sporting Cristal", "Cienciano", 4, 2],
-  [18, "ADT", "Alianza Lima", 2, 1],
-  [18, "Universitario", "Cusco", 1, 0],
-  [18, "Municipal", "Alianza Atlético", 2, 1],
-  [18, "Binacional", "Carlos Mannucci", 3, 0],
-  [18, "Deportivo Garcilaso", "Comercio", 2, 2],
-  [18, "Atlético Grau", "Cantolao", 3, 0],
-  [18, "Sport Boys", "Sport Huancayo", 1, 0],
-  [18, "César Vallejo", "UTC", 3, 1]
-
-// --- JORNADA 19 (Junio - FIN DEL APERTURA) ---
-  [19, "Cienciano", "Sport Boys", 0, 1],
-  [19, "Comercio", "Atlético Grau", 2, 2],
-  [19, "Cantolao", "Municipal", 0, 1],
-  [19, "Melgar", "Binacional", 2, 1],
-  [19, "Carlos Mannucci", "ADT", 1, 1],
-  [19, "Alianza Lima", "Deportivo Garcilaso", 3, 2],
-  [19, "Alianza Atlético", "Sporting Cristal", 0, 0],
-  [19, "Cusco", "César Vallejo", 2, 0],
-  [19, "Sport Huancayo", "Universitario", 1, 0],
-
-  // ==========================================
-  //            TORNEO CLAUSURA
-  // ==========================================
-
-  // --- CLAUSURA JORNADA 1 (Fecha Global 20) ---
+  [1, "Universitario", "Cienciano", 3, 0, "Apertura"],
+  [1, "Sporting Cristal", "Cantolao", 2, 0, "Apertura"],
+  [1, "César Vallejo", "Sport Huancayo", 0, 2, "Apertura"],
+  [1, "Municipal", "Comercio", 2, 0, "Apertura"],
+  [1, "Atlético Grau", "Alianza Lima", 1, 2, "Apertura"],
+  [1, "ADT", "Melgar", 0, 0, "Apertura"],
+  [1, "Sport Boys", "Alianza Atlético", 0, 1, "Apertura"],
+  [1, "Deportivo Garcilaso", "Carlos Mannucci", 1, 2, "Apertura"],
+  [1, "UTC", "Cusco", 0, 0, "Apertura"],
+  [2, "Sport Huancayo", "UTC", 5, 1, "Apertura"],
+  [2, "Binacional", "ADT", 1, 0, "Apertura"],
+  [2, "Comercio", "Sporting Cristal", 1, 6, "Apertura"],
+  [2, "Carlos Mannucci", "Atlético Grau", 1, 0, "Apertura"],
+  [2, "Alianza Atlético", "Universitario", 3, 1, "Apertura"],
+  [2, "Cienciano", "César Vallejo", 1, 1, "Apertura"],
+  [2, "Melgar", "Deportivo Garcilaso", 2, 4, "Apertura"],
+  [2, "Alianza Lima", "Municipal", 2, 1, "Apertura"],
+  [2, "Cantolao", "Sport Boys", 0, 0, "Apertura"],
+  [3, "Cusco", "Sport Huancayo", 0, 3, "Apertura"],
+  [3, "Atlético Grau", "Melgar", 3, 0, "Apertura"],
+  [3, "UTC", "Cienciano", 3, 0, "Apertura"],
+  [3, "Universitario", "Cantolao", 4, 0, "Apertura"],
+  [3, "Deportivo Garcilaso", "Binacional", 3, 0, "Apertura"],
+  [3, "Sporting Cristal", "Alianza Lima", 3, 0, "Apertura"],
+  [3, "Sport Boys", "Comercio", 2, 1, "Apertura"],
+  [3, "César Vallejo", "Alianza Atlético", 2, 2, "Apertura"],
+  [3, "Municipal", "Carlos Mannucci", 0, 3, "Apertura"],
+  [4, "Cienciano", "Cusco", 2, 0, "Apertura"],
+  [4, "Cantolao", "César Vallejo", 1, 2, "Apertura"],
+  [4, "Binacional", "Atlético Grau", 2, 4, "Apertura"],
+  [4, "ADT", "Deportivo Garcilaso", 1, 2, "Apertura"],
+  [4, "Alianza Atlético", "UTC", 2, 0, "Apertura"],
+  [4, "Comercio", "Universitario", 1, 0, "Apertura"],
+  [4, "Carlos Mannucci", "Sporting Cristal", 1, 1, "Apertura"],
+  [4, "Alianza Lima", "Sport Boys", 2, 0, "Apertura"],
+  [4, "Melgar", "Municipal", 0, 2, "Apertura"],
+  [5, "Sporting Cristal", "Melgar", 1, 0, "Apertura"],
+  [5, "César Vallejo", "Comercio", 3, 1, "Apertura"],
+  [5, "Sport Huancayo", "Cienciano", 1, 3, "Apertura"],
+  [5, "Sport Boys", "Carlos Mannucci", 0, 1, "Apertura"],
+  [5, "Atlético Grau", "ADT", 1, 1, "Apertura"],
+  [5, "Universitario", "Alianza Lima", 1, 2, "Apertura"],
+  [5, "Cusco", "Alianza Atlético", 2, 1, "Apertura"],
+  [5, "Municipal", "Binacional", 2, 0, "Apertura"],
+  [5, "UTC", "Cantolao", 1, 0, "Apertura"],
+  [6, "Alianza Atlético", "Sport Huancayo", 4, 2, "Apertura"],
+  [6, "Deportivo Garcilaso", "Atlético Grau", 2, 0, "Apertura"],
+  [6, "Comercio", "UTC", 1, 0, "Apertura"],
+  [6, "ADT", "Municipal", 3, 0, "Apertura"],
+  [6, "Carlos Mannucci", "Universitario", 2, 0, "Apertura"],
+  [6, "Cantolao", "Cusco", 2, 3, "Apertura"],
+  [6, "Alianza Lima", "César Vallejo", 2, 0, "Apertura"],
+  [6, "Melgar", "Sport Boys", 2, 0, "Apertura"],
+  [6, "Binacional", "Sporting Cristal", 0, 1, "Apertura"],
+  [7, "Sport Boys", "Binacional", 2, 2, "Apertura"],
+  [7, "Sport Huancayo", "Cantolao", 4, 0, "Apertura"],
+  [7, "Sporting Cristal", "ADT", 0, 0, "Apertura"],
+  [7, "César Vallejo", "Carlos Mannucci", 2, 0, "Apertura"],
+  [7, "UTC", "Alianza Lima", 0, 1, "Apertura"],
+  [7, "Universitario", "Melgar", 1, 0, "Apertura"],
+  [7, "Municipal", "Deportivo Garcilaso", 0, 3, "Apertura"],
+  [7, "Cusco", "Comercio", 2, 1, "Apertura"],
+  [7, "Cienciano", "Alianza Atlético", 5, 2, "Apertura"],
+  [8, "ADT", "Sport Boys", 1, 0, "Apertura"],
+  [8, "Alianza Lima", "Cusco", 2, 0, "Apertura"],
+  [8, "Comercio", "Sport Huancayo", 2, 0, "Apertura"],
+  [8, "Atlético Grau", "Municipal", 1, 1, "Apertura"],
+  [8, "Cantolao", "Cienciano", 1, 0, "Apertura"],
+  [8, "Deportivo Garcilaso", "Sporting Cristal", 4, 4, "Apertura"],
+  [8, "Binacional", "Universitario", 1, 2, "Apertura"],
+  [8, "Carlos Mannucci", "UTC", 0, 1, "Apertura"],
+  [8, "Melgar", "César Vallejo", 2, 2, "Apertura"],
+  [9, "Sport Boys", "Deportivo Garcilaso", 2, 1, "Apertura"],
+  [9, "Alianza Atlético", "Cantolao", 2, 1, "Apertura"],
+  [9, "UTC", "Melgar", 0, 0, "Apertura"],
+  [9, "Cienciano", "Comercio", 3, 1, "Apertura"],
+  [9, "Universitario", "ADT", 3, 1, "Apertura"],
+  [9, "César Vallejo", "Binacional", 2, 0, "Apertura"],
+  [9, "Sporting Cristal", "Atlético Grau", 2, 1, "Apertura"],
+  [9, "Sport Huancayo", "Alianza Lima", 2, 1, "Apertura"],
+  [9, "Cusco", "Carlos Mannucci", 3, 0, "Apertura"],
+  [10, "Municipal", "Sporting Cristal", 1, 1, "Apertura"],
+  [10, "ADT", "César Vallejo", 2, 0, "Apertura"],
+  [10, "Deportivo Garcilaso", "Universitario", 0, 0, "Apertura"],
+  [10, "Melgar", "Cusco", 1, 1, "Apertura"],
+  [10, "Alianza Lima", "Cienciano", 2, 0, "Apertura"],
+  [10, "Comercio", "Alianza Atlético", 3, 3, "Apertura"],
+  [10, "Carlos Mannucci", "Sport Huancayo", 0, 0, "Apertura"],
+  [10, "Atlético Grau", "Sport Boys", 3, 0, "Apertura"],
+  [10, "Binacional", "UTC", 1, 1, "Apertura"],
+  [11, "Cusco", "Binacional", 2, 1, "Apertura"],
+  [11, "Sport Boys", "Municipal", 0, 2, "Apertura"],
+  [11, "UTC", "ADT", 1, 0, "Apertura"],
+  [11, "Cienciano", "Carlos Mannucci", 1, 0, "Apertura"],
+  [11, "Alianza Atlético", "Alianza Lima", 0, 1, "Apertura"],
+  [11, "Sport Huancayo", "Melgar", 1, 1, "Apertura"],
+  [11, "Universitario", "Atlético Grau", 2, 1, "Apertura"],
+  [11, "Cantolao", "Comercio", 1, 2, "Apertura"],
+  [11, "César Vallejo", "Deportivo Garcilaso", 3, 0, "Apertura"],
+  [12, "Sporting Cristal", "Sport Boys", 1, 1, "Apertura"],
+  [12, "Melgar", "Cienciano", 1, 0, "Apertura"],
+  [12, "Atlético Grau", "César Vallejo", 1, 1, "Apertura"],
+  [12, "Alianza Lima", "Cantolao", 3, 0, "Apertura"],
+  [12, "Deportivo Garcilaso", "UTC", 2, 2, "Apertura"],
+  [12, "ADT", "Cusco", 0, 2, "Apertura"],
+  [12, "Municipal", "Universitario", 1, 2, "Apertura"],
+  [12, "Binacional", "Sport Huancayo", 5, 3, "Apertura"],
+  [12, "Carlos Mannucci", "Alianza Atlético", 1, 0, "Apertura"],
+  [13, "UTC", "Atlético Grau", 1, 1, "Apertura"],
+  [13, "Cantolao", "Carlos Mannucci", 0, 2, "Apertura"],
+  [13, "Sport Huancayo", "ADT", 1, 3, "Apertura"],
+  [13, "Cienciano", "Binacional", 1, 1, "Apertura"],
+  [13, "Comercio", "Alianza Lima", 1, 3, "Apertura"],
+  [13, "Cusco", "Deportivo Garcilaso", 2, 1, "Apertura"],
+  [13, "Alianza Atlético", "Melgar", 3, 3, "Apertura"],
+  [13, "César Vallejo", "Municipal", 1, 1, "Apertura"],
+  [13, "Universitario", "Sporting Cristal", 2, 0, "Apertura"],
+  [14, "Sporting Cristal", "César Vallejo", 1, 1, "Apertura"],
+  [14, "Atlético Grau", "Cusco", 3, 0, "Apertura"],
+  [14, "Sport Boys", "Universitario", 0, 3, "Apertura"],
+  [14, "Deportivo Garcilaso", "Sport Huancayo", 1, 1, "Apertura"],
+  [14, "Melgar", "Cantolao", 5, 0, "Apertura"],
+  [14, "Binacional", "Alianza Atlético", 4, 2, "Apertura"],
+  [14, "Municipal", "UTC", 2, 0, "Apertura"],
+  [14, "ADT", "Cienciano", 3, 4, "Apertura"],
+  [14, "Carlos Mannucci", "Comercio", 2, 0, "Apertura"],
+  [15, "Cantolao", "Binacional", 1, 0, "Apertura"],
+  [15, "Cusco", "Municipal", 1, 0, "Apertura"],
+  [15, "Alianza Atlético", "ADT", 1, 1, "Apertura"],
+  [15, "Sport Huancayo", "Atlético Grau", 1, 0, "Apertura"],
+  [15, "Cienciano", "Deportivo Garcilaso", 0, 0, "Apertura"],
+  [15, "UTC", "Sporting Cristal", 1, 1, "Apertura"],
+  [15, "César Vallejo", "Sport Boys", 2, 0, "Apertura"],
+  [15, "Alianza Lima", "Carlos Mannucci", 3, 0, "Apertura"],
+  [15, "Comercio", "Melgar", 1, 1, "Apertura"],
+  [16, "Melgar", "Alianza Lima", 2, 1, "Apertura"],
+  [16, "Universitario", "César Vallejo", 4, 0, "Apertura"],
+  [16, "ADT", "Cantolao", 1, 1, "Apertura"],
+  [16, "Deportivo Garcilaso", "Alianza Atlético", 3, 2, "Apertura"],
+  [16, "Sporting Cristal", "Cusco", 3, 2, "Apertura"],
+  [16, "Atlético Grau", "Cienciano", 4, 0, "Apertura"],
+  [16, "Municipal", "Sport Huancayo", 1, 2, "Apertura"],
+  [16, "Sport Boys", "UTC", 3, 2, "Apertura"],
+  [16, "Binacional", "Comercio", 5, 0, "Apertura"],
+  [17, "Cantolao", "Deportivo Garcilaso", 1, 1, "Apertura"],
+  [17, "Cienciano", "Municipal", 1, 0, "Apertura"],
+  [17, "Alianza Atlético", "Atlético Grau", 3, 2, "Apertura"],
+  [17, "Cusco", "Sport Boys", 2, 1, "Apertura"],
+  [17, "Comercio", "ADT", 4, 3, "Apertura"],
+  [17, "UTC", "Universitario", 1, 0, "Apertura"],
+  [17, "Sport Huancayo", "Sporting Cristal", 1, 2, "Apertura"],
+  [17, "Carlos Mannucci", "Melgar", 1, 2, "Apertura"],
+  [17, "Alianza Lima", "Binacional", 6, 1, "Apertura"],
+  [18, "Sporting Cristal", "Cienciano", 4, 2, "Apertura"],
+  [18, "ADT", "Alianza Lima", 2, 1, "Apertura"],
+  [18, "Universitario", "Cusco", 1, 0, "Apertura"],
+  [18, "Municipal", "Alianza Atlético", 2, 1, "Apertura"],
+  [18, "Binacional", "Carlos Mannucci", 3, 0, "Apertura"],
+  [18, "Deportivo Garcilaso", "Comercio", 2, 2, "Apertura"],
+  [18, "Atlético Grau", "Cantolao", 3, 0, "Apertura"],
+  [18, "Sport Boys", "Sport Huancayo", 1, 0, "Apertura"],
+  [18, "César Vallejo", "UTC", 3, 1, "Apertura"],
+  [19, "Cienciano", "Sport Boys", 0, 1, "Apertura"],
+  [19, "Comercio", "Atlético Grau", 2, 2, "Apertura"],
+  [19, "Cantolao", "Municipal", 0, 1, "Apertura"],
+  [19, "Melgar", "Binacional", 2, 1, "Apertura"],
+  [19, "Carlos Mannucci", "ADT", 1, 1, "Apertura"],
+  [19, "Alianza Lima", "Deportivo Garcilaso", 3, 2, "Apertura"],
+  [19, "Alianza Atlético", "Sporting Cristal", 0, 0, "Apertura"],
+  [19, "Cusco", "César Vallejo", 2, 0, "Apertura"],
+  [19, "Sport Huancayo", "Universitario", 1, 0, "Apertura"],
   [20, "Cantolao", "Sporting Cristal", 0, 2, "Clausura"],
   [20, "Melgar", "ADT", 4, 0, "Clausura"],
   [20, "Cienciano", "Universitario", 1, 1, "Clausura"],
@@ -264,8 +179,6 @@
   [20, "Alianza Atlético", "Sport Boys", 1, 2, "Clausura"],
   [20, "Comercio", "Municipal", 1, 3, "Clausura"],
   [20, "Cusco", "UTC", 2, 1, "Clausura"],
-
-  // --- CLAUSURA JORNADA 2 (Fecha Global 21) ---
   [21, "UTC", "Sport Huancayo", 0, 0, "Clausura"],
   [21, "ADT", "Binacional", 2, 0, "Clausura"],
   [21, "Deportivo Garcilaso", "Melgar", 2, 2, "Clausura"],
@@ -275,8 +188,6 @@
   [21, "César Vallejo", "Cienciano", 0, 3, "Clausura"],
   [21, "Universitario", "Alianza Atlético", 2, 0, "Clausura"],
   [21, "Sport Boys", "Cantolao", 0, 1, "Clausura"],
-
-  // --- CLAUSURA JORNADA 3 (Fecha Global 22) ---
   [22, "Melgar", "Atlético Grau", 3, 0, "Clausura"],
   [22, "Cantolao", "Universitario", 1, 4, "Clausura"],
   [22, "Alianza Atlético", "César Vallejo", 0, 1, "Clausura"],
@@ -285,9 +196,7 @@
   [22, "Comercio", "Sport Boys", 0, 1, "Clausura"],
   [22, "Binacional", "Deportivo Garcilaso", 1, 5, "Clausura"],
   [22, "Sport Huancayo", "Cusco", 3, 1, "Clausura"],
-  [22, "Carlos Mannucci", "Municipal", null, null, "Clausura"], // Marcado como aplazado, lo dejé en null para que sume asterisco si corresponde
-
-  // --- CLAUSURA JORNADA 4 (Fecha Global 23) ---
+  [22, "Carlos Mannucci", "Municipal", null, null, "Clausura"],
   [23, "UTC", "Alianza Atlético", 1, 1, "Clausura"],
   [23, "Universitario", "Comercio", 2, 0, "Clausura"],
   [23, "Deportivo Garcilaso", "ADT", 1, 2, "Clausura"],
@@ -297,8 +206,6 @@
   [23, "Sport Boys", "Alianza Lima", 1, 0, "Clausura"],
   [23, "Cusco", "Cienciano", 0, 0, "Clausura"],
   [23, "Municipal", "Melgar", 0, 1, "Clausura"],
-
-  // --- CLAUSURA JORNADA 5 (Fecha Global 24) ---
   [24, "Comercio", "César Vallejo", 1, 4, "Clausura"],
   [24, "Cienciano", "Sport Huancayo", 1, 0, "Clausura"],
   [24, "Alianza Atlético", "Cusco", 2, 0, "Clausura"],
@@ -307,9 +214,7 @@
   [24, "Carlos Mannucci", "Sport Boys", 0, 0, "Clausura"],
   [24, "ADT", "Atlético Grau", 1, 0, "Clausura"],
   [24, "Melgar", "Sporting Cristal", 1, 1, "Clausura"],
-  [24, "Binacional", "Municipal", 4, 1, "Clausura"]
-
-// --- CLAUSURA JORNADA 6 (Fecha Global 25) ---
+  [24, "Binacional", "Municipal", 4, 1, "Clausura"],
   [25, "Sporting Cristal", "Binacional", 5, 0, "Clausura"],
   [25, "Cusco", "Cantolao", 3, 0, "Clausura"],
   [25, "UTC", "Comercio", 1, 1, "Clausura"],
@@ -319,8 +224,6 @@
   [25, "Sport Huancayo", "Alianza Atlético", 2, 0, "Clausura"],
   [25, "Universitario", "Carlos Mannucci", 3, 0, "Clausura"],
   [25, "Municipal", "ADT", 1, 2, "Clausura"],
-
-  // --- CLAUSURA JORNADA 7 (Fecha Global 26) ---
   [26, "Comercio", "Cusco", 2, 1, "Clausura"],
   [26, "Binacional", "Sport Boys", 4, 0, "Clausura"],
   [26, "Alianza Lima", "UTC", 1, 0, "Clausura"],
@@ -330,8 +233,6 @@
   [26, "Melgar", "Universitario", 0, 1, "Clausura"],
   [26, "Cantolao", "Sport Huancayo", 1, 1, "Clausura"],
   [26, "Deportivo Garcilaso", "Municipal", 5, 2, "Clausura"],
-
-  // --- CLAUSURA JORNADA 8 (Fecha Global 27) ---
   [27, "Sport Huancayo", "Comercio", 1, 1, "Clausura"],
   [27, "UTC", "Carlos Mannucci", 2, 0, "Clausura"],
   [27, "César Vallejo", "Melgar", 1, 2, "Clausura"],
@@ -340,9 +241,7 @@
   [27, "Universitario", "Binacional", 1, 0, "Clausura"],
   [27, "Sporting Cristal", "Deportivo Garcilaso", 3, 0, "Clausura"],
   [27, "Cusco", "Alianza Lima", 1, 1, "Clausura"],
-  [27, "Municipal", "Atlético Grau", null, null, "Clausura"], // Marcado como "Concedido" en la imagen, lo dejo en null temporalmente para revisar reglas. *Asumiendo walkover o similar, confirmar*.
-
-  // --- CLAUSURA JORNADA 9 (Fecha Global 28) ---
+  [27, "Municipal", "Atlético Grau", 0, 0, "Clausura"],
   [28, "Comercio", "Cienciano", 2, 0, "Clausura"],
   [28, "Cantolao", "Alianza Atlético", 1, 0, "Clausura"],
   [28, "Melgar", "UTC", 1, 1, "Clausura"],
@@ -352,8 +251,6 @@
   [28, "Alianza Lima", "Sport Huancayo", 1, 0, "Clausura"],
   [28, "Binacional", "César Vallejo", 1, 0, "Clausura"],
   [28, "Atlético Grau", "Sporting Cristal", 2, 3, "Clausura"],
-
-  // --- CLAUSURA JORNADA 10 (Fecha Global 29) ---
   [29, "Alianza Atlético", "Comercio", 2, 2, "Clausura"],
   [29, "Cusco", "Melgar", 1, 1, "Clausura"],
   [29, "Sport Huancayo", "Carlos Mannucci", 3, 1, "Clausura"],
@@ -363,8 +260,6 @@
   [29, "Sport Boys", "Atlético Grau", 1, 1, "Clausura"],
   [29, "UTC", "Binacional", 3, 2, "Clausura"],
   [29, "César Vallejo", "ADT", 1, 1, "Clausura"],
-
-  // --- CLAUSURA JORNADA 11 (Fecha Global 30) ---
   [30, "Comercio", "Cantolao", 2, 1, "Clausura"],
   [30, "Carlos Mannucci", "Cienciano", 2, 0, "Clausura"],
   [30, "Binacional", "Cusco", 2, 0, "Clausura"],
@@ -373,9 +268,7 @@
   [30, "Municipal", "Sport Boys", 0, 3, "Clausura"],
   [30, "Melgar", "Sport Huancayo", 1, 3, "Clausura"],
   [30, "ADT", "UTC", 0, 0, "Clausura"],
-  [30, "Deportivo Garcilaso", "César Vallejo", 1, 0, "Clausura"]
-
-// --- CLAUSURA JORNADA 13 (Fecha Global 32) ---
+  [30, "Deportivo Garcilaso", "César Vallejo", 1, 0, "Clausura"],
   [32, "Atlético Grau", "UTC", 4, 2, "Clausura"],
   [32, "Carlos Mannucci", "Cantolao", 1, 2, "Clausura"],
   [32, "Melgar", "Alianza Atlético", 4, 0, "Clausura"],
@@ -385,8 +278,6 @@
   [32, "Sporting Cristal", "Universitario", 0, 0, "Clausura"],
   [32, "ADT", "Sport Huancayo", 2, 1, "Clausura"],
   [32, "Alianza Lima", "Comercio", 3, 1, "Clausura"],
-
-  // --- CLAUSURA JORNADA 14 (Fecha Global 33) ---
   [33, "Alianza Atlético", "Binacional", 1, 0, "Clausura"],
   [33, "Cantolao", "Melgar", 0, 1, "Clausura"],
   [33, "Comercio", "Carlos Mannucci", 0, 0, "Clausura"],
@@ -396,8 +287,6 @@
   [33, "Sport Huancayo", "Deportivo Garcilaso", 0, 0, "Clausura"],
   [33, "Cusco", "Atlético Grau", 0, 0, "Clausura"],
   [33, "César Vallejo", "Sporting Cristal", 0, 1, "Clausura"],
-
-  // --- CLAUSURA JORNADA 15 (Fecha Global 34) ---
   [34, "Binacional", "Cantolao", 1, 0, "Clausura"],
   [34, "ADT", "Alianza Atlético", 1, 0, "Clausura"],
   [34, "Sport Boys", "César Vallejo", 0, 2, "Clausura"],
@@ -407,8 +296,6 @@
   [34, "Municipal", "Cusco", 2, 0, "Clausura"],
   [34, "Atlético Grau", "Sport Huancayo", 0, 0, "Clausura"],
   [34, "Sporting Cristal", "UTC", 1, 1, "Clausura"],
-
-  // --- CLAUSURA JORNADA 16 (Fecha Global 35) ---
   [35, "Comercio", "Binacional", 2, 2, "Clausura"],
   [35, "César Vallejo", "Universitario", 0, 1, "Clausura"],
   [35, "Alianza Lima", "Melgar", 0, 0, "Clausura"],
@@ -418,8 +305,6 @@
   [35, "Cienciano", "Atlético Grau", 2, 0, "Clausura"],
   [35, "Alianza Atlético", "Deportivo Garcilaso", 2, 0, "Clausura"],
   [35, "Cantolao", "ADT", 0, 1, "Clausura"],
-
-  // --- CLAUSURA JORNADA 17 (Fecha Global 36) ---
   [36, "Universitario", "UTC", 3, 0, "Clausura"],
   [36, "Sporting Cristal", "Sport Huancayo", 2, 0, "Clausura"],
   [36, "Sport Boys", "Cusco", 2, 1, "Clausura"],
@@ -429,8 +314,6 @@
   [36, "Deportivo Garcilaso", "Cantolao", 0, 0, "Clausura"],
   [36, "Atlético Grau", "Alianza Atlético", 1, 1, "Clausura"],
   [36, "ADT", "Comercio", 3, 0, "Clausura"],
-
-  // --- CLAUSURA JORNADA 18 (Fecha Global 37) ---
   [37, "UTC", "César Vallejo", 1, 1, "Clausura"],
   [37, "Alianza Atlético", "Municipal", 1, 2, "Clausura"],
   [37, "Alianza Lima", "ADT", 0, 0, "Clausura"],
@@ -439,9 +322,7 @@
   [37, "Sport Huancayo", "Sport Boys", 1, 0, "Clausura"],
   [37, "Comercio", "Deportivo Garcilaso", 1, 2, "Clausura"],
   [37, "Cienciano", "Sporting Cristal", 1, 0, "Clausura"],
-  [37, "Cantolao", "Atlético Grau", 0, 4, "Clausura"]
-
-// --- CLAUSURA JORNADA 19 (Fecha Global 38) ---
+  [37, "Cantolao", "Atlético Grau", 0, 4, "Clausura"],
   [38, "Municipal", "Cantolao", 1, 2, "Clausura"],
   [38, "Sport Boys", "Cienciano", 2, 1, "Clausura"],
   [38, "César Vallejo", "Cusco", 3, 1, "Clausura"],
@@ -451,10 +332,6 @@
   [38, "Binacional", "Melgar", 1, 2, "Clausura"],
   [38, "Deportivo Garcilaso", "Alianza Lima", 0, 1, "Clausura"],
   [38, "Universitario", "Sport Huancayo", 2, 0, "Clausura"],
-
-  // --- PLAYOFFS (Final) ---
   [39, "Universitario", "Alianza Lima", 1, 1, "Final"],
   [40, "Alianza Lima", "Universitario", 0, 2, "Final"]
 ]
-]
-
