@@ -1,8 +1,8 @@
 'use client';
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import partidosJSON from './torneo_2018.json';
 import partidos2013JSON from './torneo_2013.json';
-import partidos2023JSON from './torneo_2023.json'; // ¡AQUÍ ESTÁ TU TEMPORADA 2023!
+import partidos2023JSON from './torneo_2023.json';
 
 const partidos2026JSON = [
   [1, 'Sport Huancayo', 'Alianza Lima', 1, 2], [1, 'UTC', 'Atlético Grau', 2, 0], [1, 'Comerciantes Unidos', 'CD Moquegua', 1, 0],
@@ -46,29 +46,52 @@ export default function Home() {
   const [temporada, setTemporada] = useState('2026');
   
   const listaPartidos = useMemo(() => {
-    if (temporada === '2018') return listaPartidos2018;
+    if (temporada === '2018') return listaPartidos2018.map(p => ({ ...p, Jornada_Oficial: p.Fecha_Global }));
     if (temporada === '2023') {
       const raw2023 = Array.isArray(partidos2023JSON) ? partidos2023JSON : [];
-      return raw2023.map(p => ({
-        Fecha_Global: p[0],
-        Torneo: p[5] || 'Apertura', // Detecta automáticamente si dice "Clausura" o "Final"
-        Local: p[1],
-        Visitante: p[2],
-        GL: p[3],
-        GV: p[4]
-      }));
+      
+      // EL CEREBRO CRONOLÓGICO: Mapea la Jornada Oficial a la Semana Real en la que se jugó
+      const ordenCronologicoApertura = {
+        3: 1, 4: 2, 5: 3, 6: 4, 7: 5, 8: 6, 9: 7, 
+        1: 8,   // Fecha 1 se jugó entre la 9 y la 10
+        10: 9, 11: 10, 12: 11, 13: 12, 14: 13, 15: 14, 
+        2: 15,  // Fecha 2 se jugó entre la 15 y la 16
+        16: 16, 17: 17, 18: 18, 19: 19
+      };
+
+      return raw2023.map(p => {
+        let jornadaOficial = p[0];
+        let torneo = p[5] || 'Apertura';
+        let fechaCronologica = jornadaOficial;
+
+        // Si es Apertura, aplicamos el mapeo para que la Semana 1 sea la Jornada 3
+        if (torneo === 'Apertura' && ordenCronologicoApertura[jornadaOficial]) {
+          fechaCronologica = ordenCronologicoApertura[jornadaOficial];
+        }
+
+        return {
+          Jornada_Oficial: jornadaOficial, // Guardamos el nombre real para mostrarlo visualmente
+          Fecha_Global: fechaCronologica,  // Usamos la cronológica para que el filtro de la tabla sea HIPER REALISTA
+          Torneo: torneo,
+          Local: p[1],
+          Visitante: p[2],
+          GL: p[3],
+          GV: p[4]
+        };
+      });
     }
     if (temporada === '2013') {
       const raw2013 = Array.isArray(partidos2013JSON) ? partidos2013JSON : [];
       return raw2013.map(p => {
         let gl = p[3]; let gv = p[4];
         if (p[0] === 5 && p[1] === 'Cusco (Garcilaso)' && p[2] === 'Leon de Huanuco') { gl = 0; gv = 3; }
-        return { Fecha_Global: p[0], Torneo: 'Descentralizado', Local: p[1], Visitante: p[2], GL: gl, GV: gv };
+        return { Fecha_Global: p[0], Jornada_Oficial: p[0], Torneo: 'Descentralizado', Local: p[1], Visitante: p[2], GL: gl, GV: gv };
       });
     }
-    return partidos2026JSON;
+    return partidos2026JSON.map(p => ({ ...p, Jornada_Oficial: p.Fecha_Global }));
   }, [temporada]);
   
+  // Si estamos en 2023, el selector empezará automáticamente en la Semana 1 (que muestra los partidos de la Jornada 3)
   const [fecha, setFecha] = useState(8); 
   const [tab, setTab] = useState('fixture');
   const [equipoSeleccionado, setEquipoSeleccionado] = useState(null);
@@ -80,7 +103,7 @@ export default function Home() {
     'FBC Melgar': 'https://tmssl.akamaized.net//images/wappen/head/2734.png',
     'Cienciano': 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/4814.png',
     'Cusco FC': 'https://tmssl.akamaized.net//images/wappen/head/28999.png',
-    'Cusco': 'https://tmssl.akamaized.net//images/wappen/head/28999.png', // Alias para 2023
+    'Cusco': 'https://tmssl.akamaized.net//images/wappen/head/28999.png', 
     'Cusco (Garcilaso)': 'https://images.seeklogo.com/logo-png/32/2/asociacion-civil-real-atletico-garcilaso-logo-png_seeklogo-328024.png',
     'Sport Boys': 'https://tmssl.akamaized.net//images/wappen/head/2730.png',
     'UTC': 'https://tmssl.akamaized.net//images/wappen/head/21170.png',
@@ -95,12 +118,12 @@ export default function Home() {
     'Juan Pablo II': 'https://tmssl.akamaized.net//images/wappen/head/99517.png?lm=1712524979',
     'FC Cajamarca': 'https://tmssl.akamaized.net//images/wappen/head/120792.png?lm=1767023947',
     'Dep. Municipal': 'https://tmssl.akamaized.net//images/wappen/head/17974.png',
-    'Municipal': 'https://tmssl.akamaized.net//images/wappen/head/17974.png', // Alias
+    'Municipal': 'https://tmssl.akamaized.net//images/wappen/head/17974.png', 
     'Cantolao': 'https://tmssl.akamaized.net//images/wappen/head/11247.png',
     'Sport Rosario': 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/18441.png',
     'U. San Martin': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcROfQWRTSLDENcZLhqUcuH2MNeOyHkGsCnxeQ&s',
     'Union Comercio': 'https://tmssl.akamaized.net//images/wappen/head/31337.png',
-    'Comercio': 'https://tmssl.akamaized.net//images/wappen/head/31337.png', // Alias
+    'Comercio': 'https://tmssl.akamaized.net//images/wappen/head/31337.png', 
     'Ayacucho FC': 'https://tmssl.akamaized.net//images/wappen/head/21178.png',
     'Binacional': 'https://tmssl.akamaized.net//images/wappen/head/41054.png',
     'Leon de Huanuco': 'https://tmssl.akamaized.net//images/wappen/big/25774.png?lm=1424441686',
@@ -327,6 +350,11 @@ export default function Home() {
       )}
       
       {/* NOTAS AL PIE SEGÚN TEMPORADA */}
+      {temporada === '2023' && !esAcumulado && fecha < 19 && (
+        <div className="text-[11px] text-left mx-[10px] my-[10px] p-[5px] bg-[#e5eee9] rounded-[4px] border border-[#d1e0d7]" style={{ color: '#6b7280' }}>
+          📝 <strong>Leyenda de Aplazados:</strong> El símbolo <strong style={{ color: '#d32f2f' }}>*</strong> indica que el equipo tiene 1 partido pendiente por reprogramación de fechas. <strong style={{ color: '#d32f2f' }}>**</strong> indica 2 partidos pendientes.
+        </div>
+      )}
       {temporada === '2023' && esAcumulado && (
         <div className="text-[11px] text-left mx-[10px] my-[10px] p-[5px] bg-[#e5eee9] rounded-[4px] border border-[#d1e0d7]" style={{ color: '#6b7280' }}>
           * Resoluciones FPF aplicadas en Acumulada 2023: D. Municipal (-5), Sport Boys (-4), D. Garcilaso (-1). 
@@ -357,7 +385,12 @@ export default function Home() {
         ) : (
           partidos.map((p, idx) => (
             <div key={idx} className={`flex justify-between items-center py-[8px] px-[10px] border-t border-[#d1e0d7] hover:bg-[#f8fbf9] transition-colors ${idx % 2 === 0 ? 'bg-transparent' : 'bg-[#fcfdfc]'}`}>
-              <span className="text-[10px] font-bold w-[35px]" style={{ color: '#6b7280' }}>F{p.Fecha_Global > 19 && temporada === '2023' ? p.Fecha_Global - 19 : p.Fecha_Global}</span>
+              <span className="text-[10px] font-bold w-[35px]" style={{ color: '#6b7280' }}>
+                {/* Muestra la Jornada Oficial sin importar el orden cronológico */}
+                {temporada === '2023' && p.Torneo === 'Clausura' 
+                  ? `F${p.Jornada_Oficial - 19}` 
+                  : (p.Jornada_Oficial ? `F${p.Jornada_Oficial}` : `F${p.Fecha_Global}`)}
+              </span>
               <div className="flex items-center w-[85%] justify-center">
                 <span className="text-right w-[40%] text-[12px] font-bold truncate" style={{ color: '#000000' }}>{p.Local}</span>
                 <img src={logos[p.Local] || 'https://cdn-icons-png.flaticon.com/128/33/33736.png'} style={{ width: '18px', height: '18px', minWidth: '18px', objectFit: 'contain', margin: '0 5px' }} />
@@ -404,7 +437,7 @@ export default function Home() {
         {temporada !== '2026' && (
           <div className="absolute right-4 top-2">
             <button 
-              onClick={() => { setTemporada('2026'); setFecha(8); setTab('fixture'); setEquipoSeleccionado(null); }}
+              onClick={() => { setTemporada('2026'); setFecha(8); setTab('fixture'); setEquipoSeleccionado(null); window.scrollTo(0,0); }}
               className="bg-white border border-[#fbbf24] text-[#fbbf24] text-[10px] font-bold px-3 py-1.5 rounded-full hover:bg-[#fbbf24] hover:text-white transition-colors shadow-lg cursor-pointer"
             >
               ⬅️ VOLVER AL 2026
@@ -449,7 +482,7 @@ export default function Home() {
               <TablaComponent titulo="TORNEO CLAUSURA 2023" zona="ZONA ÚNICA" datos={generarTabla(partidosValidos.filter(p => p.Torneo === 'Clausura'))} />
             )}
             {temporada === '2023' && (
-              <TablaComponent titulo={`TABLA ACUMULADA (FECHA ${fecha})`} datos={generarTabla(partidosValidos, null, true)} esAcumulado={true} />
+              <TablaComponent titulo={`TABLA ACUMULADA (HASTA LA SEMANA ${fecha})`} datos={generarTabla(partidosValidos, null, true)} esAcumulado={true} />
             )}
 
             {/* RENDERIZADO OTROS AÑOS */}
@@ -501,7 +534,19 @@ export default function Home() {
                   {[...Array(temporada === '2023' ? 38 : (temporada === '2013' ? 48 : (temporada === '2018' ? 44 : 17)))].map((_, i) => {
                     let etiqueta = `FECHA ${i+1}`;
                     if (temporada === '2023') {
-                        etiqueta = i < 19 ? `APERTURA F${i+1}` : `CLAUSURA F${i-18}`;
+                        if (i < 19) {
+                          // Nombres reales de las jornadas para el menú desplegable en el Apertura 2023
+                          const nombresJornadas = {
+                            1: 'Jornada 3', 2: 'Jornada 4', 3: 'Jornada 5', 4: 'Jornada 6',
+                            5: 'Jornada 7', 6: 'Jornada 8', 7: 'Jornada 9', 8: 'Jornada 1 (Aplazada)',
+                            9: 'Jornada 10', 10: 'Jornada 11', 11: 'Jornada 12', 12: 'Jornada 13',
+                            13: 'Jornada 14', 14: 'Jornada 15', 15: 'Jornada 2 (Aplazada)',
+                            16: 'Jornada 16', 17: 'Jornada 17', 18: 'Jornada 18', 19: 'Jornada 19'
+                          };
+                          etiqueta = `Semana ${i+1} (${nombresJornadas[i+1]})`;
+                        } else {
+                          etiqueta = `CLAUSURA F${i-18}`;
+                        }
                     }
                     return <option key={i+1} value={i+1} className="bg-white">{etiqueta}</option>
                   })}
@@ -516,7 +561,16 @@ export default function Home() {
                 </button>
               </div>
 
-              <div className="bg-white border border-[#d1e0d7] rounded-lg overflow-hidden shadow-lg">
+              {/* BANNER EXPLICATIVO 2023 */}
+              {temporada === '2023' && [1, 8, 15].includes(fecha) && (
+                <div className="bg-[#fff3cd] border-l-[4px] border-[#fbbf24] text-[#854d0e] p-[10px] text-[11px] rounded shadow-sm font-medium leading-relaxed mt-2 mb-[-10px]">
+                  {fecha === 1 && "🚨 Inicio cronológico del torneo. Estuvo marcado por varios Walkovers (derrotas 3-0 en mesa) por disputas de TV."}
+                  {fecha === 8 && "⏳ La Jornada 1 original se jugó por fin en esta fecha (fines de marzo) luego de haber sido aplazada por el Estado de Emergencia."}
+                  {fecha === 15 && "⏳ La Jornada 2 se recuperó finalmente en esta fecha (mediados de mayo) tras la huelga por los derechos de TV."}
+                </div>
+              )}
+
+              <div className="bg-white border border-[#d1e0d7] rounded-lg overflow-hidden shadow-lg mt-4">
                 <div className="flex flex-col max-h-[550px] overflow-y-auto custom-scrollbar">
                   {listaPartidos.filter(p => p.Fecha_Global === fecha).map((p, idx) => (
                     <div key={idx} className={`flex justify-between items-center py-[8px] px-[10px] border-b border-[#d1e0d7] hover:bg-[#f8fbf9] transition-colors ${idx % 2 === 0 ? 'bg-transparent' : 'bg-[#fcfdfc]'}`}>
@@ -563,7 +617,10 @@ export default function Home() {
                     if (temporada === '2026') return partidos2026JSON.some(p => p.Local === eq || p.Visitante === eq);
                     if (temporada === '2018') return equipo_A_2018.includes(eq) || equipo_B_2018.includes(eq);
                     if (temporada === '2013') return liguillaA_2013.includes(eq) || liguillaB_2013.includes(eq);
-                    if (temporada === '2023' && partidos2023JSON) return partidos2023JSON.some(p => p[1] === eq || p[2] === eq);
+                    if (temporada === '2023') {
+                      const raw2023 = Array.isArray(partidos2023JSON) ? partidos2023JSON : [];
+                      return raw2023.some(p => p[1] === eq || p[2] === eq);
+                    }
                     return true; 
                   })
                   .map(eq => (
@@ -625,7 +682,7 @@ export default function Home() {
                     </div>
                     {['2018', '2013', '2023'].includes(row.Año) && (
                       <button 
-                        onClick={() => { setTemporada(row.Año); setFecha(row.Año === '2013' ? 48 : (row.Año === '2023' ? 38 : 44)); setTab('fixture'); setEquipoSeleccionado(null); window.scrollTo(0,0); }}
+                        onClick={() => { setTemporada(row.Año); setFecha(row.Año === '2013' ? 48 : (row.Año === '2023' ? 1 : 44)); setTab('fixture'); setEquipoSeleccionado(null); window.scrollTo(0,0); }}
                         className="bg-[#8cc63f] text-white font-bold text-[10px] px-3 py-1 rounded border-none outline-none cursor-pointer"
                       >
                         VER AÑO
