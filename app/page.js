@@ -42,14 +42,26 @@ const partidos2026JSON = [
 
 const listaPartidos2018 = Array.isArray(partidosJSON) ? partidosJSON : (partidosJSON.BaseDatos || Object.values(partidosJSON)[0] || []);
 
+// EL TRADUCTOR DE EQUIPOS: Normaliza los nombres para que el código siempre use el mismo
+const normalizarEquipo = (nombre) => {
+  const alias = {
+    'Melgar': 'FBC Melgar',
+    'César Vallejo': 'Cesar Vallejo',
+    'Cusco': 'Cusco FC',
+    'Comercio': 'Union Comercio'
+    // Puedes agregar más alias aquí si en el futuro aparece otro equipo mal escrito
+  };
+  return alias[nombre] || nombre;
+};
+
 export default function Home() {
   const [temporada, setTemporada] = useState('2026');
   
   // FUNCIONES PARA DETECTAR RESULTADOS DE MESA (2023)
   const esWalkover = (p) => {
     if (temporada === '2023' && p.Torneo === 'Apertura' && p.Jornada_Oficial === 3) {
-      return (p.Local === 'Cusco' && p.Visitante === 'Sport Huancayo') ||
-             (p.Local === 'Atlético Grau' && p.Visitante === 'Melgar') ||
+      return (p.Local === 'Cusco FC' && p.Visitante === 'Sport Huancayo') ||
+             (p.Local === 'Atlético Grau' && p.Visitante === 'FBC Melgar') ||
              (p.Local === 'UTC' && p.Visitante === 'Cienciano') ||
              (p.Local === 'Deportivo Garcilaso' && p.Visitante === 'Binacional') ||
              (p.Local === 'Sporting Cristal' && p.Visitante === 'Alianza Lima') ||
@@ -79,7 +91,7 @@ export default function Home() {
   };
 
   const listaPartidos = useMemo(() => {
-    if (temporada === '2018') return listaPartidos2018.map(p => ({ ...p, Jornada_Oficial: p.Fecha_Global }));
+    if (temporada === '2018') return listaPartidos2018.map(p => ({ ...p, Jornada_Oficial: p.Fecha_Global, Local: normalizarEquipo(p.Local), Visitante: normalizarEquipo(p.Visitante) }));
     if (temporada === '2023') {
       const raw2023 = Array.isArray(partidos2023JSON) ? partidos2023JSON : [];
       
@@ -104,8 +116,8 @@ export default function Home() {
           Jornada_Oficial: jornadaOficial, 
           Fecha_Global: fechaCronologica,  
           Torneo: torneo,
-          Local: p[1],
-          Visitante: p[2],
+          Local: normalizarEquipo(p[1]), // APLICAMOS NORMALIZADOR
+          Visitante: normalizarEquipo(p[2]), // APLICAMOS NORMALIZADOR
           GL: p[3],
           GV: p[4]
         };
@@ -116,10 +128,10 @@ export default function Home() {
       return raw2013.map(p => {
         let gl = p[3]; let gv = p[4];
         if (p[0] === 5 && p[1] === 'Cusco (Garcilaso)' && p[2] === 'Leon de Huanuco') { gl = 0; gv = 3; }
-        return { Fecha_Global: p[0], Jornada_Oficial: p[0], Torneo: 'Descentralizado', Local: p[1], Visitante: p[2], GL: gl, GV: gv };
+        return { Fecha_Global: p[0], Jornada_Oficial: p[0], Torneo: 'Descentralizado', Local: normalizarEquipo(p[1]), Visitante: normalizarEquipo(p[2]), GL: gl, GV: gv };
       });
     }
-    return partidos2026JSON.map(p => ({ ...p, Jornada_Oficial: p.Fecha_Global }));
+    return partidos2026JSON.map(p => ({ ...p, Jornada_Oficial: p.Fecha_Global, Local: normalizarEquipo(p.Local), Visitante: normalizarEquipo(p.Visitante) }));
   }, [temporada]);
   
   const [fecha, setFecha] = useState(8); 
@@ -133,7 +145,6 @@ export default function Home() {
     'FBC Melgar': 'https://tmssl.akamaized.net//images/wappen/head/2734.png',
     'Cienciano': 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/4814.png',
     'Cusco FC': 'https://tmssl.akamaized.net//images/wappen/head/28999.png',
-    'Cusco': 'https://tmssl.akamaized.net//images/wappen/head/28999.png', 
     'Cusco (Garcilaso)': 'https://images.seeklogo.com/logo-png/32/2/asociacion-civil-real-atletico-garcilaso-logo-png_seeklogo-328024.png',
     'Sport Boys': 'https://tmssl.akamaized.net//images/wappen/head/2730.png',
     'UTC': 'https://tmssl.akamaized.net//images/wappen/head/21170.png',
@@ -153,7 +164,6 @@ export default function Home() {
     'Sport Rosario': 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/18441.png',
     'U. San Martin': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcROfQWRTSLDENcZLhqUcuH2MNeOyHkGsCnxeQ&s',
     'Union Comercio': 'https://tmssl.akamaized.net//images/wappen/head/31337.png',
-    'Comercio': 'https://tmssl.akamaized.net//images/wappen/head/31337.png', 
     'Ayacucho FC': 'https://tmssl.akamaized.net//images/wappen/head/21178.png',
     'Binacional': 'https://tmssl.akamaized.net//images/wappen/head/41054.png',
     'Leon de Huanuco': 'https://tmssl.akamaized.net//images/wappen/big/25774.png?lm=1424441686',
@@ -161,7 +171,7 @@ export default function Home() {
     'Jose Galvez': 'https://tmssl.akamaized.net//images/wappen/head/16700.png?lm=1699653454',
     'Juan Aurich': 'https://tmssl.akamaized.net//images/wappen/head/4576.png?lm=1435783099',
     'Cesar Vallejo': 'https://tmssl.akamaized.net//images/wappen/big/6889.png?lm=1435783460',
-    'Carlos Mannucci': 'https://tmssl.akamaized.net//images/wappen/homepageWappen150x150/19520.png?lm=1545864399',
+    'Carlos Mannucci': 'https://tmssl.akamaized.net//images/wappen/head/35587.png',
   };
 
   const info_clubes = {
@@ -434,8 +444,8 @@ export default function Home() {
               <div key={idx} className={`flex justify-between items-center py-[8px] px-[10px] border-t border-[#d1e0d7] hover:bg-[#f8fbf9] transition-colors ${idx % 2 === 0 ? 'bg-transparent' : 'bg-[#fcfdfc]'}`}>
                 <div className="flex flex-col justify-center items-center w-[35px]">
                   <span className="text-[10px] font-bold" style={{ color: '#6b7280' }}>
-                    {temporada === '2023' && p.Torneo === 'Clausura' 
-                      ? `F${p.Jornada_Oficial - 19}` 
+                    {temporada === '2023' && (p.Torneo === 'Clausura' || p.Torneo === 'Final') 
+                      ? (p.Torneo === 'Final' ? 'FINAL' : `F${p.Jornada_Oficial - 19}`)
                       : (p.Jornada_Oficial ? `F${p.Jornada_Oficial}` : `F${p.Fecha_Global}`)}
                   </span>
                 </div>
@@ -697,7 +707,7 @@ export default function Home() {
                     if (temporada === '2013') return liguillaA_2013.includes(eq) || liguillaB_2013.includes(eq);
                     if (temporada === '2023') {
                       const raw2023 = Array.isArray(partidos2023JSON) ? partidos2023JSON : [];
-                      return raw2023.some(p => p[1] === eq || p[2] === eq);
+                      return raw2023.some(p => normalizarEquipo(p[1]) === eq || normalizarEquipo(p[2]) === eq);
                     }
                     return true; 
                   })
