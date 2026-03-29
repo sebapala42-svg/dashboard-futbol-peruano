@@ -70,8 +70,8 @@ export default function Home() {
         }
 
         return {
-          Jornada_Oficial: jornadaOficial, // Guardamos el nombre real para mostrarlo visualmente
-          Fecha_Global: fechaCronologica,  // Usamos la cronológica para que el filtro de la tabla sea HIPER REALISTA
+          Jornada_Oficial: jornadaOficial, 
+          Fecha_Global: fechaCronologica,  
           Torneo: torneo,
           Local: p[1],
           Visitante: p[2],
@@ -91,7 +91,6 @@ export default function Home() {
     return partidos2026JSON.map(p => ({ ...p, Jornada_Oficial: p.Fecha_Global }));
   }, [temporada]);
   
-  // Si estamos en 2023, el selector empezará automáticamente en la Semana 1 (que muestra los partidos de la Jornada 3)
   const [fecha, setFecha] = useState(8); 
   const [tab, setTab] = useState('fixture');
   const [equipoSeleccionado, setEquipoSeleccionado] = useState(null);
@@ -195,15 +194,11 @@ export default function Home() {
       equiposActuales = Array.from(setEquipos);
     }
 
-    equiposActuales.forEach(eq => tabla[eq] = { equipo: eq, pj: 0, g: 0, e: 0, p: 0, gf: 0, gc: 0, pts: 0, racha: [], pendientes: 0 });
+    equiposActuales.forEach(eq => tabla[eq] = { equipo: eq, pj: 0, g: 0, e: 0, p: 0, gf: 0, gc: 0, pts: 0, racha: [] });
 
     partidos.forEach(p => {
-      // SI EL PARTIDO ES NULL, SUMA COMO PENDIENTE Y NO CALCULA PUNTOS
-      if (p.GL === null || p.GV === null) {
-        if (tabla[p.Local]) tabla[p.Local].pendientes++;
-        if (tabla[p.Visitante]) tabla[p.Visitante].pendientes++;
-        return; 
-      }
+      // SI EL PARTIDO ES NULL, NO SUMA NADA EN LA TABLA, SOLO SALTA
+      if (p.GL === null || p.GV === null) return; 
 
       if (tabla[p.Local]) {
         tabla[p.Local].pj++;
@@ -247,14 +242,14 @@ export default function Home() {
           }
         }
         
-        // REGLAS 2023 (Castigos en Mesa Apertura/Acumulado)
-        if (temporada === '2023' && (esAcumulado || (!esAcumulado && fecha <= 19))) {
+        // REGLAS 2023 (Castigos en Mesa Acumulado Final)
+        if (temporada === '2023' && esAcumulado && fecha >= 38) {
           if (t.equipo === 'Deportivo Garcilaso') finalPts -= 1;
           if (t.equipo === 'Sport Boys') finalPts -= 4;
           if (t.equipo === 'Municipal' || t.equipo === 'Dep. Municipal') finalPts -= 5;
         }
 
-        return { ...t, pts: finalPts, dif: t.gf - t.gc, ultimas: t.racha.slice(-5).reverse(), pendientes: t.pendientes };
+        return { ...t, pts: finalPts, dif: t.gf - t.gc, ultimas: t.racha.slice(-5).reverse() };
       })
       .sort((a, b) => b.pts - a.pts || b.dif - a.dif || b.gf - a.gf);
   };
@@ -306,11 +301,6 @@ export default function Home() {
                 bordeColor = '#3db4dc';
               }
 
-              let asteriscos = '';
-              if (eq.pendientes === 1) asteriscos = '*';
-              if (eq.pendientes === 2) asteriscos = '**';
-              if (eq.pendientes > 2) asteriscos = `(${eq.pendientes}*)`;
-
               return (
                 <tr key={eq.equipo} className={`hover:bg-[#f8fbf9] transition-colors ${i % 2 === 0 ? 'bg-transparent' : 'bg-[#fcfdfc]'}`}>
                   <td className="py-[6px] px-[4px] font-bold border-l-[3px] text-center" style={{ borderLeftColor: bordeColor, color: '#000000' }}>{i + 1}</td>
@@ -319,9 +309,7 @@ export default function Home() {
                       <img src={logos[eq.equipo] || 'https://cdn-icons-png.flaticon.com/128/33/33736.png'} 
                            style={{ width: compactLogo ? '13px' : '15px', height: compactLogo ? '13px' : '15px', minWidth: compactLogo ? '13px' : '15px', objectFit: 'contain', marginRight: '6px' }} 
                            alt={eq.equipo} />
-                      <span>
-                        {eq.equipo} <span style={{ color: '#d32f2f', marginLeft: '2px' }}>{asteriscos}</span>
-                      </span>
+                      <span>{eq.equipo}</span>
                     </div>
                   </td>
                   <td className="py-[6px] px-[4px] font-bold text-[13px] text-center border-r border-[#d1e0d7]" style={{ color: '#000000' }}>{eq.pts}</td>
@@ -350,14 +338,9 @@ export default function Home() {
       )}
       
       {/* NOTAS AL PIE SEGÚN TEMPORADA */}
-      {temporada === '2023' && !esAcumulado && fecha < 19 && (
+      {temporada === '2023' && esAcumulado && fecha >= 38 && (
         <div className="text-[11px] text-left mx-[10px] my-[10px] p-[5px] bg-[#e5eee9] rounded-[4px] border border-[#d1e0d7]" style={{ color: '#6b7280' }}>
-          📝 <strong>Leyenda de Aplazados:</strong> El símbolo <strong style={{ color: '#d32f2f' }}>*</strong> indica que el equipo tiene 1 partido pendiente por reprogramación de fechas. <strong style={{ color: '#d32f2f' }}>**</strong> indica 2 partidos pendientes.
-        </div>
-      )}
-      {temporada === '2023' && esAcumulado && (
-        <div className="text-[11px] text-left mx-[10px] my-[10px] p-[5px] bg-[#e5eee9] rounded-[4px] border border-[#d1e0d7]" style={{ color: '#6b7280' }}>
-          * Resoluciones FPF aplicadas en Acumulada 2023: D. Municipal (-5), Sport Boys (-4), D. Garcilaso (-1). 
+          * Resoluciones FPF aplicadas en la Tabla Final 2023: D. Municipal (-5), Sport Boys (-4), D. Garcilaso (-1). 
         </div>
       )}
       {temporada === '2018' && esAcumulado && fecha >= 44 && (
