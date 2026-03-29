@@ -1,9 +1,8 @@
 'use client';
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import partidosJSON from './torneo_2018.json';
 import partidos2013JSON from './torneo_2013.json';
-// PREPARACIÓN 2023: Descomentar cuando tengas el archivo
-// import partidos2023JSON from './torneo_2023.json';
+import partidos2023JSON from './torneo_2023.json'; // ¡AQUÍ ESTÁ TU TEMPORADA 2023!
 
 const partidos2026JSON = [
   [1, 'Sport Huancayo', 'Alianza Lima', 1, 2], [1, 'UTC', 'Atlético Grau', 2, 0], [1, 'Comerciantes Unidos', 'CD Moquegua', 1, 0],
@@ -48,6 +47,17 @@ export default function Home() {
   
   const listaPartidos = useMemo(() => {
     if (temporada === '2018') return listaPartidos2018;
+    if (temporada === '2023') {
+      const raw2023 = Array.isArray(partidos2023JSON) ? partidos2023JSON : [];
+      return raw2023.map(p => ({
+        Fecha_Global: p[0],
+        Torneo: p[5] || 'Apertura', // Detecta automáticamente si dice "Clausura" o "Final"
+        Local: p[1],
+        Visitante: p[2],
+        GL: p[3],
+        GV: p[4]
+      }));
+    }
     if (temporada === '2013') {
       const raw2013 = Array.isArray(partidos2013JSON) ? partidos2013JSON : [];
       return raw2013.map(p => {
@@ -56,7 +66,6 @@ export default function Home() {
         return { Fecha_Global: p[0], Torneo: 'Descentralizado', Local: p[1], Visitante: p[2], GL: gl, GV: gv };
       });
     }
-    // if (temporada === '2023') return partidos2023JSON;
     return partidos2026JSON;
   }, [temporada]);
   
@@ -71,6 +80,7 @@ export default function Home() {
     'FBC Melgar': 'https://tmssl.akamaized.net//images/wappen/head/2734.png',
     'Cienciano': 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/4814.png',
     'Cusco FC': 'https://tmssl.akamaized.net//images/wappen/head/28999.png',
+    'Cusco': 'https://tmssl.akamaized.net//images/wappen/head/28999.png', // Alias para 2023
     'Cusco (Garcilaso)': 'https://images.seeklogo.com/logo-png/32/2/asociacion-civil-real-atletico-garcilaso-logo-png_seeklogo-328024.png',
     'Sport Boys': 'https://tmssl.akamaized.net//images/wappen/head/2730.png',
     'UTC': 'https://tmssl.akamaized.net//images/wappen/head/21170.png',
@@ -85,10 +95,12 @@ export default function Home() {
     'Juan Pablo II': 'https://tmssl.akamaized.net//images/wappen/head/99517.png?lm=1712524979',
     'FC Cajamarca': 'https://tmssl.akamaized.net//images/wappen/head/120792.png?lm=1767023947',
     'Dep. Municipal': 'https://tmssl.akamaized.net//images/wappen/head/17974.png',
+    'Municipal': 'https://tmssl.akamaized.net//images/wappen/head/17974.png', // Alias
     'Cantolao': 'https://tmssl.akamaized.net//images/wappen/head/11247.png',
     'Sport Rosario': 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/18441.png',
     'U. San Martin': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcROfQWRTSLDENcZLhqUcuH2MNeOyHkGsCnxeQ&s',
     'Union Comercio': 'https://tmssl.akamaized.net//images/wappen/head/31337.png',
+    'Comercio': 'https://tmssl.akamaized.net//images/wappen/head/31337.png', // Alias
     'Ayacucho FC': 'https://tmssl.akamaized.net//images/wappen/head/21178.png',
     'Binacional': 'https://tmssl.akamaized.net//images/wappen/head/41054.png',
     'Leon de Huanuco': 'https://tmssl.akamaized.net//images/wappen/big/25774.png?lm=1424441686',
@@ -96,10 +108,7 @@ export default function Home() {
     'Jose Galvez': 'https://tmssl.akamaized.net//images/wappen/head/16700.png?lm=1699653454',
     'Juan Aurich': 'https://tmssl.akamaized.net//images/wappen/head/4576.png?lm=1435783099',
     'Cesar Vallejo': 'https://tmssl.akamaized.net//images/wappen/big/6889.png?lm=1435783460',
-    'Carlos Mannucci': 'https://tmssl.akamaized.net//images/wappen/head/35587.png', // Equipos 2023
-    'Union Comercio': 'https://tmssl.akamaized.net//images/wappen/head/31337.png',
-    'Deportivo Municipal': 'https://tmssl.akamaized.net//images/wappen/head/17974.png',
-    'Academia Cantolao': 'https://tmssl.akamaized.net//images/wappen/head/11247.png',
+    'Carlos Mannucci': 'https://tmssl.akamaized.net//images/wappen/head/35587.png',
   };
 
   const info_clubes = {
@@ -135,7 +144,6 @@ export default function Home() {
   const liguillaB_2013 = ['Universitario', 'UTC', 'Ayacucho FC', 'Juan Aurich', 'Cienciano', 'Leon de Huanuco', 'U. San Martin', 'Jose Galvez'];
 
   const partidosValidos = useMemo(() => {
-    // AHORA PERMITIMOS QUE PASEN LOS PARTIDOS CON NULL PARA CONTARLOS COMO PENDIENTES
     return listaPartidos.filter(p => p.Fecha_Global <= fecha);
   }, [listaPartidos, fecha]);
 
@@ -164,7 +172,6 @@ export default function Home() {
       equiposActuales = Array.from(setEquipos);
     }
 
-    // AÑADIDO: Campo "pendientes" en la estructura inicial
     equiposActuales.forEach(eq => tabla[eq] = { equipo: eq, pj: 0, g: 0, e: 0, p: 0, gf: 0, gc: 0, pts: 0, racha: [], pendientes: 0 });
 
     partidos.forEach(p => {
@@ -172,7 +179,7 @@ export default function Home() {
       if (p.GL === null || p.GV === null) {
         if (tabla[p.Local]) tabla[p.Local].pendientes++;
         if (tabla[p.Visitante]) tabla[p.Visitante].pendientes++;
-        return; // Salta al siguiente partido
+        return; 
       }
 
       if (tabla[p.Local]) {
@@ -197,12 +204,16 @@ export default function Home() {
     return Object.values(tabla)
       .map(t => {
         let finalPts = t.pts;
+        
+        // REGLAS 2018
         if (temporada === '2018' && esAcumulado && fecha >= 44) {
           if (t.equipo === 'Sporting Cristal') finalPts += 2;
           if (t.equipo === 'Sport Rosario') finalPts -= 7;
           if (['Dep. Municipal', 'UTC', 'Cantolao'].includes(t.equipo)) finalPts -= 2;
           if (t.equipo === 'Universitario') finalPts -= 1;
         }
+        
+        // REGLAS 2013
         if (temporada === '2013') {
           if (esAcumulado && fecha >= 31) {
             if (t.equipo === 'U. San Martin') finalPts += 2; 
@@ -212,6 +223,14 @@ export default function Home() {
             finalPts -= 1;
           }
         }
+        
+        // REGLAS 2023 (Castigos en Mesa Apertura/Acumulado)
+        if (temporada === '2023' && (esAcumulado || (!esAcumulado && fecha <= 19))) {
+          if (t.equipo === 'Deportivo Garcilaso') finalPts -= 1;
+          if (t.equipo === 'Sport Boys') finalPts -= 4;
+          if (t.equipo === 'Municipal' || t.equipo === 'Dep. Municipal') finalPts -= 5;
+        }
+
         return { ...t, pts: finalPts, dif: t.gf - t.gc, ultimas: t.racha.slice(-5).reverse(), pendientes: t.pendientes };
       })
       .sort((a, b) => b.pts - a.pts || b.dif - a.dif || b.gf - a.gf);
@@ -264,7 +283,6 @@ export default function Home() {
                 bordeColor = '#3db4dc';
               }
 
-              // RENDERIZADO DE ASTERISCOS
               let asteriscos = '';
               if (eq.pendientes === 1) asteriscos = '*';
               if (eq.pendientes === 2) asteriscos = '**';
@@ -307,6 +325,13 @@ export default function Home() {
           </tbody>
         </table>
       )}
+      
+      {/* NOTAS AL PIE SEGÚN TEMPORADA */}
+      {temporada === '2023' && esAcumulado && (
+        <div className="text-[11px] text-left mx-[10px] my-[10px] p-[5px] bg-[#e5eee9] rounded-[4px] border border-[#d1e0d7]" style={{ color: '#6b7280' }}>
+          * Resoluciones FPF aplicadas en Acumulada 2023: D. Municipal (-5), Sport Boys (-4), D. Garcilaso (-1). 
+        </div>
+      )}
       {temporada === '2018' && esAcumulado && fecha >= 44 && (
         <div className="text-[11px] text-left mx-[10px] my-[10px] p-[5px] bg-[#e5eee9] rounded-[4px] border border-[#d1e0d7]" style={{ color: '#6b7280' }}>
           * Nota: Resoluciones FPF aplicadas en Acumulada 2018: Rosario (-7), Muni (-2), UTC (-2), Cantolao (-2), U (-1). Cristal (+2) por Reservas.
@@ -314,8 +339,8 @@ export default function Home() {
       )}
       {temporada === '2013' && esAcumulado && fecha >= 44 && !zona && (
         <div className="text-[11px] text-left mx-[10px] my-[10px] p-[5px] bg-[#e5eee9] rounded-[4px] border border-[#d1e0d7]" style={{ color: '#6b7280' }}>
-          * Nota (2013): Garcilaso y Universitario (ganadores de Liguilla) a Libertadores. El 3° de esta tabla acumulada a Libertadores. Del 4° al 7° a Sudamericana. Los dos últimos descienden (Comercio y Pacífico jugaron partido extra de desempate). <br/>
-          * Sanción: Cusco (Garcilaso) perdió 1 punto y se le sumaron 3 goles en contra por infracción en la Fecha 5 ante León de Huánuco (el resultado de 0-0 se mantuvo en cancha para León).
+          * Nota (2013): Garcilaso y Universitario a Libertadores. El 3° a Libertadores. Del 4° al 7° a Sudamericana. Los dos últimos descienden.<br/>
+          * Sanción: Cusco (Garcilaso) perdió 1 punto en la Fecha 5 ante León de Huánuco.
         </div>
       )}
     </div>
@@ -332,7 +357,7 @@ export default function Home() {
         ) : (
           partidos.map((p, idx) => (
             <div key={idx} className={`flex justify-between items-center py-[8px] px-[10px] border-t border-[#d1e0d7] hover:bg-[#f8fbf9] transition-colors ${idx % 2 === 0 ? 'bg-transparent' : 'bg-[#fcfdfc]'}`}>
-              <span className="text-[10px] font-bold w-[35px]" style={{ color: '#6b7280' }}>F{p.Fecha_Global}</span>
+              <span className="text-[10px] font-bold w-[35px]" style={{ color: '#6b7280' }}>F{p.Fecha_Global > 19 && temporada === '2023' ? p.Fecha_Global - 19 : p.Fecha_Global}</span>
               <div className="flex items-center w-[85%] justify-center">
                 <span className="text-right w-[40%] text-[12px] font-bold truncate" style={{ color: '#000000' }}>{p.Local}</span>
                 <img src={logos[p.Local] || 'https://cdn-icons-png.flaticon.com/128/33/33736.png'} style={{ width: '18px', height: '18px', minWidth: '18px', objectFit: 'contain', margin: '0 5px' }} />
@@ -416,6 +441,18 @@ export default function Home() {
         <main style={{ display: 'grid', gridTemplateColumns: '64% 34%', gap: '2%', maxWidth: '1250px', margin: '0 auto', padding: '20px', alignItems: 'start' }}>
           
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            {/* RENDERIZADO 2023 */}
+            {temporada === '2023' && fecha <= 19 && (
+              <TablaComponent titulo="TORNEO APERTURA 2023" zona="ZONA ÚNICA" datos={generarTabla(partidosValidos.filter(p => p.Torneo === 'Apertura'))} />
+            )}
+            {temporada === '2023' && fecha > 19 && fecha <= 38 && (
+              <TablaComponent titulo="TORNEO CLAUSURA 2023" zona="ZONA ÚNICA" datos={generarTabla(partidosValidos.filter(p => p.Torneo === 'Clausura'))} />
+            )}
+            {temporada === '2023' && (
+              <TablaComponent titulo={`TABLA ACUMULADA (FECHA ${fecha})`} datos={generarTabla(partidosValidos, null, true)} esAcumulado={true} />
+            )}
+
+            {/* RENDERIZADO OTROS AÑOS */}
             {temporada === '2018' && fecha <= 14 && (
               <>
                 <TablaComponent titulo="TORNEO DE VERANO" zona="ZONA A" datos={generarTabla(partidosValidos.filter(p => p.Torneo === 'Verano'), equipo_A_2018)} />
@@ -439,7 +476,7 @@ export default function Home() {
                 <TablaComponent titulo="TABLA GENERAL ACUMULADA" datos={generarTabla(partidosValidos, null, true)} esAcumulado={true} />
               </>
             ) : (
-              <TablaComponent 
+              temporada === '2013' && <TablaComponent 
                 titulo={fecha > 44 ? "TABLA FINAL ACUMULADA" : `TABLA ACUMULADA (HASTA LA FECHA ${fecha})`} 
                 datos={generarTabla(temporada === '2013' && fecha > 44 ? listaPartidos.filter(p => p.Fecha_Global <= 44) : partidosValidos, null, true)} 
                 esAcumulado={true} 
@@ -461,13 +498,19 @@ export default function Home() {
                   ◀
                 </button>
                 <select value={fecha} onChange={(e) => setFecha(Number(e.target.value))} className="w-full bg-transparent font-bold text-[13px] px-[10px] py-[8px] outline-none appearance-none text-center cursor-pointer border-none" style={{ color: '#000000' }}>
-                  {[...Array(temporada === '2013' ? 48 : (temporada === '2018' ? 44 : 17))].map((_, i) => <option key={i+1} value={i+1} className="bg-white">FECHA {i+1}</option>)}
+                  {[...Array(temporada === '2023' ? 38 : (temporada === '2013' ? 48 : (temporada === '2018' ? 44 : 17)))].map((_, i) => {
+                    let etiqueta = `FECHA ${i+1}`;
+                    if (temporada === '2023') {
+                        etiqueta = i < 19 ? `APERTURA F${i+1}` : `CLAUSURA F${i-18}`;
+                    }
+                    return <option key={i+1} value={i+1} className="bg-white">{etiqueta}</option>
+                  })}
                 </select>
                 <button 
-                  onClick={() => setFecha(prev => Math.min(temporada === '2013' ? 48 : (temporada === '2018' ? 44 : 17), prev + 1))} 
+                  onClick={() => setFecha(prev => Math.min(temporada === '2023' ? 38 : (temporada === '2013' ? 48 : (temporada === '2018' ? 44 : 17)), prev + 1))} 
                   className="text-[#8cc63f] hover:text-[#000000] font-bold text-[14px] px-2 py-1 bg-transparent border-none outline-none cursor-pointer transition-colors"
-                  style={{ opacity: fecha === (temporada === '2013' ? 48 : (temporada === '2018' ? 44 : 17)) ? 0.3 : 1, cursor: fecha === (temporada === '2013' ? 48 : (temporada === '2018' ? 44 : 17)) ? 'default' : 'pointer' }}
-                  disabled={fecha === (temporada === '2013' ? 48 : (temporada === '2018' ? 44 : 17))}
+                  style={{ opacity: fecha === (temporada === '2023' ? 38 : (temporada === '2013' ? 48 : (temporada === '2018' ? 44 : 17))) ? 0.3 : 1, cursor: fecha === (temporada === '2023' ? 38 : (temporada === '2013' ? 48 : (temporada === '2018' ? 44 : 17))) ? 'default' : 'pointer' }}
+                  disabled={fecha === (temporada === '2023' ? 38 : (temporada === '2013' ? 48 : (temporada === '2018' ? 44 : 17)))}
                 >
                   ▶
                 </button>
@@ -477,7 +520,7 @@ export default function Home() {
                 <div className="flex flex-col max-h-[550px] overflow-y-auto custom-scrollbar">
                   {listaPartidos.filter(p => p.Fecha_Global === fecha).map((p, idx) => (
                     <div key={idx} className={`flex justify-between items-center py-[8px] px-[10px] border-b border-[#d1e0d7] hover:bg-[#f8fbf9] transition-colors ${idx % 2 === 0 ? 'bg-transparent' : 'bg-[#fcfdfc]'}`}>
-                      <span className="text-[10px] font-bold w-[35px]" style={{ color: '#6b7280' }}>Final</span>
+                      <span className="text-[#000000] text-[10px] font-bold w-[35px]">Final</span>
                       <div className="flex items-center w-[85%] justify-center">
                         <span className="text-right w-[40%] text-[12px] font-bold truncate" style={{ color: '#000000' }}>{p.Local}</span>
                         <img src={logos[p.Local] || 'https://cdn-icons-png.flaticon.com/128/33/33736.png'} style={{ width: '18px', height: '18px', minWidth: '18px', objectFit: 'contain', margin: '0 5px' }} />
@@ -520,6 +563,7 @@ export default function Home() {
                     if (temporada === '2026') return partidos2026JSON.some(p => p.Local === eq || p.Visitante === eq);
                     if (temporada === '2018') return equipo_A_2018.includes(eq) || equipo_B_2018.includes(eq);
                     if (temporada === '2013') return liguillaA_2013.includes(eq) || liguillaB_2013.includes(eq);
+                    if (temporada === '2023' && partidos2023JSON) return partidos2023JSON.some(p => p[1] === eq || p[2] === eq);
                     return true; 
                   })
                   .map(eq => (
@@ -579,17 +623,9 @@ export default function Home() {
                       <img src={logos[row.Campeón] || 'https://cdn-icons-png.flaticon.com/128/33/33736.png'} style={{ width: '16px', height: '16px', objectFit: 'contain' }} />
                       <span style={{ color: '#000000' }}>{row.Campeón}</span>
                     </div>
-                    {row.Año === '2018' && (
+                    {['2018', '2013', '2023'].includes(row.Año) && (
                       <button 
-                        onClick={() => { setTemporada('2018'); setFecha(44); setTab('fixture'); setEquipoSeleccionado(null); window.scrollTo(0,0); }}
-                        className="bg-[#8cc63f] text-white font-bold text-[10px] px-3 py-1 rounded border-none outline-none cursor-pointer"
-                      >
-                        VER AÑO
-                      </button>
-                    )}
-                    {row.Año === '2013' && (
-                      <button 
-                        onClick={() => { setTemporada('2013'); setFecha(48); setTab('fixture'); setEquipoSeleccionado(null); window.scrollTo(0,0); }}
+                        onClick={() => { setTemporada(row.Año); setFecha(row.Año === '2013' ? 48 : (row.Año === '2023' ? 38 : 44)); setTab('fixture'); setEquipoSeleccionado(null); window.scrollTo(0,0); }}
                         className="bg-[#8cc63f] text-white font-bold text-[10px] px-3 py-1 rounded border-none outline-none cursor-pointer"
                       >
                         VER AÑO
