@@ -300,6 +300,16 @@
   [30, "ADT", "UTC", 0, 0, "Clausura"],
   [30, "Deportivo Garcilaso", "César Vallejo", 1, 0, "Clausura"],
 
+  [31, "Alianza Atlético", "Carlos Mannucci", 1, 1, "Clausura"],
+  [31, "Cusco", "ADT", 1, 0, "Clausura"],
+  [31, "Sport Huancayo", "Binacional", 3, 1, "Clausura"],
+  [31, "UTC", "Deportivo Garcilaso", 0, 0, "Clausura"],
+  [31, "César Vallejo", "Atlético Grau", 5, 0, "Clausura"],
+  [31, "Cantolao", "Alianza Lima", 0, 2, "Clausura"],
+  [31, "Cienciano", "Melgar", 0, 1, "Clausura"],
+  [31, "Sport Boys", "Sporting Cristal", 1, 1, "Clausura"],
+  [31, "Universitario", "Municipal", 1, 0, "Clausura"],
+
   [32, "Atlético Grau", "UTC", 4, 2, "Clausura"],
   [32, "Carlos Mannucci", "Cantolao", 1, 2, "Clausura"],
   [32, "Melgar", "Alianza Atlético", 4, 0, "Clausura"],
