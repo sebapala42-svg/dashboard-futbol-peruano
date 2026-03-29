@@ -45,17 +45,30 @@ const listaPartidos2018 = Array.isArray(partidosJSON) ? partidosJSON : (partidos
 export default function Home() {
   const [temporada, setTemporada] = useState('2026');
   
+  // FUNCIÓN PARA DETECTAR WALKOVERS 2023 EN ROJO
+  const esWalkover = (p) => {
+    if (temporada === '2023' && p.Torneo === 'Apertura' && p.Jornada_Oficial === 3) {
+      return (p.Local === 'Cusco' && p.Visitante === 'Sport Huancayo') ||
+             (p.Local === 'Atlético Grau' && p.Visitante === 'Melgar') ||
+             (p.Local === 'UTC' && p.Visitante === 'Cienciano') ||
+             (p.Local === 'Deportivo Garcilaso' && p.Visitante === 'Binacional') ||
+             (p.Local === 'Sporting Cristal' && p.Visitante === 'Alianza Lima') ||
+             (p.Local === 'Municipal' && p.Visitante === 'Carlos Mannucci');
+    }
+    return false;
+  };
+
   const listaPartidos = useMemo(() => {
     if (temporada === '2018') return listaPartidos2018.map(p => ({ ...p, Jornada_Oficial: p.Fecha_Global }));
     if (temporada === '2023') {
       const raw2023 = Array.isArray(partidos2023JSON) ? partidos2023JSON : [];
       
-      // EL CEREBRO CRONOLÓGICO: Mapea la Jornada Oficial a la Semana Real en la que se jugó
+      // EL CEREBRO CRONOLÓGICO: Mapea la Jornada Oficial a la Semana Real
       const ordenCronologicoApertura = {
         3: 1, 4: 2, 5: 3, 6: 4, 7: 5, 8: 6, 9: 7, 
-        1: 8,   // Fecha 1 se jugó entre la 9 y la 10
+        1: 8,   
         10: 9, 11: 10, 12: 11, 13: 12, 14: 13, 15: 14, 
-        2: 15,  // Fecha 2 se jugó entre la 15 y la 16
+        2: 15,  
         16: 16, 17: 17, 18: 18, 19: 19
       };
 
@@ -64,7 +77,6 @@ export default function Home() {
         let torneo = p[5] || 'Apertura';
         let fechaCronologica = jornadaOficial;
 
-        // Si es Apertura, aplicamos el mapeo para que la Semana 1 sea la Jornada 3
         if (torneo === 'Apertura' && ordenCronologicoApertura[jornadaOficial]) {
           fechaCronologica = ordenCronologicoApertura[jornadaOficial];
         }
@@ -197,25 +209,47 @@ export default function Home() {
     equiposActuales.forEach(eq => tabla[eq] = { equipo: eq, pj: 0, g: 0, e: 0, p: 0, gf: 0, gc: 0, pts: 0, racha: [] });
 
     partidos.forEach(p => {
-      // SI EL PARTIDO ES NULL, NO SUMA NADA EN LA TABLA, SOLO SALTA
       if (p.GL === null || p.GV === null) return; 
+
+      let gl = p.GL;
+      let gv = p.GV;
+      let ptsLocal = 0;
+      let ptsVisita = 0;
+      let rLocal = '';
+      let rVisita = '';
+
+      if (gl > gv) { ptsLocal = 3; rLocal = 'V'; rVisita = 'D'; }
+      else if (gl < gv) { ptsVisita = 3; rVisita = 'V'; rLocal = 'D'; }
+      else { ptsLocal = 1; ptsVisita = 1; rLocal = 'E'; rVisita = 'E'; }
+
+      // RESOLUCIÓN INHABILITACIÓN MUNICIPAL (Clausura J8): Juegan 0-0 pero Grau suma 3 puntos y Muni 0.
+      if (temporada === '2023' && p.Torneo === 'Clausura' && p.Jornada_Oficial === 8 && p.Local === 'Municipal' && p.Visitante === 'Atlético Grau') {
+        ptsLocal = 0;
+        ptsVisita = 3;
+        rLocal = 'D';
+        rVisita = 'V';
+      }
 
       if (tabla[p.Local]) {
         tabla[p.Local].pj++;
-        tabla[p.Local].gf += p.GL;
-        tabla[p.Local].gc += p.GV;
-        if (p.GL > p.GV) { tabla[p.Local].g++; tabla[p.Local].pts += 3; tabla[p.Local].racha.push('V'); }
-        else if (p.GL < p.GV) { tabla[p.Local].p++; tabla[p.Local].racha.push('D'); } 
-        else { tabla[p.Local].e++; tabla[p.Local].pts += 1; tabla[p.Local].racha.push('E'); } 
+        tabla[p.Local].gf += gl;
+        tabla[p.Local].gc += gv;
+        tabla[p.Local].pts += ptsLocal;
+        if (rLocal === 'V') tabla[p.Local].g++;
+        else if (rLocal === 'D') tabla[p.Local].p++;
+        else tabla[p.Local].e++;
+        tabla[p.Local].racha.push(rLocal);
       }
       
       if (tabla[p.Visitante]) {
         tabla[p.Visitante].pj++;
-        tabla[p.Visitante].gf += p.GV;
-        tabla[p.Visitante].gc += p.GL;
-        if (p.GV > p.GL) { tabla[p.Visitante].g++; tabla[p.Visitante].pts += 3; tabla[p.Visitante].racha.push('V'); }
-        else if (p.GV < p.GL) { tabla[p.Visitante].p++; tabla[p.Visitante].racha.push('D'); } 
-        else { tabla[p.Visitante].e++; tabla[p.Visitante].pts += 1; tabla[p.Visitante].racha.push('E'); } 
+        tabla[p.Visitante].gf += gv;
+        tabla[p.Visitante].gc += gl;
+        tabla[p.Visitante].pts += ptsVisita;
+        if (rVisita === 'V') tabla[p.Visitante].g++;
+        else if (rVisita === 'D') tabla[p.Visitante].p++;
+        else tabla[p.Visitante].e++;
+        tabla[p.Visitante].racha.push(rVisita);
       }
     });
 
@@ -368,23 +402,28 @@ export default function Home() {
         ) : (
           partidos.map((p, idx) => (
             <div key={idx} className={`flex justify-between items-center py-[8px] px-[10px] border-t border-[#d1e0d7] hover:bg-[#f8fbf9] transition-colors ${idx % 2 === 0 ? 'bg-transparent' : 'bg-[#fcfdfc]'}`}>
-              <span className="text-[10px] font-bold w-[35px]" style={{ color: '#6b7280' }}>
-                {/* Muestra la Jornada Oficial sin importar el orden cronológico */}
-                {temporada === '2023' && p.Torneo === 'Clausura' 
-                  ? `F${p.Jornada_Oficial - 19}` 
-                  : (p.Jornada_Oficial ? `F${p.Jornada_Oficial}` : `F${p.Fecha_Global}`)}
-              </span>
+              <div className="flex flex-col justify-center items-center w-[35px]">
+                <span className="text-[10px] font-bold" style={{ color: '#6b7280' }}>
+                  {temporada === '2023' && p.Torneo === 'Clausura' 
+                    ? `F${p.Jornada_Oficial - 19}` 
+                    : (p.Jornada_Oficial ? `F${p.Jornada_Oficial}` : `F${p.Fecha_Global}`)}
+                </span>
+              </div>
               <div className="flex items-center w-[85%] justify-center">
                 <span className="text-right w-[40%] text-[12px] font-bold truncate" style={{ color: '#000000' }}>{p.Local}</span>
                 <img src={logos[p.Local] || 'https://cdn-icons-png.flaticon.com/128/33/33736.png'} style={{ width: '18px', height: '18px', minWidth: '18px', objectFit: 'contain', margin: '0 5px' }} />
                 
-                <div className="flex items-center justify-center gap-[2px] mx-[5px]">
+                <div className="flex items-center justify-center gap-[2px] mx-[5px] min-w-[65px]">
                   {p.GL !== null && p.GV !== null ? (
-                    <>
-                      <div className="bg-[#e5eee9] border border-[#d1e0d7] rounded-[4px] font-bold text-[14px] w-[25px] h-[25px] flex items-center justify-center" style={{ color: '#000000' }}>{p.GL}</div>
-                      <div className="font-bold text-[14px] mx-[2px]" style={{ color: '#8cc63f' }}>-</div>
-                      <div className="bg-[#e5eee9] border border-[#d1e0d7] rounded-[4px] font-bold text-[14px] w-[25px] h-[25px] flex items-center justify-center" style={{ color: '#000000' }}>{p.GV}</div>
-                    </>
+                    esWalkover(p) ? (
+                      <div className="text-[#d32f2f] text-[8px] font-black w-[45px] text-center leading-[10px]">WALK<br/>OVER</div>
+                    ) : (
+                      <>
+                        <div className="bg-[#e5eee9] border border-[#d1e0d7] rounded-[4px] font-bold text-[14px] w-[25px] h-[25px] flex items-center justify-center" style={{ color: '#000000' }}>{p.GL}</div>
+                        <div className="font-bold text-[14px] mx-[2px]" style={{ color: '#8cc63f' }}>-</div>
+                        <div className="bg-[#e5eee9] border border-[#d1e0d7] rounded-[4px] font-bold text-[14px] w-[25px] h-[25px] flex items-center justify-center" style={{ color: '#000000' }}>{p.GV}</div>
+                      </>
+                    )
                   ) : (
                     <div className="font-bold text-[12px] mx-[2px]" style={{ color: '#8cc63f' }}>VS</div>
                   )}
@@ -518,7 +557,6 @@ export default function Home() {
                     let etiqueta = `FECHA ${i+1}`;
                     if (temporada === '2023') {
                         if (i < 19) {
-                          // Nombres reales de las jornadas para el menú desplegable en el Apertura 2023
                           const nombresJornadas = {
                             1: 'Jornada 3', 2: 'Jornada 4', 3: 'Jornada 5', 4: 'Jornada 6',
                             5: 'Jornada 7', 6: 'Jornada 8', 7: 'Jornada 9', 8: 'Jornada 1 (Aplazada)',
@@ -557,21 +595,33 @@ export default function Home() {
                 <div className="flex flex-col max-h-[550px] overflow-y-auto custom-scrollbar">
                   {listaPartidos.filter(p => p.Fecha_Global === fecha).map((p, idx) => (
                     <div key={idx} className={`flex justify-between items-center py-[8px] px-[10px] border-b border-[#d1e0d7] hover:bg-[#f8fbf9] transition-colors ${idx % 2 === 0 ? 'bg-transparent' : 'bg-[#fcfdfc]'}`}>
-                      <span className="text-[#000000] text-[10px] font-bold w-[35px]">Final</span>
+                      <div className="flex flex-col justify-center items-center w-[35px]">
+                        <span className="text-[10px] font-bold" style={{ color: '#6b7280' }}>
+                          {temporada === '2023' && p.Torneo === 'Clausura' 
+                            ? `F${p.Jornada_Oficial - 19}` 
+                            : (p.Jornada_Oficial ? `F${p.Jornada_Oficial}` : `F${p.Fecha_Global}`)}
+                        </span>
+                      </div>
                       <div className="flex items-center w-[85%] justify-center">
                         <span className="text-right w-[40%] text-[12px] font-bold truncate" style={{ color: '#000000' }}>{p.Local}</span>
                         <img src={logos[p.Local] || 'https://cdn-icons-png.flaticon.com/128/33/33736.png'} style={{ width: '18px', height: '18px', minWidth: '18px', objectFit: 'contain', margin: '0 5px' }} />
-                        <div className="flex items-center justify-center gap-[2px] mx-[5px]">
+                        
+                        <div className="flex items-center justify-center gap-[2px] mx-[5px] min-w-[65px]">
                           {p.GL !== null && p.GV !== null ? (
-                            <>
-                              <div className="bg-[#e5eee9] border border-[#d1e0d7] rounded-[4px] font-bold text-[14px] w-[25px] h-[25px] flex items-center justify-center" style={{ color: '#000000' }}>{p.GL}</div>
-                              <div className="font-bold text-[14px] mx-[2px]" style={{ color: '#8cc63f' }}>-</div>
-                              <div className="bg-[#e5eee9] border border-[#d1e0d7] rounded-[4px] font-bold text-[14px] w-[25px] h-[25px] flex items-center justify-center" style={{ color: '#000000' }}>{p.GV}</div>
-                            </>
+                            esWalkover(p) ? (
+                              <div className="text-[#d32f2f] text-[8px] font-black w-[45px] text-center leading-[10px]">WALK<br/>OVER</div>
+                            ) : (
+                              <>
+                                <div className="bg-[#e5eee9] border border-[#d1e0d7] rounded-[4px] font-bold text-[14px] w-[25px] h-[25px] flex items-center justify-center" style={{ color: '#000000' }}>{p.GL}</div>
+                                <div className="font-bold text-[14px] mx-[2px]" style={{ color: '#8cc63f' }}>-</div>
+                                <div className="bg-[#e5eee9] border border-[#d1e0d7] rounded-[4px] font-bold text-[14px] w-[25px] h-[25px] flex items-center justify-center" style={{ color: '#000000' }}>{p.GV}</div>
+                              </>
+                            )
                           ) : (
                             <div className="font-bold text-[12px] mx-[2px]" style={{ color: '#8cc63f' }}>VS</div>
                           )}
                         </div>
+                        
                         <img src={logos[p.Visitante] || 'https://cdn-icons-png.flaticon.com/128/33/33736.png'} style={{ width: '18px', height: '18px', minWidth: '18px', objectFit: 'contain', margin: '0 5px' }} />
                         <span className="text-left w-[40%] text-[12px] font-bold truncate" style={{ color: '#000000' }}>{p.Visitante}</span>
                       </div>
