@@ -2,6 +2,8 @@
 import React, { useState, useMemo } from 'react';
 import partidosJSON from './torneo_2018.json';
 import partidos2013JSON from './torneo_2013.json';
+// PREPARACIÓN 2023: Descomentar cuando tengas el archivo
+// import partidos2023JSON from './torneo_2023.json';
 
 const partidos2026JSON = [
   [1, 'Sport Huancayo', 'Alianza Lima', 1, 2], [1, 'UTC', 'Atlético Grau', 2, 0], [1, 'Comerciantes Unidos', 'CD Moquegua', 1, 0],
@@ -49,18 +51,12 @@ export default function Home() {
     if (temporada === '2013') {
       const raw2013 = Array.isArray(partidos2013JSON) ? partidos2013JSON : [];
       return raw2013.map(p => {
-        let gl = p[3];
-        let gv = p[4];
-        
-        // CORRECCIÓN ADMINISTRATIVA MESA 2013: Garcilaso vs León de Huánuco (Fecha 5)
-        if (p[0] === 5 && p[1] === 'Cusco (Garcilaso)' && p[2] === 'Leon de Huanuco') {
-          gl = 0;
-          gv = 3;
-        }
-
+        let gl = p[3]; let gv = p[4];
+        if (p[0] === 5 && p[1] === 'Cusco (Garcilaso)' && p[2] === 'Leon de Huanuco') { gl = 0; gv = 3; }
         return { Fecha_Global: p[0], Torneo: 'Descentralizado', Local: p[1], Visitante: p[2], GL: gl, GV: gv };
       });
     }
+    // if (temporada === '2023') return partidos2023JSON;
     return partidos2026JSON;
   }, [temporada]);
   
@@ -99,7 +95,11 @@ export default function Home() {
     'Pacifico FC': 'https://tmssl.akamaized.net//images/wappen/head/37579.png?lm=1749433973',
     'Jose Galvez': 'https://tmssl.akamaized.net//images/wappen/head/16700.png?lm=1699653454',
     'Juan Aurich': 'https://tmssl.akamaized.net//images/wappen/head/4576.png?lm=1435783099',
-    'Cesar Vallejo': 'https://tmssl.akamaized.net//images/wappen/big/6889.png?lm=1435783460'
+    'Cesar Vallejo': 'https://tmssl.akamaized.net//images/wappen/big/6889.png?lm=1435783460',
+    'Carlos Mannucci': 'https://tmssl.akamaized.net//images/wappen/head/35587.png', // Equipos 2023
+    'Union Comercio': 'https://tmssl.akamaized.net//images/wappen/head/31337.png',
+    'Deportivo Municipal': 'https://tmssl.akamaized.net//images/wappen/head/17974.png',
+    'Academia Cantolao': 'https://tmssl.akamaized.net//images/wappen/head/11247.png',
   };
 
   const info_clubes = {
@@ -135,7 +135,8 @@ export default function Home() {
   const liguillaB_2013 = ['Universitario', 'UTC', 'Ayacucho FC', 'Juan Aurich', 'Cienciano', 'Leon de Huanuco', 'U. San Martin', 'Jose Galvez'];
 
   const partidosValidos = useMemo(() => {
-    return listaPartidos.filter(p => p.Fecha_Global <= fecha && p.GL !== null && p.GV !== null);
+    // AHORA PERMITIMOS QUE PASEN LOS PARTIDOS CON NULL PARA CONTARLOS COMO PENDIENTES
+    return listaPartidos.filter(p => p.Fecha_Global <= fecha);
   }, [listaPartidos, fecha]);
 
   const partidosJugadosEquipo = useMemo(() => {
@@ -163,9 +164,17 @@ export default function Home() {
       equiposActuales = Array.from(setEquipos);
     }
 
-    equiposActuales.forEach(eq => tabla[eq] = { equipo: eq, pj: 0, g: 0, e: 0, p: 0, gf: 0, gc: 0, pts: 0, racha: [] });
+    // AÑADIDO: Campo "pendientes" en la estructura inicial
+    equiposActuales.forEach(eq => tabla[eq] = { equipo: eq, pj: 0, g: 0, e: 0, p: 0, gf: 0, gc: 0, pts: 0, racha: [], pendientes: 0 });
 
     partidos.forEach(p => {
+      // SI EL PARTIDO ES NULL, SUMA COMO PENDIENTE Y NO CALCULA PUNTOS
+      if (p.GL === null || p.GV === null) {
+        if (tabla[p.Local]) tabla[p.Local].pendientes++;
+        if (tabla[p.Visitante]) tabla[p.Visitante].pendientes++;
+        return; // Salta al siguiente partido
+      }
+
       if (tabla[p.Local]) {
         tabla[p.Local].pj++;
         tabla[p.Local].gf += p.GL;
@@ -203,7 +212,7 @@ export default function Home() {
             finalPts -= 1;
           }
         }
-        return { ...t, pts: finalPts, dif: t.gf - t.gc, ultimas: t.racha.slice(-5).reverse() };
+        return { ...t, pts: finalPts, dif: t.gf - t.gc, ultimas: t.racha.slice(-5).reverse(), pendientes: t.pendientes };
       })
       .sort((a, b) => b.pts - a.pts || b.dif - a.dif || b.gf - a.gf);
   };
@@ -222,11 +231,9 @@ export default function Home() {
         <table className="w-full text-[12px] font-sans border-collapse mt-1">
           <thead>
             <tr>
-              {/* #, Equipos y PTS: Negro y negrita. Líneas separadoras añadidas. */}
               <th className="bg-[#e5eee9] border-b border-[#d1e0d7] py-[8px] px-[4px] font-bold text-[11px] w-[30px] text-center" style={{ color: '#000000' }}>#</th>
               <th className="bg-[#e5eee9] border-b border-r border-[#d1e0d7] py-[8px] px-[4px] font-bold text-[11px] text-left" style={{ color: '#000000' }}>Equipos</th>
               <th className="bg-[#e5eee9] border-b border-r border-[#d1e0d7] py-[8px] px-[4px] font-bold text-[11px] text-center" style={{ color: '#000000' }}>PTS</th>
-              {/* El resto: Gris desaturado y sin negrita */}
               <th className="bg-[#e5eee9] border-b border-[#d1e0d7] py-[8px] px-[4px] font-normal text-[11px] text-center" style={{ color: '#6b7280' }}>J</th>
               <th className="bg-[#e5eee9] border-b border-[#d1e0d7] py-[8px] px-[4px] font-normal text-[11px] text-center" style={{ color: '#6b7280' }}>Gol</th>
               <th className="bg-[#e5eee9] border-b border-[#d1e0d7] py-[8px] px-[4px] font-normal text-[11px] text-center" style={{ color: '#6b7280' }}>+/-</th>
@@ -257,6 +264,12 @@ export default function Home() {
                 bordeColor = '#3db4dc';
               }
 
+              // RENDERIZADO DE ASTERISCOS
+              let asteriscos = '';
+              if (eq.pendientes === 1) asteriscos = '*';
+              if (eq.pendientes === 2) asteriscos = '**';
+              if (eq.pendientes > 2) asteriscos = `(${eq.pendientes}*)`;
+
               return (
                 <tr key={eq.equipo} className={`hover:bg-[#f8fbf9] transition-colors ${i % 2 === 0 ? 'bg-transparent' : 'bg-[#fcfdfc]'}`}>
                   <td className="py-[6px] px-[4px] font-bold border-l-[3px] text-center" style={{ borderLeftColor: bordeColor, color: '#000000' }}>{i + 1}</td>
@@ -265,7 +278,9 @@ export default function Home() {
                       <img src={logos[eq.equipo] || 'https://cdn-icons-png.flaticon.com/128/33/33736.png'} 
                            style={{ width: compactLogo ? '13px' : '15px', height: compactLogo ? '13px' : '15px', minWidth: compactLogo ? '13px' : '15px', objectFit: 'contain', marginRight: '6px' }} 
                            alt={eq.equipo} />
-                      <span>{eq.equipo}</span>
+                      <span>
+                        {eq.equipo} <span style={{ color: '#d32f2f', marginLeft: '2px' }}>{asteriscos}</span>
+                      </span>
                     </div>
                   </td>
                   <td className="py-[6px] px-[4px] font-bold text-[13px] text-center border-r border-[#d1e0d7]" style={{ color: '#000000' }}>{eq.pts}</td>
