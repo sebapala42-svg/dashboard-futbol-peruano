@@ -1,12 +1,12 @@
 'use client';
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import partidosJSON from './torneo_2018.json';
 import partidos2013JSON from './torneo_2013.json';
 import partidos2023JSON from './torneo_2023.json';
 
 const listaPartidos2018 = Array.isArray(partidosJSON) ? partidosJSON : (partidosJSON.BaseDatos || Object.values(partidosJSON)[0] || []);
 
-// EL TRADUCTOR DE EQUIPOS: Normaliza los nombres para que el código siempre use el mismo
+// EL TRADUCTOR DE EQUIPOS
 const normalizarEquipoListado = (nombre) => {
   const alias = {
     'Melgar': 'FBC Melgar',
@@ -17,6 +17,12 @@ const normalizarEquipoListado = (nombre) => {
   };
   return alias[nombre] || nombre;
 };
+
+// ======================= CONFIGURACIÓN DE LA API =======================
+// ⚠️ REEMPLAZA 'TU_API_KEY_AQUI' POR TU CLAVE REAL DE RAPIDAPI ⚠️
+const API_KEY = 'c96c8805bbmsha31d2cee880d709p13e8c8jsn72808e880595'; 
+const API_HOST = 'free-api-live-football-data.p.rapidapi.com';
+const LIGA_ID = '131'; // El ID de la Liga 1 Perú que descubriste
 
 // ======================= MAPAS DE DATOS GLOBALES =======================
 const logos = {
@@ -87,81 +93,96 @@ const equipo_B_2018 = ['Sport Huancayo', 'FBC Melgar', 'Cantolao', 'Dep. Municip
 const liguillaA_2013 = ['Cusco (Garcilaso)', 'Sporting Cristal', 'Alianza Lima', 'Cesar Vallejo', 'Sport Huancayo', 'FBC Melgar', 'Pacifico FC', 'Union Comercio'];
 const liguillaB_2013 = ['Universitario', 'UTC', 'Ayacucho FC', 'Juan Aurich', 'Cienciano', 'Leon de Huanuco', 'U. San Martin', 'Jose Galvez'];
 
-// ======================= DATA MOCKEADA TORNEO 2026 CON HORAS =======================
-// FECHA ACTUAL FIJADA: Domingo, 29 de Marzo del 2026
-const partidos2026Base = [
-  [1, 'Sport Huancayo', 'Alianza Lima', 1, 2, '2026-02-01T15:00:00-05:00'], [1, 'UTC', 'Atlético Grau', 2, 0, '2026-02-01T15:00:00-05:00'], [1, 'Comerciantes Unidos', 'CD Moquegua', 1, 0, '2026-02-01T15:00:00-05:00'],
-  [1, 'Sport Boys', 'Los Chankas', 1, 1, '2026-02-01T15:00:00-05:00'], [1, 'Juan Pablo II', 'FC Cajamarca', 3, 3, '2026-02-01T15:00:00-05:00'], [1, 'FBC Melgar', 'Cienciano', 2, 0, '2026-02-01T15:00:00-05:00'],
-  [1, 'Deportivo Garcilaso', 'Sporting Cristal', 1, 1, '2026-02-01T15:00:00-05:00'], [1, 'Alianza Atlético', 'Cusco FC', 1, 0, '2026-02-01T15:00:00-05:00'], [1, 'Universitario', 'ADT', 2, 0, '2026-02-01T15:00:00-05:00'],
-  [2, 'CD Moquegua', 'UTC', 2, 3, '2026-02-08T15:00:00-05:00'], [2, 'ADT', 'Sport Boys', 1, 0, '2026-02-08T15:00:00-05:00'], [2, 'Atlético Grau', 'Sport Huancayo', 0, 0, '2026-02-08T15:00:00-05:00'],
-  [2, 'Cusco FC', 'Universitario', 1, 1, '2026-02-08T15:00:00-05:00'], [2, 'Sporting Cristal', 'FBC Melgar', 1, 2, '2026-02-08T15:00:00-05:00'], [2, 'Los Chankas', 'Alianza Atlético', 1, 0, '2026-02-08T15:00:00-05:00'],
-  [2, 'Cienciano', 'Juan Pablo II', 6, 1, '2026-02-08T15:00:00-05:00'], [2, 'Alianza Lima', 'Comerciantes Unidos', 2, 1, '2026-02-08T15:00:00-05:00'], [2, 'FC Cajamarca', 'Deportivo Garcilaso', 1, 1, '2026-02-08T15:00:00-05:00'],
-  [3, 'UTC', 'Cusco FC', 1, 0, '2026-02-15T15:00:00-05:00'], [3, 'Universitario', 'Cienciano', 2, 1, '2026-02-15T15:00:00-05:00'], [3, 'Deportivo Garcilaso', 'ADT', 1, 0, '2026-02-15T15:00:00-05:00'],
-  [3, 'Juan Pablo II', 'Sporting Cristal', 0, 2, '2026-02-15T15:00:00-05:00'], [3, 'Sport Boys', 'Atlético Grau', 1, 0, '2026-02-15T15:00:00-05:00'], [3, 'Alianza Atlético', 'Alianza Lima', 0, 0, '2026-02-15T15:00:00-05:00'],
-  [3, 'Sport Huancayo', 'FC Cajamarca', 2, 0, '2026-02-15T15:00:00-05:00'], [3, 'Comerciantes Unidos', 'Los Chankas', 1, 1, '2026-02-15T15:00:00-05:00'], [3, 'FBC Melgar', 'CD Moquegua', 4, 0, '2026-02-15T15:00:00-05:00'],
-  [4, 'Alianza Lima', 'Sport Boys', 1, 0, '2026-02-22T15:00:00-05:00'], [4, 'FC Cajamarca', 'FBC Melgar', 3, 1, '2026-02-22T15:00:00-05:00'], [4, 'Sporting Cristal', 'Universitario', 2, 2, '2026-02-22T15:00:00-05:00'],
-  [4, 'Cienciano', 'Alianza Atlético', 1, 1, '2026-02-22T15:00:00-05:00'], [4, 'ADT', 'UTC', 2, 2, '2026-02-22T15:00:00-05:00'], [4, 'Los Chankas', 'Sport Huancayo', 3, 2, '2026-02-22T15:00:00-05:00'],
-  [4, 'Atlético Grau', 'Juan Pablo II', 1, 2, '2026-02-22T15:00:00-05:00'], [4, 'Cusco FC', 'Comerciantes Unidos', 3, 1, '2026-02-22T15:00:00-05:00'], [4, 'CD Moquegua', 'Deportivo Garcilaso', 1, 0, '2026-02-22T15:00:00-05:00'],
-  [5, 'Alianza Atlético', 'ADT', 0, 0, '2026-03-01T15:00:00-05:00'], [5, 'FBC Melgar', 'Los Chankas', 1, 2, '2026-03-01T15:00:00-05:00'], [5, 'Deportivo Garcilaso', 'Cienciano', 2, 3, '2026-03-01T15:00:00-05:00'],
-  [5, 'Sport Huancayo', 'Sporting Cristal', 2, 1, '2026-03-01T15:00:00-05:00'], [5, 'UTC', 'Alianza Lima', 0, 1, '2026-03-01T15:00:00-05:00'], [5, 'Sport Boys', 'CD Moquegua', 0, 0, '2026-03-01T15:00:00-05:00'],
-  [5, 'Comerciantes Unidos', 'Atlético Grau', 3, 1, '2026-03-01T15:00:00-05:00'], [5, 'Juan Pablo II', 'Cusco FC', 2, 1, '2026-03-01T15:00:00-05:00'], [5, 'Universitario', 'FC Cajamarca', 1, 0, '2026-03-01T15:00:00-05:00'],
-  [6, 'Atlético Grau', 'FC Cajamarca', 1, 0, '2026-03-08T15:00:00-05:00'], [6, 'CD Moquegua', 'Sport Huancayo', 2, 1, '2026-03-08T15:00:00-05:00'], [6, 'Comerciantes Unidos', 'UTC', 1, 2, '2026-03-08T15:00:00-05:00'],
-  [6, 'Sporting Cristal', 'Alianza Atlético', 3, 1, '2026-03-08T15:00:00-05:00'], [6, 'Cusco FC', 'Deportivo Garcilaso', 1, 0, '2026-03-08T15:00:00-05:00'], [6, 'ADT', 'Juan Pablo II', 2, 3, '2026-03-08T15:00:00-05:00'],
-  [6, 'Los Chankas', 'Universitario', 3, 1, '2026-03-08T15:00:00-05:00'], [6, 'Cienciano', 'Sport Boys', 3, 1, '2026-03-08T15:00:00-05:00'], [6, 'Alianza Lima', 'FBC Melgar', 3, 1, '2026-03-08T15:00:00-05:00'],
-  [7, 'FC Cajamarca', 'Comerciantes Unidos', 3, 4, '2026-03-15T15:00:00-05:00'], [7, 'Sport Huancayo', 'ADT', 0, 1, '2026-03-15T15:00:00-05:00'], [7, 'Juan Pablo II', 'Los Chankas', 2, 3, '2026-03-15T15:00:00-05:00'],
-  [7, 'Deportivo Garcilaso', 'Alianza Lima', 1, 1, '2026-03-15T15:00:00-05:00'], [7, 'Universitario', 'UTC', 2, 0, '2026-03-15T15:00:00-05:00'], [7, 'Sporting Cristal', 'Sport Boys', 3, 0, '2026-03-15T15:00:00-05:00'],
-  [7, 'FBC Melgar', 'Atlético Grau', 0, 0, '2026-03-15T15:00:00-05:00'], [7, 'Alianza Atlético', 'CD Moquegua', 3, 0, '2026-03-15T15:00:00-05:00'], [7, 'Cusco FC', 'Cienciano', 1, 2, '2026-03-15T15:00:00-05:00'],
-  [8, 'ADT', 'FBC Melgar', 1, 1, '2026-03-28T13:00:00-05:00'], 
-  [8, 'Cienciano', 'FC Cajamarca', 3, 0, '2026-03-28T15:30:00-05:00'],
-  [8, 'CD Moquegua', 'Cusco FC', 1, 2, '2026-03-28T18:00:00-05:00'],
-  [8, 'UTC', 'Alianza Atlético', 1, 1, '2026-03-28T19:00:00-05:00'],
-  [8, 'Comerciantes Unidos', 'Universitario', 0, 0, '2026-03-21T15:00:00-05:00'], [8, 'Los Chankas', 'Sporting Cristal', 3, 2, '2026-03-21T15:00:00-05:00'], [8, 'Alianza Lima', 'Juan Pablo II', 2, 0, '2026-03-21T15:00:00-05:00'],
-  [8, 'Atlético Grau', 'Deportivo Garcilaso', 0, 0, '2026-03-21T15:00:00-05:00'], [8, 'Sport Boys', 'Sport Huancayo', 3, 0, '2026-03-21T15:00:00-05:00'],
-  [9, 'Juan Pablo II', 'UTC', null, null, '2026-03-29T13:00:00-05:00'],
-  [9, 'Alianza Atlético', 'Atlético Grau', null, null, '2026-03-29T15:30:00-05:00'],
-  [9, 'Universitario', 'Alianza Lima', null, null, '2026-03-29T18:00:00-05:00'], // EL CLÁSICO
-  [9, 'FBC Melgar', 'Cusco FC', null, null, '2026-03-30T15:30:00-05:00'],
-  [9, 'FC Cajamarca', 'Los Chankas', null, null, '2026-03-30T19:00:00-05:00'],
-  [9, 'Cienciano', 'ADT', null, null, '2026-03-31T15:00:00-05:00'], [9, 'Deportivo Garcilaso', 'Sporting Cristal', null, null, '2026-03-31T15:00:00-05:00'], [9, 'Sport Huancayo', 'Comerciantes Unidos', null, null, '2026-03-31T15:00:00-05:00'], [9, 'Sport Boys', 'CD Moquegua', null, null, '2026-03-31T15:00:00-05:00'], 
-  [10, 'Cusco FC', 'FC Cajamarca', null, null, '2026-04-05T15:00:00-05:00'], [10, 'ADT', 'Alianza Lima', null, null, '2026-04-05T15:00:00-05:00'], [10, 'UTC', 'Sport Huancayo', null, null, '2026-04-05T15:00:00-05:00'], [10, 'Atlético Grau', 'Sporting Cristal', null, null, '2026-04-05T15:00:00-05:00'], [10, 'Universitario', 'Deportivo Garcilaso', null, null, '2026-04-05T15:00:00-05:00'], [10, 'Los Chankas', 'Cienciano', null, null, '2026-04-05T15:00:00-05:00'], [10, 'Sport Boys', 'FBC Melgar', null, null, '2026-04-05T15:00:00-05:00'], [10, 'CD Moquegua', 'Juan Pablo II', null, null, '2026-04-05T15:00:00-05:00'], [10, 'Comerciantes Unidos', 'Alianza Atlético', null, null, '2026-04-05T15:00:00-05:00'],
-  [11, 'Juan Pablo II', 'Comerciantes Unidos', null, null, '2026-04-12T15:00:00-05:00'], [11, 'Alianza Atlético', 'Sport Boys', null, null, '2026-04-12T15:00:00-05:00'], [11, 'FBC Melgar', 'Universitario', null, null, '2026-04-12T15:00:00-05:00'], [11, 'Alianza Lima', 'Cusco FC', null, null, '2026-04-12T15:00:00-05:00'], [11, 'Cienciano', 'CD Moquegua', null, null, '2026-04-12T15:00:00-05:00'], [11, 'Sport Huancayo', 'Deportivo Garcilaso', null, null, '2026-04-12T15:00:00-05:00'], [11, 'Sporting Cristal', 'UTC', null, null, '2026-04-12T15:00:00-05:00'], [11, 'FC Cajamarca', 'ADT', null, null, '2026-04-12T15:00:00-05:00'], [11, 'Los Chankas', 'Atlético Grau', null, null, '2026-04-12T15:00:00-05:00'],
-  [12, 'Cusco FC', 'Sport Huancayo', null, null, '2026-04-19T15:00:00-05:00'], [12, 'ADT', 'Los Chankas', null, null, '2026-04-19T15:00:00-05:00'], [12, 'UTC', 'Cienciano', null, null, '2026-04-19T15:00:00-05:00'], [12, 'Deportivo Garcilaso', 'FBC Melgar', null, null, '2026-04-19T15:00:00-05:00'], [12, 'Atlético Grau', 'Alianza Lima', null, null, '2026-04-19T15:00:00-05:00'], [12, 'Universitario', 'Alianza Atlético', null, null, '2026-04-19T15:00:00-05:00'], [12, 'Sport Boys', 'Juan Pablo II', null, null, '2026-04-19T15:00:00-05:00'], [12, 'CD Moquegua', 'FC Cajamarca', null, null, '2026-04-19T15:00:00-05:00'], [12, 'Comerciantes Unidos', 'Sporting Cristal', null, null, '2026-04-19T15:00:00-05:00'],
-  [13, 'Juan Pablo II', 'Universitario', null, null, '2026-04-26T15:00:00-05:00'], [13, 'Alianza Atlético', 'Sport Huancayo', null, null, '2026-04-26T15:00:00-05:00'], [13, 'ADT', 'Atlético Grau', null, null, '2026-04-26T15:00:00-05:00'], [13, 'FBC Melgar', 'UTC', null, null, '2026-04-26T15:00:00-05:00'], [13, 'Alianza Lima', 'CD Moquegua', null, null, '2026-04-26T15:00:00-05:00'], [13, 'Cienciano', 'Comerciantes Unidos', null, null, '2026-04-26T15:00:00-05:00'], [13, 'Sporting Cristal', 'Cusco FC', null, null, '2026-04-26T15:00:00-05:00'], [13, 'FC Cajamarca', 'Sport Boys', null, null, '2026-04-26T15:00:00-05:00'], [13, 'Los Chankas', 'Deportivo Garcilaso', null, null, '2026-04-26T15:00:00-05:00'],
-  [14, 'Cusco FC', 'Los Chankas', null, null, '2026-05-03T15:00:00-05:00'], [14, 'UTC', 'FC Cajamarca', null, null, '2026-05-03T15:00:00-05:00'], [14, 'Alianza Lima', 'Sporting Cristal', null, null, '2026-05-03T15:00:00-05:00'], [14, 'Deportivo Garcilaso', 'Alianza Atlético', null, null, '2026-05-03T15:00:00-05:00'], [14, 'Sport Huancayo', 'Juan Pablo II', null, null, '2026-05-03T15:00:00-05:00'], [14, 'Atlético Grau', 'Cienciano', null, null, '2026-05-03T15:00:00-05:00'], [14, 'Sport Boys', 'Universitario', null, null, '2026-05-03T15:00:00-05:00'], [14, 'CD Moquegua', 'ADT', null, null, '2026-05-03T15:00:00-05:00'], [14, 'Comerciantes Unidos', 'FBC Melgar', null, null, '2026-05-03T15:00:00-05:00'],
-  [15, 'Juan Pablo II', 'Alianza Atlético', null, null, '2026-05-10T15:00:00-05:00'], [15, 'ADT', 'Comerciantes Unidos', null, null, '2026-05-10T15:00:00-05:00'], [15, 'FBC Melgar', 'Sport Huancayo', null, null, '2026-05-10T15:00:00-05:00'], [15, 'Cienciano', 'Alianza Lima', null, null, '2026-05-10T15:00:00-05:00'], [15, 'Deportivo Garcilaso', 'UTC', null, null, '2026-05-10T15:00:00-05:00'], [15, 'Universitario', 'Atlético Grau', null, null, '2026-05-10T15:00:00-05:00'], [15, 'FC Cajamarca', 'Sporting Cristal', null, null, '2026-05-10T15:00:00-05:00'], [15, 'Los Chankas', 'CD Moquegua', null, null, '2026-05-10T15:00:00-05:00'], [15, 'Sport Boys', 'Cusco FC', null, null, '2026-05-10T15:00:00-05:00'],
-  [16, 'Cusco FC', 'Atlético Grau', null, null, '2026-05-17T15:00:00-05:00'], [16, 'Juan Pablo II', 'FBC Melgar', null, null, '2026-05-17T15:00:00-05:00'], [16, 'Alianza Atlético', 'FC Cajamarca', null, null, '2026-05-17T15:00:00-05:00'], [16, 'UTC', 'Sport Boys', null, null, '2026-05-17T15:00:00-05:00'], [16, 'Alianza Lima', 'Los Chankas', null, null, '2026-05-17T15:00:00-05:00'], [16, 'Sport Huancayo', 'Cienciano', null, null, '2026-05-17T15:00:00-05:00'], [16, 'Sporting Cristal', 'ADT', null, null, '2026-05-17T15:00:00-05:00'], [16, 'CD Moquegua', 'Universitario', null, null, '2026-05-17T15:00:00-05:00'], [16, 'Comerciantes Unidos', 'Deportivo Garcilaso', null, null, '2026-05-17T15:00:00-05:00'],
-  [17, 'ADT', 'Cusco FC', null, null, '2026-05-24T15:00:00-05:00'], [17, 'FBC Melgar', 'Alianza Atlético', null, null, '2026-05-24T15:00:00-05:00'], [17, 'Cienciano', 'Sporting Cristal', null, null, '2026-05-24T15:00:00-05:00'], [17, 'Deportivo Garcilaso', 'Juan Pablo II', null, null, '2026-05-24T15:00:00-05:00'], [17, 'Atlético Grau', 'CD Moquegua', null, null, '2026-05-24T15:00:00-05:00'], [17, 'Universitario', 'Sport Huancayo', null, null, '2026-05-24T15:00:00-05:00'], [17, 'FC Cajamarca', 'Alianza Lima', null, null, '2026-05-24T15:00:00-05:00'], [17, 'Los Chankas', 'UTC', null, null, '2026-05-24T15:00:00-05:00'], [17, 'Sport Boys', 'Comerciantes Unidos', null, null, '2026-05-24T15:00:00-05:00']
-].map(p => ({ Fecha_Global: p[0], Torneo: 'Apertura', Local: normalizarEquipoListado(p[1]), Visitante: normalizarEquipoListado(p[2]), GL: p[3], GV: p[4], Timestamp: p[5] }));
-
 export default function Home() {
   const [temporada, setTemporada] = useState('2026');
   
-  // ======================= LÓGICA PORTADA RÁPIDA (Hoy/Mañana) =======================
-  const fechaReferenciaContexto = useMemo(() => new Date('2026-03-29T00:00:00-05:00'), []);
+  // ======================= ESTADOS DE LA API DE PORTADA =======================
   const [filtroFechaPortada, setFiltroFechaPortada] = useState('HOY');
+  const [partidosPortadaListado, setPartidosPortadaListado] = useState([]);
+  const [cargandoApi, setCargandoApi] = useState(false);
+  const [errorApi, setErrorApi] = useState(null);
 
-  const partidosPortadaListado = useMemo(() => {
-    const ayer = new Date(fechaReferenciaContexto); ayer.setDate(ayer.getDate() - 1);
-    const manana = new Date(fechaReferenciaContexto); manana.setDate(manana.getDate() + 1);
+  // FECHA REAL DEL USUARIO (Sacada de su dispositivo)
+  const fechaHoy = useMemo(() => new Date(), []);
 
-    const targetDate = filtroFechaPortada === 'AYER' ? ayer : filtroFechaPortada === 'MAÑANA' ? manana : fechaReferenciaContexto;
+  // FUNCIÓN PARA LLAMAR A LA API CUANDO CAMBIA EL FILTRO DE AYER/HOY/MAÑANA
+  useEffect(() => {
+    const fetchPartidos = async () => {
+      // 1. Calculamos qué fecha exacta pedirle a la API
+      const targetDate = new Date(fechaHoy);
+      if (filtroFechaPortada === 'AYER') targetDate.setDate(targetDate.getDate() - 1);
+      if (filtroFechaPortada === 'MAÑANA') targetDate.setDate(targetDate.getDate() + 1);
+      
+      // Formato requerido por la API: YYYYMMDD (Ej: 20260329)
+      const year = targetDate.getFullYear();
+      const month = String(targetDate.getMonth() + 1).padStart(2, '0');
+      const day = String(targetDate.getDate()).padStart(2, '0');
+      const formattedDate = `${year}${month}${day}`;
 
-    return partidos2026Base
-      .filter(p => p.Timestamp)
-      .filter(p => {
-        const pDate = new Date(p.Timestamp);
-        return pDate.getFullYear() === targetDate.getFullYear() &&
-               pDate.getMonth() === targetDate.getMonth() &&
-               pDate.getDate() === targetDate.getDate();
-      })
-      .map(p => {
-        const timeStr = p.Timestamp.split('T')[1].substring(0, 5); 
-        return { ...p, HoraVisual: timeStr };
-      })
-      .sort((a, b) => new Date(a.Timestamp) - new Date(b.Timestamp));
-  }, [filtroFechaPortada, fechaReferenciaContexto]);
+      setCargandoApi(true);
+      setErrorApi(null);
 
-  // FUNCIONES PARA DETECTAR RESULTADOS DE MESA (2023)
+      try {
+        // 2. Llamada real a la API
+        const response = await fetch(`https://${API_HOST}/football-get-matches-by-date?date=${formattedDate}`, {
+          method: 'GET',
+          headers: {
+            'x-rapidapi-host': API_HOST,
+            'x-rapidapi-key': API_KEY, // USA LA LLAVE QUE PUSISTE ARRIBA
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error('Error en la conexión a la API');
+        }
+
+        const data = await response.json();
+
+        // 3. Procesar y filtrar los datos para sacar solo la Liga 1 de Perú
+        if (data.status === 'success' && data.response && data.response.matches) {
+          
+          // Filtramos buscando el ID de la Liga 1 (131)
+          const partidosPeru = data.response.matches.filter(
+            partido => String(partido.leagueId) === String(LIGA_ID)
+          );
+
+          // Formateamos los datos recibidos para que nuestra web los entienda
+          const partidosMapeados = partidosPeru.map(p => {
+            // Extraer solo la hora de "08.11.2023 18:45"
+            const horaCompleta = p.time.split(' ')[1]; // "18:45"
+            
+            // Reutilizamos tu lógica normalizando los nombres para asegurar los escudos
+            return {
+              Local: normalizarEquipoListado(p.home.name),
+              Visitante: normalizarEquipoListado(p.away.name),
+              GL: p.statusId === 6 || p.statusId === 7 ? p.home.score : null, // Si terminó (6) u otros estados finales
+              GV: p.statusId === 6 || p.statusId === 7 ? p.away.score : null,
+              HoraVisual: horaCompleta,
+              EstadoApi: p.statusId // Guardamos el estado crudo para futuras lógicas (en vivo, etc)
+            };
+          });
+
+          setPartidosPortadaListado(partidosMapeados);
+        } else {
+           setPartidosPortadaListado([]); // Si no hay partidos, lista vacía
+        }
+
+      } catch (error) {
+        console.error("Error cargando partidos:", error);
+        setErrorApi(error.message);
+      } finally {
+        setCargandoApi(false);
+      }
+    };
+
+    // Si estás en la temporada actual (2026 en este caso), activa la API.
+    // Si estás viendo 2023 o 2018, no pedimos nada a la API para no gastar peticiones en vano.
+    if (temporada === '2026') {
+      fetchPartidos();
+    }
+  }, [filtroFechaPortada, fechaHoy, temporada]);
+
+  // ======================= FUNCIONES TABLAS HISTÓRICAS =======================
   const esWalkover = (p) => {
     if (temporada === '2023' && p.Torneo === 'Apertura' && p.Jornada_Oficial === 3) {
       return (p.Local === 'Cusco FC' && p.Visitante === 'Sport Huancayo') ||
@@ -233,7 +254,7 @@ export default function Home() {
         return { Fecha_Global: p[0], Jornada_Oficial: p[0], Torneo: 'Descentralizado', Local: normalizarEquipoListado(p[1]), Visitante: normalizarEquipoListado(p[2]), GL: gl, GV: gv };
       });
     }
-    return partidos2026Base.map(p => ({ ...p, Jornada_Oficial: p.Fecha_Global }));
+    return []; // La tabla 2026 inferior se llenará en el futuro
   }, [temporada]);
   
   const [fecha, setFecha] = useState(8); 
@@ -274,11 +295,15 @@ export default function Home() {
 
     partidos.forEach(p => {
       let isConcedidoMatch = esConcedido(p);
+
       if ((p.GL === null || p.GV === null) && !isConcedidoMatch) return; 
 
       let gl = p.GL !== null ? p.GL : 0;
       let gv = p.GV !== null ? p.GV : 0;
-      let ptsLocal = 0; let ptsVisita = 0; let rLocal = ''; let rVisita = '';
+      let ptsLocal = 0;
+      let ptsVisita = 0;
+      let rLocal = '';
+      let rVisita = '';
 
       if (isConcedidoMatch) {
         if (p.Local === 'Municipal') {
@@ -294,14 +319,24 @@ export default function Home() {
       }
 
       if (tabla[p.Local]) {
-        tabla[p.Local].pj++; tabla[p.Local].gf += gl; tabla[p.Local].gc += gv; tabla[p.Local].pts += ptsLocal;
-        if (rLocal === 'V') tabla[p.Local].g++; else if (rLocal === 'D') tabla[p.Local].p++; else tabla[p.Local].e++;
+        tabla[p.Local].pj++;
+        tabla[p.Local].gf += gl;
+        tabla[p.Local].gc += gv;
+        tabla[p.Local].pts += ptsLocal;
+        if (rLocal === 'V') tabla[p.Local].g++;
+        else if (rLocal === 'D') tabla[p.Local].p++;
+        else tabla[p.Local].e++;
         tabla[p.Local].racha.push(rLocal);
       }
       
       if (tabla[p.Visitante]) {
-        tabla[p.Visitante].pj++; tabla[p.Visitante].gf += gv; tabla[p.Visitante].gc += gl; tabla[p.Visitante].pts += ptsVisita;
-        if (rVisita === 'V') tabla[p.Visitante].g++; else if (rVisita === 'D') tabla[p.Visitante].p++; else tabla[p.Visitante].e++;
+        tabla[p.Visitante].pj++;
+        tabla[p.Visitante].gf += gv;
+        tabla[p.Visitante].gc += gl;
+        tabla[p.Visitante].pts += ptsVisita;
+        if (rVisita === 'V') tabla[p.Visitante].g++;
+        else if (rVisita === 'D') tabla[p.Visitante].p++;
+        else tabla[p.Visitante].e++;
         tabla[p.Visitante].racha.push(rVisita);
       }
     });
@@ -309,24 +344,30 @@ export default function Home() {
     return Object.values(tabla)
       .map(t => {
         let finalPts = t.pts;
+        
         if (temporada === '2018' && esAcumulado && fecha >= 44) {
           if (t.equipo === 'Sporting Cristal') finalPts += 2;
           if (t.equipo === 'Sport Rosario') finalPts -= 7;
           if (['Dep. Municipal', 'UTC', 'Cantolao'].includes(t.equipo)) finalPts -= 2;
           if (t.equipo === 'Universitario') finalPts -= 1;
         }
+        
         if (temporada === '2013') {
           if (esAcumulado && fecha >= 31) {
             if (t.equipo === 'U. San Martin') finalPts += 2; 
             if (t.equipo === 'Alianza Lima') finalPts += 1;  
           }
-          if (fecha >= 5 && t.equipo === 'Cusco (Garcilaso)') finalPts -= 1;
+          if (fecha >= 5 && t.equipo === 'Cusco (Garcilaso)') {
+            finalPts -= 1;
+          }
         }
+        
         if (temporada === '2023' && esAcumulado && fecha >= 38) {
           if (t.equipo === 'Deportivo Garcilaso') finalPts -= 1;
           if (t.equipo === 'Sport Boys') finalPts -= 4;
           if (t.equipo === 'Municipal' || t.equipo === 'Dep. Municipal') finalPts -= 5;
         }
+
         return { ...t, pts: finalPts, dif: t.gf - t.gc, ultimas: t.racha.slice(-5).reverse() };
       })
       .sort((a, b) => b.pts - a.pts || b.dif - a.dif || b.gf - a.gf);
@@ -521,83 +562,102 @@ export default function Home() {
         )}
       </div>
 
-      {/* PORTADA RÁPIDA (Hoy/Mañana) */}
-      <main className="max-w-[1250px] mx-auto p-4 pt-0 mb-[-15px]">
-        <div className="bg-white border border-[#d1e0d7] rounded-[8px] overflow-hidden shadow-lg mb-[20px] pb-1">
-          <div className="bg-[#e5eee9] p-[10px] flex items-center gap-2 border-b border-[#d1e0d7]">
-            <img src="https://tmssl.akamaized.net//images/holding/head/pe.png" alt="Bandera Perú" className="w-[18px] h-auto object-contain" />
-            <h3 className="text-[15px] font-bold uppercase m-0 flex items-center gap-1" style={{ color: '#000000' }}>
-              <span style={{color: '#8cc63f'}}>•</span> PARTIDOS DESTACADOS (LIGA 1 2026)
-            </h3>
-          </div>
-          
-          <div className="p-[10px] flex justify-center gap-[10px] border-b border-[#d1e0d7]">
-            {['AYER', 'HOY', 'MAÑANA'].map(f => {
-              const dateObj = new Date(fechaReferenciaContexto);
-              if (f === 'AYER') dateObj.setDate(dateObj.getDate() - 1);
-              if (f === 'MAÑANA') dateObj.setDate(dateObj.getDate() + 1);
-              const labelDate = `${dateObj.getDate()} ${dateObj.toLocaleString('es-ES', { month: 'short' }).toUpperCase()}`;
-              
-              return (
-                <button 
-                  key={f}
-                  onClick={() => setFiltroFechaPortada(f)}
-                  className={`flex flex-col items-center px-[20px] py-[8px] rounded-[4px] font-bold text-[12px] cursor-pointer transition-colors border outline-none ${filtroFechaPortada === f ? 'bg-[#fbbf24] text-black border-[#fbbf24]' : 'bg-[#f8fbf9] text-[#6b7280] border-[#d1e0d7] hover:border-[#fbbf24]'}`}
-                >
-                  <span>{f}</span>
-                  <span className="font-normal opacity-80 text-[10px]">{labelDate}</span>
-                </button>
-              );
-            })}
-          </div>
-
-          <div className="flex flex-col">
-            {partidosPortadaListado.length === 0 ? (
-              <div className="text-center text-[12px] p-[20px]" style={{ color: '#6b7280' }}>No hay partidos registrados para {filtroFechaPortada === 'HOY' ? 'hoy' : filtroFechaPortada === 'MAÑANA' ? 'mañana' : 'ayer'} según el fixture.</div>
-            ) : (
-              partidosPortadaListado.map((p, idx) => {
-                const esWO = esWalkover(p);
-                const esConc = esConcedido(p);
-                const teamGanador = ganadorMesa(p);
-
+      {/* PORTADA RÁPIDA CON API EN VIVO */}
+      {temporada === '2026' && (
+        <main className="max-w-[1250px] mx-auto p-4 pt-0 mb-[-15px]">
+          <div className="bg-white border border-[#d1e0d7] rounded-[8px] overflow-hidden shadow-lg mb-[20px] pb-1">
+            <div className="bg-[#e5eee9] p-[10px] flex items-center justify-between border-b border-[#d1e0d7]">
+              <div className="flex items-center gap-2">
+                <img src="https://tmssl.akamaized.net//images/holding/head/pe.png" alt="Bandera Perú" className="w-[18px] h-auto object-contain" />
+                <h3 className="text-[15px] font-bold uppercase m-0 flex items-center gap-1" style={{ color: '#000000' }}>
+                  <span style={{color: '#8cc63f'}} className={cargandoApi ? 'animate-pulse' : ''}>•</span> PARTIDOS DESTACADOS (LIGA 1 EN VIVO)
+                </h3>
+              </div>
+            </div>
+            
+            <div className="p-[10px] flex justify-center gap-[10px] border-b border-[#d1e0d7]">
+              {['AYER', 'HOY', 'MAÑANA'].map(f => {
+                const dateObj = new Date(fechaHoy);
+                if (f === 'AYER') dateObj.setDate(dateObj.getDate() - 1);
+                if (f === 'MAÑANA') dateObj.setDate(dateObj.getDate() + 1);
+                const labelDate = `${dateObj.getDate()} ${dateObj.toLocaleString('es-ES', { month: 'short' }).toUpperCase()}`;
+                
                 return (
-                  <div key={idx} className={`flex justify-between items-center py-[10px] px-[15px] border-b border-[#d1e0d7] hover:bg-[#f8fbf9] transition-colors ${idx % 2 === 0 ? 'bg-transparent' : 'bg-[#fcfdfc]'}`}>
-                    <div className="flex flex-col justify-center items-center w-[45px] text-center">
-                      <span className="text-[13px] font-black text-[#8cc63f]">{p.HoraVisual}</span>
-                      <span className="text-[9px] font-bold" style={{ color: '#6b7280' }}>
-                        {temporada === '2026' ? 'LIGA 1' : 'APERTURA'}
-                      </span>
-                    </div>
-                    <div className="flex items-center w-[85%] justify-center">
-                      <span className={`text-right w-[40%] text-[13px] font-bold truncate ${teamGanador === p.Local ? 'underline decoration-2 underline-offset-2 text-[#8cc63f]' : ''}`} style={{ color: teamGanador === p.Local ? '#000000' : '#000000' }}>{p.Local}</span>
-                      <img src={logos[p.Local] || 'https://cdn-icons-png.flaticon.com/128/33/33736.png'} style={{ width: '22px', height: '22px', minWidth: '22px', objectFit: 'contain', margin: '0 8px' }} />
-                      
-                      <div className="flex items-center justify-center gap-[3px] mx-[8px] min-w-[75px]">
-                        {esWO ? (
-                          <div className="text-[#d32f2f] text-[10px] font-black w-[50px] text-center leading-[11px]">WALK<br/>OVER</div>
-                        ) : esConc ? (
-                          <div className="text-[#d32f2f] text-[10px] font-black w-[50px] text-center leading-[11px]">CONCE<br/>DIDO</div>
-                        ) : p.GL !== null && p.GV !== null ? (
-                          <>
-                            <div className="bg-[#e5eee9] border border-[#d1e0d7] rounded-[4px] font-bold text-[16px] w-[30px] h-[30px] flex items-center justify-center" style={{ color: '#000000' }}>{p.GL}</div>
-                            <div className="font-bold text-[16px]" style={{ color: '#8cc63f' }}>-</div>
-                            <div className="bg-[#e5eee9] border border-[#d1e0d7] rounded-[4px] font-bold text-[16px] w-[30px] h-[30px] flex items-center justify-center" style={{ color: '#000000' }}>{p.GV}</div>
-                          </>
-                        ) : (
-                          <div className="font-bold text-[13px]" style={{ color: '#8cc63f' }}>VS</div>
-                        )}
-                      </div>
-                      
-                      <img src={logos[p.Visitante] || 'https://cdn-icons-png.flaticon.com/128/33/33736.png'} style={{ width: '22px', height: '22px', minWidth: '22px', objectFit: 'contain', margin: '0 8px' }} />
-                      <span className={`text-left w-[40%] text-[13px] font-bold truncate ${teamGanador === p.Visitante ? 'underline decoration-2 underline-offset-2 text-[#8cc63f]' : ''}`} style={{ color: teamGanador === p.Visitante ? '#000000' : '#000000' }}>{p.Visitante}</span>
-                    </div>
-                  </div>
+                  <button 
+                    key={f}
+                    onClick={() => setFiltroFechaPortada(f)}
+                    disabled={cargandoApi}
+                    className={`flex flex-col items-center px-[20px] py-[8px] rounded-[4px] font-bold text-[12px] transition-colors border outline-none ${cargandoApi ? 'opacity-50 cursor-wait' : 'cursor-pointer'} ${filtroFechaPortada === f ? 'bg-[#fbbf24] text-black border-[#fbbf24]' : 'bg-[#f8fbf9] text-[#6b7280] border-[#d1e0d7] hover:border-[#fbbf24]'}`}
+                  >
+                    <span>{f}</span>
+                    <span className="font-normal opacity-80 text-[10px]">{labelDate}</span>
+                  </button>
                 );
-              })
-            )}
+              })}
+            </div>
+
+            <div className="flex flex-col min-h-[100px] justify-center">
+              {cargandoApi ? (
+                <div className="text-center text-[12px] p-[20px]" style={{ color: '#8cc63f' }}>Cargando conexión con el estadio... ⚽</div>
+              ) : errorApi ? (
+                <div className="text-center text-[12px] p-[20px] text-[#d32f2f]">Error de conexión: Verifica tu API KEY.</div>
+              ) : partidosPortadaListado.length === 0 ? (
+                <div className="text-center text-[12px] p-[20px]" style={{ color: '#6b7280' }}>No hay partidos de Liga 1 programados para {filtroFechaPortada.toLowerCase()}.</div>
+              ) : (
+                partidosPortadaListado.map((p, idx) => {
+                  
+                  // Lógica visual básica según el estado del partido
+                  let infoCentro = <div className="font-bold text-[13px]" style={{ color: '#8cc63f' }}>VS</div>;
+                  let colorHora = '#6b7280';
+                  let textoHora = p.HoraVisual;
+
+                  if (p.GL !== null && p.GV !== null) {
+                    // Si ya tiene goles
+                    infoCentro = (
+                      <>
+                        <div className="bg-[#e5eee9] border border-[#d1e0d7] rounded-[4px] font-bold text-[16px] w-[30px] h-[30px] flex items-center justify-center" style={{ color: '#000000' }}>{p.GL}</div>
+                        <div className="font-bold text-[16px]" style={{ color: '#8cc63f' }}>-</div>
+                        <div className="bg-[#e5eee9] border border-[#d1e0d7] rounded-[4px] font-bold text-[16px] w-[30px] h-[30px] flex items-center justify-center" style={{ color: '#000000' }}>{p.GV}</div>
+                      </>
+                    );
+                    
+                    // Si el estado no es 6 (Finalizado) o 7 (Cancelado/etc), asumimos EN VIVO
+                    if (p.EstadoApi !== 6 && p.EstadoApi !== 7) {
+                      colorHora = '#d32f2f'; // Rojo
+                      textoHora = "EN VIVO";
+                    } else {
+                       colorHora = '#000000'; // Negro, ya terminó
+                       textoHora = "Final";
+                    }
+                  }
+
+                  const ganador = p.GL > p.GV ? p.Local : (p.GL < p.GV ? p.Visitante : null);
+
+                  return (
+                    <div key={idx} className={`flex justify-between items-center py-[10px] px-[15px] border-b border-[#d1e0d7] hover:bg-[#f8fbf9] transition-colors ${idx % 2 === 0 ? 'bg-transparent' : 'bg-[#fcfdfc]'}`}>
+                      <div className="flex flex-col justify-center items-center w-[45px] text-center">
+                        <span className={`text-[13px] font-black ${textoHora === 'EN VIVO' ? 'animate-pulse' : ''}`} style={{color: colorHora}}>{textoHora}</span>
+                        {textoHora !== p.HoraVisual && <span className="text-[9px] font-bold text-[#6b7280]">{p.HoraVisual}</span>}
+                      </div>
+                      <div className="flex items-center w-[85%] justify-center">
+                        <span className={`text-right w-[40%] text-[13px] font-bold truncate ${ganador === p.Local ? 'underline decoration-2 underline-offset-2 text-[#8cc63f]' : ''}`} style={{ color: '#000000' }}>{p.Local}</span>
+                        <img src={logos[p.Local] || 'https://cdn-icons-png.flaticon.com/128/33/33736.png'} style={{ width: '22px', height: '22px', minWidth: '22px', objectFit: 'contain', margin: '0 8px' }} />
+                        
+                        <div className="flex items-center justify-center gap-[3px] mx-[8px] min-w-[75px]">
+                          {infoCentro}
+                        </div>
+                        
+                        <img src={logos[p.Visitante] || 'https://cdn-icons-png.flaticon.com/128/33/33736.png'} style={{ width: '22px', height: '22px', minWidth: '22px', objectFit: 'contain', margin: '0 8px' }} />
+                        <span className={`text-left w-[40%] text-[13px] font-bold truncate ${ganador === p.Visitante ? 'underline decoration-2 underline-offset-2 text-[#8cc63f]' : ''}`} style={{ color: '#000000' }}>{p.Visitante}</span>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
           </div>
-        </div>
-      </main>
+        </main>
+      )}
 
       {/* MENÚ DE NAVEGACIÓN (TABS) */}
       <nav className="w-full mb-6 mt-4 border-b border-[#d1e0d7]">
@@ -735,7 +795,7 @@ export default function Home() {
                     const teamGanador = ganadorMesa(p);
 
                     return (
-                      <div key={idx} className={`flex justify-between items-center py-[8px] px-[10px] border-b border-[#d1e0d7] hover:bg-[#f8fbf9] transition-colors ${idx % 2 === 0 ? 'bg-transparent' : 'bg-[#fcfdfc]'}`}>
+                      <div key={idx} className={`flex justify-between items-center py-[8px] px-[10px] border-t border-[#d1e0d7] hover:bg-[#f8fbf9] transition-colors ${idx % 2 === 0 ? 'bg-transparent' : 'bg-[#fcfdfc]'}`}>
                         <div className="flex flex-col justify-center items-center w-[35px]">
                           <span className="text-[10px] font-bold" style={{ color: '#6b7280' }}>
                             {temporada === '2023' && (p.Torneo === 'Clausura' || p.Torneo === 'Final') 
@@ -788,7 +848,7 @@ export default function Home() {
                 {Object.keys(logos)
                   .sort()
                   .filter(eq => {
-                    if (temporada === '2026') return partidos2026Base.some(p => p.Local === eq || p.Visitante === eq);
+                    if (temporada === '2026') return partidos2026JSON.some(p => p.Local === eq || p.Visitante === eq);
                     if (temporada === '2018') return equipo_A_2018.includes(eq) || equipo_B_2018.includes(eq);
                     if (temporada === '2013') return liguillaA_2013.includes(eq) || liguillaB_2013.includes(eq);
                     if (temporada === '2023') {
