@@ -60,10 +60,10 @@ export default function Home() {
 
   const esConcedido = (p) => {
     if (temporada === '2023' && p.Torneo === 'Clausura') {
-      // Carlos Mannucci vs Municipal (Jornada 3)
-      if (p.Jornada_Oficial === 3 && p.Local === 'Carlos Mannucci' && p.Visitante === 'Municipal') return true;
-      // Municipal vs Atlético Grau (Jornada 8)
-      if (p.Jornada_Oficial === 8 && p.Local === 'Municipal' && p.Visitante === 'Atlético Grau') return true;
+      // Carlos Mannucci vs Municipal (Jornada 3 del Clausura = Fecha Global 22)
+      if (p.Jornada_Oficial === 22 && p.Local === 'Carlos Mannucci' && p.Visitante === 'Municipal') return true;
+      // Municipal vs Atlético Grau (Jornada 8 del Clausura = Fecha Global 27)
+      if (p.Jornada_Oficial === 27 && p.Local === 'Municipal' && p.Visitante === 'Atlético Grau') return true;
     }
     return false;
   };
@@ -437,7 +437,7 @@ export default function Home() {
                   </span>
                 </div>
                 <div className="flex items-center w-[85%] justify-center">
-                  <span className={`text-right w-[40%] text-[12px] font-bold truncate ${teamGanador === p.Local ? 'underline decoration-2 underline-offset-2' : ''}`} style={{ color: '#000000' }}>{p.Local}</span>
+                  <span className={`text-right w-[40%] text-[12px] font-bold truncate ${teamGanador === p.Local ? 'underline decoration-2 underline-offset-2 text-[#8cc63f]' : ''}`} style={{ color: teamGanador === p.Local ? '#000000' : '#000000' }}>{p.Local}</span>
                   <img src={logos[p.Local] || 'https://cdn-icons-png.flaticon.com/128/33/33736.png'} style={{ width: '18px', height: '18px', minWidth: '18px', objectFit: 'contain', margin: '0 5px' }} />
                   
                   <div className="flex items-center justify-center gap-[2px] mx-[5px] min-w-[65px]">
@@ -457,7 +457,7 @@ export default function Home() {
                   </div>
                   
                   <img src={logos[p.Visitante] || 'https://cdn-icons-png.flaticon.com/128/33/33736.png'} style={{ width: '18px', height: '18px', minWidth: '18px', objectFit: 'contain', margin: '0 5px' }} />
-                  <span className={`text-left w-[40%] text-[12px] font-bold truncate ${teamGanador === p.Visitante ? 'underline decoration-2 underline-offset-2' : ''}`} style={{ color: '#000000' }}>{p.Visitante}</span>
+                  <span className={`text-left w-[40%] text-[12px] font-bold truncate ${teamGanador === p.Visitante ? 'underline decoration-2 underline-offset-2 text-[#8cc63f]' : ''}`} style={{ color: teamGanador === p.Visitante ? '#000000' : '#000000' }}>{p.Visitante}</span>
                 </div>
               </div>
             );
@@ -636,7 +636,7 @@ export default function Home() {
                           </span>
                         </div>
                         <div className="flex items-center w-[85%] justify-center">
-                          <span className={`text-right w-[40%] text-[12px] font-bold truncate ${teamGanador === p.Local ? 'underline decoration-2 underline-offset-2' : ''}`} style={{ color: '#000000' }}>{p.Local}</span>
+                          <span className={`text-right w-[40%] text-[12px] font-bold truncate ${teamGanador === p.Local ? 'underline decoration-2 underline-offset-2 text-[#8cc63f]' : ''}`} style={{ color: teamGanador === p.Local ? '#000000' : '#000000' }}>{p.Local}</span>
                           <img src={logos[p.Local] || 'https://cdn-icons-png.flaticon.com/128/33/33736.png'} style={{ width: '18px', height: '18px', minWidth: '18px', objectFit: 'contain', margin: '0 5px' }} />
                           
                           <div className="flex items-center justify-center gap-[2px] mx-[5px] min-w-[65px]">
@@ -656,7 +656,7 @@ export default function Home() {
                           </div>
                           
                           <img src={logos[p.Visitante] || 'https://cdn-icons-png.flaticon.com/128/33/33736.png'} style={{ width: '18px', height: '18px', minWidth: '18px', objectFit: 'contain', margin: '0 5px' }} />
-                          <span className={`text-left w-[40%] text-[12px] font-bold truncate ${teamGanador === p.Visitante ? 'underline decoration-2 underline-offset-2' : ''}`} style={{ color: '#000000' }}>{p.Visitante}</span>
+                          <span className={`text-left w-[40%] text-[12px] font-bold truncate ${teamGanador === p.Visitante ? 'underline decoration-2 underline-offset-2 text-[#8cc63f]' : ''}`} style={{ color: teamGanador === p.Visitante ? '#000000' : '#000000' }}>{p.Visitante}</span>
                         </div>
                       </div>
                     );
