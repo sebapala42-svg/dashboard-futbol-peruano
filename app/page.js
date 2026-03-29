@@ -7,13 +7,13 @@ import partidos2023JSON from './torneo_2023.json';
 const listaPartidos2018 = Array.isArray(partidosJSON) ? partidosJSON : (partidosJSON.BaseDatos || Object.values(partidosJSON)[0] || []);
 
 // EL TRADUCTOR DE EQUIPOS: Normaliza los nombres para que el código siempre use el mismo
-const normalizarEquipo = (nombre) => {
+const normalizarEquipoListado = (nombre) => {
   const alias = {
     'Melgar': 'FBC Melgar',
     'César Vallejo': 'Cesar Vallejo',
     'Cusco': 'Cusco FC',
-    'Comercio': 'Union Comercio'
-    // Puedes agregar más alias aquí si en el futuro aparece otro equipo mal escrito
+    'Comercio': 'Union Comercio',
+    'Binacional': 'Dep. Binacional'
   };
   return alias[nombre] || nombre;
 };
@@ -46,7 +46,7 @@ const logos = {
   'U. San Martin': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcROfQWRTSLDENcZLhqUcuH2MNeOyHkGsCnxeQ&s',
   'Union Comercio': 'https://tmssl.akamaized.net//images/wappen/head/31337.png',
   'Ayacucho FC': 'https://tmssl.akamaized.net//images/wappen/head/21178.png',
-  'Binacional': 'https://tmssl.akamaized.net//images/wappen/head/41054.png',
+  'Dep. Binacional': 'https://tmssl.akamaized.net//images/wappen/head/41054.png',
   'Leon de Huanuco': 'https://tmssl.akamaized.net//images/wappen/big/25774.png?lm=1424441686',
   'Pacifico FC': 'https://tmssl.akamaized.net//images/wappen/head/37579.png?lm=1749433973',
   'Jose Galvez': 'https://tmssl.akamaized.net//images/wappen/head/16700.png?lm=1699653454',
@@ -68,7 +68,7 @@ const historial_datos = [
   { Año: "2025", Campeón: "Universitario" }, { Año: "2024", Campeón: "Universitario" },
   { Año: "2023", Campeón: "Universitario" }, { Año: "2022", Campeón: "Alianza Lima" },
   { Año: "2021", Campeón: "Alianza Lima" }, { Año: "2020", Campeón: "Sporting Cristal" },
-  { Año: "2019", Campeón: "Binacional" }, { Año: "2018", Campeón: "Sporting Cristal" },
+  { Año: "2019", Campeón: "Dep. Binacional" }, { Año: "2018", Campeón: "Sporting Cristal" },
   { Año: "2017", Campeón: "Alianza Lima" }, { Año: "2016", Campeón: "Sporting Cristal" },
   { Año: "2015", Campeón: "FBC Melgar" }, { Año: "2014", Campeón: "Sporting Cristal" },
   { Año: "2013", Campeón: "Universitario" }, { Año: "2012", Campeón: "Sporting Cristal" }
@@ -78,56 +78,65 @@ const ranking_datos = [
   { Equipo: "Universitario", Títulos: 29 }, { Equipo: "Alianza Lima", Títulos: 25 },
   { Equipo: "Sporting Cristal", Títulos: 20 }, { Equipo: "Sport Boys", Títulos: 6 },
   { Equipo: "Dep. Municipal", Títulos: 4 }, { Equipo: "U. San Martin", Títulos: 3 },
-  { Equipo: "FBC Melgar", Títulos: 2 }, { Equipo: "Binacional", Títulos: 1 }
+  { Equipo: "FBC Melgar", Títulos: 2 }, { Equipo: "Dep. Binacional", Títulos: 1 }
 ];
 
 const equipo_A_2018 = ['Sporting Cristal', 'Sport Rosario', 'UTC', 'U. San Martin', 'Alianza Lima', 'Comerciantes Unidos', 'Ayacucho FC', 'Universitario'];
-const equipo_B_2018 = ['Sport Huancayo', 'FBC Melgar', 'Cantolao', 'Dep. Municipal', 'Sport Boys', 'Cusco (Garcilaso)', 'Binacional', 'Union Comercio'];
+const equipo_B_2018 = ['Sport Huancayo', 'FBC Melgar', 'Cantolao', 'Dep. Municipal', 'Sport Boys', 'Cusco (Garcilaso)', 'Dep. Binacional', 'Union Comercio'];
 
 const liguillaA_2013 = ['Cusco (Garcilaso)', 'Sporting Cristal', 'Alianza Lima', 'Cesar Vallejo', 'Sport Huancayo', 'FBC Melgar', 'Pacifico FC', 'Union Comercio'];
 const liguillaB_2013 = ['Universitario', 'UTC', 'Ayacucho FC', 'Juan Aurich', 'Cienciano', 'Leon de Huanuco', 'U. San Martin', 'Jose Galvez'];
 
-// EL TRADUCTOR DE EQUIPOS: Normaliza los nombres para que el código siempre use el mismo
-const normalizarEquipoListado = (nombre) => {
-  const alias = {
-    'Melgar': 'FBC Melgar',
-    'César Vallejo': 'Cesar Vallejo',
-    'Cusco': 'Cusco FC',
-    'Comercio': 'Union Comercio',
-    'Binacional': 'Dep. Binacional' // Ejemplo adicional
-    // Puedes agregar más alias aquí si en el futuro aparece otro equipo mal escrito
-  };
-  return alias[nombre] || nombre;
-};
-
 // ======================= DATA MOCKEADA TORNEO 2026 CON HORAS =======================
 // FECHA ACTUAL FIJADA: Domingo, 29 de Marzo del 2026
 const partidos2026Base = [
-  // ... ya jugados Fecha 1-7 (omitidos por brevedad, tienen marcadores)
-  
-  // FECHA 8 - AYER (Sábado 28 Marzo 2026) - Marcadores fijos
+  [1, 'Sport Huancayo', 'Alianza Lima', 1, 2, '2026-02-01T15:00:00-05:00'], [1, 'UTC', 'Atlético Grau', 2, 0, '2026-02-01T15:00:00-05:00'], [1, 'Comerciantes Unidos', 'CD Moquegua', 1, 0, '2026-02-01T15:00:00-05:00'],
+  [1, 'Sport Boys', 'Los Chankas', 1, 1, '2026-02-01T15:00:00-05:00'], [1, 'Juan Pablo II', 'FC Cajamarca', 3, 3, '2026-02-01T15:00:00-05:00'], [1, 'FBC Melgar', 'Cienciano', 2, 0, '2026-02-01T15:00:00-05:00'],
+  [1, 'Deportivo Garcilaso', 'Sporting Cristal', 1, 1, '2026-02-01T15:00:00-05:00'], [1, 'Alianza Atlético', 'Cusco FC', 1, 0, '2026-02-01T15:00:00-05:00'], [1, 'Universitario', 'ADT', 2, 0, '2026-02-01T15:00:00-05:00'],
+  [2, 'CD Moquegua', 'UTC', 2, 3, '2026-02-08T15:00:00-05:00'], [2, 'ADT', 'Sport Boys', 1, 0, '2026-02-08T15:00:00-05:00'], [2, 'Atlético Grau', 'Sport Huancayo', 0, 0, '2026-02-08T15:00:00-05:00'],
+  [2, 'Cusco FC', 'Universitario', 1, 1, '2026-02-08T15:00:00-05:00'], [2, 'Sporting Cristal', 'FBC Melgar', 1, 2, '2026-02-08T15:00:00-05:00'], [2, 'Los Chankas', 'Alianza Atlético', 1, 0, '2026-02-08T15:00:00-05:00'],
+  [2, 'Cienciano', 'Juan Pablo II', 6, 1, '2026-02-08T15:00:00-05:00'], [2, 'Alianza Lima', 'Comerciantes Unidos', 2, 1, '2026-02-08T15:00:00-05:00'], [2, 'FC Cajamarca', 'Deportivo Garcilaso', 1, 1, '2026-02-08T15:00:00-05:00'],
+  [3, 'UTC', 'Cusco FC', 1, 0, '2026-02-15T15:00:00-05:00'], [3, 'Universitario', 'Cienciano', 2, 1, '2026-02-15T15:00:00-05:00'], [3, 'Deportivo Garcilaso', 'ADT', 1, 0, '2026-02-15T15:00:00-05:00'],
+  [3, 'Juan Pablo II', 'Sporting Cristal', 0, 2, '2026-02-15T15:00:00-05:00'], [3, 'Sport Boys', 'Atlético Grau', 1, 0, '2026-02-15T15:00:00-05:00'], [3, 'Alianza Atlético', 'Alianza Lima', 0, 0, '2026-02-15T15:00:00-05:00'],
+  [3, 'Sport Huancayo', 'FC Cajamarca', 2, 0, '2026-02-15T15:00:00-05:00'], [3, 'Comerciantes Unidos', 'Los Chankas', 1, 1, '2026-02-15T15:00:00-05:00'], [3, 'FBC Melgar', 'CD Moquegua', 4, 0, '2026-02-15T15:00:00-05:00'],
+  [4, 'Alianza Lima', 'Sport Boys', 1, 0, '2026-02-22T15:00:00-05:00'], [4, 'FC Cajamarca', 'FBC Melgar', 3, 1, '2026-02-22T15:00:00-05:00'], [4, 'Sporting Cristal', 'Universitario', 2, 2, '2026-02-22T15:00:00-05:00'],
+  [4, 'Cienciano', 'Alianza Atlético', 1, 1, '2026-02-22T15:00:00-05:00'], [4, 'ADT', 'UTC', 2, 2, '2026-02-22T15:00:00-05:00'], [4, 'Los Chankas', 'Sport Huancayo', 3, 2, '2026-02-22T15:00:00-05:00'],
+  [4, 'Atlético Grau', 'Juan Pablo II', 1, 2, '2026-02-22T15:00:00-05:00'], [4, 'Cusco FC', 'Comerciantes Unidos', 3, 1, '2026-02-22T15:00:00-05:00'], [4, 'CD Moquegua', 'Deportivo Garcilaso', 1, 0, '2026-02-22T15:00:00-05:00'],
+  [5, 'Alianza Atlético', 'ADT', 0, 0, '2026-03-01T15:00:00-05:00'], [5, 'FBC Melgar', 'Los Chankas', 1, 2, '2026-03-01T15:00:00-05:00'], [5, 'Deportivo Garcilaso', 'Cienciano', 2, 3, '2026-03-01T15:00:00-05:00'],
+  [5, 'Sport Huancayo', 'Sporting Cristal', 2, 1, '2026-03-01T15:00:00-05:00'], [5, 'UTC', 'Alianza Lima', 0, 1, '2026-03-01T15:00:00-05:00'], [5, 'Sport Boys', 'CD Moquegua', 0, 0, '2026-03-01T15:00:00-05:00'],
+  [5, 'Comerciantes Unidos', 'Atlético Grau', 3, 1, '2026-03-01T15:00:00-05:00'], [5, 'Juan Pablo II', 'Cusco FC', 2, 1, '2026-03-01T15:00:00-05:00'], [5, 'Universitario', 'FC Cajamarca', 1, 0, '2026-03-01T15:00:00-05:00'],
+  [6, 'Atlético Grau', 'FC Cajamarca', 1, 0, '2026-03-08T15:00:00-05:00'], [6, 'CD Moquegua', 'Sport Huancayo', 2, 1, '2026-03-08T15:00:00-05:00'], [6, 'Comerciantes Unidos', 'UTC', 1, 2, '2026-03-08T15:00:00-05:00'],
+  [6, 'Sporting Cristal', 'Alianza Atlético', 3, 1, '2026-03-08T15:00:00-05:00'], [6, 'Cusco FC', 'Deportivo Garcilaso', 1, 0, '2026-03-08T15:00:00-05:00'], [6, 'ADT', 'Juan Pablo II', 2, 3, '2026-03-08T15:00:00-05:00'],
+  [6, 'Los Chankas', 'Universitario', 3, 1, '2026-03-08T15:00:00-05:00'], [6, 'Cienciano', 'Sport Boys', 3, 1, '2026-03-08T15:00:00-05:00'], [6, 'Alianza Lima', 'FBC Melgar', 3, 1, '2026-03-08T15:00:00-05:00'],
+  [7, 'FC Cajamarca', 'Comerciantes Unidos', 3, 4, '2026-03-15T15:00:00-05:00'], [7, 'Sport Huancayo', 'ADT', 0, 1, '2026-03-15T15:00:00-05:00'], [7, 'Juan Pablo II', 'Los Chankas', 2, 3, '2026-03-15T15:00:00-05:00'],
+  [7, 'Deportivo Garcilaso', 'Alianza Lima', 1, 1, '2026-03-15T15:00:00-05:00'], [7, 'Universitario', 'UTC', 2, 0, '2026-03-15T15:00:00-05:00'], [7, 'Sporting Cristal', 'Sport Boys', 3, 0, '2026-03-15T15:00:00-05:00'],
+  [7, 'FBC Melgar', 'Atlético Grau', 0, 0, '2026-03-15T15:00:00-05:00'], [7, 'Alianza Atlético', 'CD Moquegua', 3, 0, '2026-03-15T15:00:00-05:00'], [7, 'Cusco FC', 'Cienciano', 1, 2, '2026-03-15T15:00:00-05:00'],
   [8, 'ADT', 'FBC Melgar', 1, 1, '2026-03-28T13:00:00-05:00'], 
   [8, 'Cienciano', 'FC Cajamarca', 3, 0, '2026-03-28T15:30:00-05:00'],
   [8, 'CD Moquegua', 'Cusco FC', 1, 2, '2026-03-28T18:00:00-05:00'],
   [8, 'UTC', 'Alianza Atlético', 1, 1, '2026-03-28T19:00:00-05:00'],
-
-  // FECHA 9 - HOY (Domingo 29 Marzo 2026) - Sin marcadores (Próximos)
+  [8, 'Comerciantes Unidos', 'Universitario', 0, 0, '2026-03-21T15:00:00-05:00'], [8, 'Los Chankas', 'Sporting Cristal', 3, 2, '2026-03-21T15:00:00-05:00'], [8, 'Alianza Lima', 'Juan Pablo II', 2, 0, '2026-03-21T15:00:00-05:00'],
+  [8, 'Atlético Grau', 'Deportivo Garcilaso', 0, 0, '2026-03-21T15:00:00-05:00'], [8, 'Sport Boys', 'Sport Huancayo', 3, 0, '2026-03-21T15:00:00-05:00'],
   [9, 'Juan Pablo II', 'UTC', null, null, '2026-03-29T13:00:00-05:00'],
   [9, 'Alianza Atlético', 'Atlético Grau', null, null, '2026-03-29T15:30:00-05:00'],
   [9, 'Universitario', 'Alianza Lima', null, null, '2026-03-29T18:00:00-05:00'], // EL CLÁSICO
-  
-  // FECHA 9 - MAÑANA (Lunes 30 Marzo 2026) - Sin marcadores (Próximos)
   [9, 'FBC Melgar', 'Cusco FC', null, null, '2026-03-30T15:30:00-05:00'],
   [9, 'FC Cajamarca', 'Los Chankas', null, null, '2026-03-30T19:00:00-05:00'],
-  
-  // ... resto omitido
+  [9, 'Cienciano', 'ADT', null, null, '2026-03-31T15:00:00-05:00'], [9, 'Deportivo Garcilaso', 'Sporting Cristal', null, null, '2026-03-31T15:00:00-05:00'], [9, 'Sport Huancayo', 'Comerciantes Unidos', null, null, '2026-03-31T15:00:00-05:00'], [9, 'Sport Boys', 'CD Moquegua', null, null, '2026-03-31T15:00:00-05:00'], 
+  [10, 'Cusco FC', 'FC Cajamarca', null, null, '2026-04-05T15:00:00-05:00'], [10, 'ADT', 'Alianza Lima', null, null, '2026-04-05T15:00:00-05:00'], [10, 'UTC', 'Sport Huancayo', null, null, '2026-04-05T15:00:00-05:00'], [10, 'Atlético Grau', 'Sporting Cristal', null, null, '2026-04-05T15:00:00-05:00'], [10, 'Universitario', 'Deportivo Garcilaso', null, null, '2026-04-05T15:00:00-05:00'], [10, 'Los Chankas', 'Cienciano', null, null, '2026-04-05T15:00:00-05:00'], [10, 'Sport Boys', 'FBC Melgar', null, null, '2026-04-05T15:00:00-05:00'], [10, 'CD Moquegua', 'Juan Pablo II', null, null, '2026-04-05T15:00:00-05:00'], [10, 'Comerciantes Unidos', 'Alianza Atlético', null, null, '2026-04-05T15:00:00-05:00'],
+  [11, 'Juan Pablo II', 'Comerciantes Unidos', null, null, '2026-04-12T15:00:00-05:00'], [11, 'Alianza Atlético', 'Sport Boys', null, null, '2026-04-12T15:00:00-05:00'], [11, 'FBC Melgar', 'Universitario', null, null, '2026-04-12T15:00:00-05:00'], [11, 'Alianza Lima', 'Cusco FC', null, null, '2026-04-12T15:00:00-05:00'], [11, 'Cienciano', 'CD Moquegua', null, null, '2026-04-12T15:00:00-05:00'], [11, 'Sport Huancayo', 'Deportivo Garcilaso', null, null, '2026-04-12T15:00:00-05:00'], [11, 'Sporting Cristal', 'UTC', null, null, '2026-04-12T15:00:00-05:00'], [11, 'FC Cajamarca', 'ADT', null, null, '2026-04-12T15:00:00-05:00'], [11, 'Los Chankas', 'Atlético Grau', null, null, '2026-04-12T15:00:00-05:00'],
+  [12, 'Cusco FC', 'Sport Huancayo', null, null, '2026-04-19T15:00:00-05:00'], [12, 'ADT', 'Los Chankas', null, null, '2026-04-19T15:00:00-05:00'], [12, 'UTC', 'Cienciano', null, null, '2026-04-19T15:00:00-05:00'], [12, 'Deportivo Garcilaso', 'FBC Melgar', null, null, '2026-04-19T15:00:00-05:00'], [12, 'Atlético Grau', 'Alianza Lima', null, null, '2026-04-19T15:00:00-05:00'], [12, 'Universitario', 'Alianza Atlético', null, null, '2026-04-19T15:00:00-05:00'], [12, 'Sport Boys', 'Juan Pablo II', null, null, '2026-04-19T15:00:00-05:00'], [12, 'CD Moquegua', 'FC Cajamarca', null, null, '2026-04-19T15:00:00-05:00'], [12, 'Comerciantes Unidos', 'Sporting Cristal', null, null, '2026-04-19T15:00:00-05:00'],
+  [13, 'Juan Pablo II', 'Universitario', null, null, '2026-04-26T15:00:00-05:00'], [13, 'Alianza Atlético', 'Sport Huancayo', null, null, '2026-04-26T15:00:00-05:00'], [13, 'ADT', 'Atlético Grau', null, null, '2026-04-26T15:00:00-05:00'], [13, 'FBC Melgar', 'UTC', null, null, '2026-04-26T15:00:00-05:00'], [13, 'Alianza Lima', 'CD Moquegua', null, null, '2026-04-26T15:00:00-05:00'], [13, 'Cienciano', 'Comerciantes Unidos', null, null, '2026-04-26T15:00:00-05:00'], [13, 'Sporting Cristal', 'Cusco FC', null, null, '2026-04-26T15:00:00-05:00'], [13, 'FC Cajamarca', 'Sport Boys', null, null, '2026-04-26T15:00:00-05:00'], [13, 'Los Chankas', 'Deportivo Garcilaso', null, null, '2026-04-26T15:00:00-05:00'],
+  [14, 'Cusco FC', 'Los Chankas', null, null, '2026-05-03T15:00:00-05:00'], [14, 'UTC', 'FC Cajamarca', null, null, '2026-05-03T15:00:00-05:00'], [14, 'Alianza Lima', 'Sporting Cristal', null, null, '2026-05-03T15:00:00-05:00'], [14, 'Deportivo Garcilaso', 'Alianza Atlético', null, null, '2026-05-03T15:00:00-05:00'], [14, 'Sport Huancayo', 'Juan Pablo II', null, null, '2026-05-03T15:00:00-05:00'], [14, 'Atlético Grau', 'Cienciano', null, null, '2026-05-03T15:00:00-05:00'], [14, 'Sport Boys', 'Universitario', null, null, '2026-05-03T15:00:00-05:00'], [14, 'CD Moquegua', 'ADT', null, null, '2026-05-03T15:00:00-05:00'], [14, 'Comerciantes Unidos', 'FBC Melgar', null, null, '2026-05-03T15:00:00-05:00'],
+  [15, 'Juan Pablo II', 'Alianza Atlético', null, null, '2026-05-10T15:00:00-05:00'], [15, 'ADT', 'Comerciantes Unidos', null, null, '2026-05-10T15:00:00-05:00'], [15, 'FBC Melgar', 'Sport Huancayo', null, null, '2026-05-10T15:00:00-05:00'], [15, 'Cienciano', 'Alianza Lima', null, null, '2026-05-10T15:00:00-05:00'], [15, 'Deportivo Garcilaso', 'UTC', null, null, '2026-05-10T15:00:00-05:00'], [15, 'Universitario', 'Atlético Grau', null, null, '2026-05-10T15:00:00-05:00'], [15, 'FC Cajamarca', 'Sporting Cristal', null, null, '2026-05-10T15:00:00-05:00'], [15, 'Los Chankas', 'CD Moquegua', null, null, '2026-05-10T15:00:00-05:00'], [15, 'Sport Boys', 'Cusco FC', null, null, '2026-05-10T15:00:00-05:00'],
+  [16, 'Cusco FC', 'Atlético Grau', null, null, '2026-05-17T15:00:00-05:00'], [16, 'Juan Pablo II', 'FBC Melgar', null, null, '2026-05-17T15:00:00-05:00'], [16, 'Alianza Atlético', 'FC Cajamarca', null, null, '2026-05-17T15:00:00-05:00'], [16, 'UTC', 'Sport Boys', null, null, '2026-05-17T15:00:00-05:00'], [16, 'Alianza Lima', 'Los Chankas', null, null, '2026-05-17T15:00:00-05:00'], [16, 'Sport Huancayo', 'Cienciano', null, null, '2026-05-17T15:00:00-05:00'], [16, 'Sporting Cristal', 'ADT', null, null, '2026-05-17T15:00:00-05:00'], [16, 'CD Moquegua', 'Universitario', null, null, '2026-05-17T15:00:00-05:00'], [16, 'Comerciantes Unidos', 'Deportivo Garcilaso', null, null, '2026-05-17T15:00:00-05:00'],
+  [17, 'ADT', 'Cusco FC', null, null, '2026-05-24T15:00:00-05:00'], [17, 'FBC Melgar', 'Alianza Atlético', null, null, '2026-05-24T15:00:00-05:00'], [17, 'Cienciano', 'Sporting Cristal', null, null, '2026-05-24T15:00:00-05:00'], [17, 'Deportivo Garcilaso', 'Juan Pablo II', null, null, '2026-05-24T15:00:00-05:00'], [17, 'Atlético Grau', 'CD Moquegua', null, null, '2026-05-24T15:00:00-05:00'], [17, 'Universitario', 'Sport Huancayo', null, null, '2026-05-24T15:00:00-05:00'], [17, 'FC Cajamarca', 'Alianza Lima', null, null, '2026-05-24T15:00:00-05:00'], [17, 'Los Chankas', 'UTC', null, null, '2026-05-24T15:00:00-05:00'], [17, 'Sport Boys', 'Comerciantes Unidos', null, null, '2026-05-24T15:00:00-05:00']
 ].map(p => ({ Fecha_Global: p[0], Torneo: 'Apertura', Local: normalizarEquipoListado(p[1]), Visitante: normalizarEquipoListado(p[2]), GL: p[3], GV: p[4], Timestamp: p[5] }));
 
 export default function Home() {
   const [temporada, setTemporada] = useState('2026');
   
   // ======================= LÓGICA PORTADA RÁPIDA (Hoy/Mañana) =======================
-  // FECHA DE REFERENCIA FIJADA (Domingo 29 Mar 2026)
   const fechaReferenciaContexto = useMemo(() => new Date('2026-03-29T00:00:00-05:00'), []);
   const [filtroFechaPortada, setFiltroFechaPortada] = useState('HOY');
 
@@ -146,7 +155,7 @@ export default function Home() {
                pDate.getDate() === targetDate.getDate();
       })
       .map(p => {
-        const timeStr = p.Timestamp.split('T')[1].substring(0, 5); // Ej: 13:00
+        const timeStr = p.Timestamp.split('T')[1].substring(0, 5); 
         return { ...p, HoraVisual: timeStr };
       })
       .sort((a, b) => new Date(a.Timestamp) - new Date(b.Timestamp));
@@ -158,7 +167,7 @@ export default function Home() {
       return (p.Local === 'Cusco FC' && p.Visitante === 'Sport Huancayo') ||
              (p.Local === 'Atlético Grau' && p.Visitante === 'FBC Melgar') ||
              (p.Local === 'UTC' && p.Visitante === 'Cienciano') ||
-             (p.Local === 'Deportivo Garcilaso' && p.Visitante === 'Binacional') ||
+             (p.Local === 'Deportivo Garcilaso' && p.Visitante === 'Dep. Binacional') ||
              (p.Local === 'Sporting Cristal' && p.Visitante === 'Alianza Lima') ||
              (p.Local === 'Municipal' && p.Visitante === 'Carlos Mannucci');
     }
@@ -167,22 +176,15 @@ export default function Home() {
 
   const esConcedido = (p) => {
     if (temporada === '2023' && p.Torneo === 'Clausura') {
-      // Carlos Mannucci vs Municipal (Jornada 3 del Clausura = Fecha Global 22)
       if (p.Jornada_Oficial === 22 && p.Local === 'Carlos Mannucci' && p.Visitante === 'Municipal') return true;
-      // Municipal vs Atlético Grau (Jornada 8 del Clausura = Fecha Global 27)
       if (p.Jornada_Oficial === 27 && p.Local === 'Municipal' && p.Visitante === 'Atlético Grau') return true;
     }
     return false;
   };
 
   const ganadorMesa = (p) => {
-    if (esWalkover(p)) {
-      return p.GL === 3 ? p.Local : p.Visitante;
-    }
-    if (esConcedido(p)) {
-      return p.Local === 'Municipal' ? p.Visitante : p.Local;
-    }
-    // Lógica normal para subrayar ganador si ya se jugó
+    if (esWalkover(p)) return p.GL === 3 ? p.Local : p.Visitante;
+    if (esConcedido(p)) return p.Local === 'Municipal' ? p.Visitante : p.Local;
     if (p.GL !== null && p.GV !== null && p.Torneo !== 'Final') {
         if (p.GL > p.GV) return p.Local;
         if (p.GL < p.GV) return p.Visitante;
@@ -216,8 +218,8 @@ export default function Home() {
           Jornada_Oficial: jornadaOficial, 
           Fecha_Global: fechaCronologica,  
           Torneo: torneo,
-          Local: normalizarEquipoListado(p[1]), // APLICAMOS NORMALIZADOR
-          Visitante: normalizarEquipoListado(p[2]), // APLICAMOS NORMALIZADOR
+          Local: normalizarEquipoListado(p[1]), 
+          Visitante: normalizarEquipoListado(p[2]), 
           GL: p[3],
           GV: p[4]
         };
@@ -231,14 +233,34 @@ export default function Home() {
         return { Fecha_Global: p[0], Jornada_Oficial: p[0], Torneo: 'Descentralizado', Local: normalizarEquipoListado(p[1]), Visitante: normalizarEquipoListado(p[2]), GL: gl, GV: gv };
       });
     }
-    // 2026 usa la base mockeada con horas
     return partidos2026Base.map(p => ({ ...p, Jornada_Oficial: p.Fecha_Global }));
   }, [temporada]);
   
   const [fecha, setFecha] = useState(8); 
   const [tab, setTab] = useState('fixture');
   const [equipoSeleccionado, setEquipoSeleccionado] = useState(null);
-  
+
+  // ======================= VARIABLES PARA EQUIPOS Y ESTADÍSTICAS =======================
+  const partidosValidos = useMemo(() => {
+    return listaPartidos.filter(p => p.Fecha_Global <= fecha && p.Torneo !== 'Final');
+  }, [listaPartidos, fecha]);
+
+  const partidosJugadosEquipo = useMemo(() => {
+    if (!equipoSeleccionado) return [];
+    return listaPartidos
+      .filter(p => p.Fecha_Global <= fecha && p.GL !== null && (p.Local === equipoSeleccionado || p.Visitante === equipoSeleccionado))
+      .sort((a, b) => b.Fecha_Global - a.Fecha_Global)
+      .slice(0, 5);
+  }, [listaPartidos, equipoSeleccionado, fecha]);
+
+  const proximosPartidosEquipo = useMemo(() => {
+    if (!equipoSeleccionado) return [];
+    return listaPartidos
+      .filter(p => p.Fecha_Global > fecha && (p.Local === equipoSeleccionado || p.Visitante === equipoSeleccionado))
+      .sort((a, b) => a.Fecha_Global - b.Fecha_Global)
+      .slice(0, 3);
+  }, [listaPartidos, equipoSeleccionado, fecha]);
+
   const generarTabla = (partidos, listaFiltro = null, esAcumulado = false) => {
     const tabla = {};
     let equiposActuales = listaFiltro;
@@ -252,15 +274,11 @@ export default function Home() {
 
     partidos.forEach(p => {
       let isConcedidoMatch = esConcedido(p);
-
       if ((p.GL === null || p.GV === null) && !isConcedidoMatch) return; 
 
       let gl = p.GL !== null ? p.GL : 0;
       let gv = p.GV !== null ? p.GV : 0;
-      let ptsLocal = 0;
-      let ptsVisita = 0;
-      let rLocal = '';
-      let rVisita = '';
+      let ptsLocal = 0; let ptsVisita = 0; let rLocal = ''; let rVisita = '';
 
       if (isConcedidoMatch) {
         if (p.Local === 'Municipal') {
@@ -276,24 +294,14 @@ export default function Home() {
       }
 
       if (tabla[p.Local]) {
-        tabla[p.Local].pj++;
-        tabla[p.Local].gf += gl;
-        tabla[p.Local].gc += gv;
-        tabla[p.Local].pts += ptsLocal;
-        if (rLocal === 'V') tabla[p.Local].g++;
-        else if (rLocal === 'D') tabla[p.Local].p++;
-        else tabla[p.Local].e++;
+        tabla[p.Local].pj++; tabla[p.Local].gf += gl; tabla[p.Local].gc += gv; tabla[p.Local].pts += ptsLocal;
+        if (rLocal === 'V') tabla[p.Local].g++; else if (rLocal === 'D') tabla[p.Local].p++; else tabla[p.Local].e++;
         tabla[p.Local].racha.push(rLocal);
       }
       
       if (tabla[p.Visitante]) {
-        tabla[p.Visitante].pj++;
-        tabla[p.Visitante].gf += gv;
-        tabla[p.Visitante].gc += gl;
-        tabla[p.Visitante].pts += ptsVisita;
-        if (rVisita === 'V') tabla[p.Visitante].g++;
-        else if (rVisita === 'D') tabla[p.Visitante].p++;
-        else tabla[p.Visitante].e++;
+        tabla[p.Visitante].pj++; tabla[p.Visitante].gf += gv; tabla[p.Visitante].gc += gl; tabla[p.Visitante].pts += ptsVisita;
+        if (rVisita === 'V') tabla[p.Visitante].g++; else if (rVisita === 'D') tabla[p.Visitante].p++; else tabla[p.Visitante].e++;
         tabla[p.Visitante].racha.push(rVisita);
       }
     });
@@ -301,30 +309,24 @@ export default function Home() {
     return Object.values(tabla)
       .map(t => {
         let finalPts = t.pts;
-        
         if (temporada === '2018' && esAcumulado && fecha >= 44) {
           if (t.equipo === 'Sporting Cristal') finalPts += 2;
           if (t.equipo === 'Sport Rosario') finalPts -= 7;
           if (['Dep. Municipal', 'UTC', 'Cantolao'].includes(t.equipo)) finalPts -= 2;
           if (t.equipo === 'Universitario') finalPts -= 1;
         }
-        
         if (temporada === '2013') {
           if (esAcumulado && fecha >= 31) {
             if (t.equipo === 'U. San Martin') finalPts += 2; 
             if (t.equipo === 'Alianza Lima') finalPts += 1;  
           }
-          if (fecha >= 5 && t.equipo === 'Cusco (Garcilaso)') {
-            finalPts -= 1;
-          }
+          if (fecha >= 5 && t.equipo === 'Cusco (Garcilaso)') finalPts -= 1;
         }
-        
         if (temporada === '2023' && esAcumulado && fecha >= 38) {
           if (t.equipo === 'Deportivo Garcilaso') finalPts -= 1;
           if (t.equipo === 'Sport Boys') finalPts -= 4;
           if (t.equipo === 'Municipal' || t.equipo === 'Dep. Municipal') finalPts -= 5;
         }
-
         return { ...t, pts: finalPts, dif: t.gf - t.gc, ultimas: t.racha.slice(-5).reverse() };
       })
       .sort((a, b) => b.pts - a.pts || b.dif - a.dif || b.gf - a.gf);
@@ -374,9 +376,9 @@ export default function Home() {
                 if (i === 0) bordeColor = '#3db4dc'; 
               }
               else if (temporada === '2023' && esAcumulado) {
-                if (i < 4) bordeColor = '#3db4dc'; // Libertadores
-                else if (i >= 4 && i < 8) bordeColor = '#e1c340'; // Sudamericana
-                else if (i >= datos.length - 3) bordeColor = '#d32f2f'; // Descenso
+                if (i < 4) bordeColor = '#3db4dc'; 
+                else if (i >= 4 && i < 8) bordeColor = '#e1c340'; 
+                else if (i >= datos.length - 3) bordeColor = '#d32f2f'; 
               }
               else if (i === 0) {
                 bordeColor = '#3db4dc';
@@ -418,7 +420,6 @@ export default function Home() {
         </table>
       )}
       
-      {/* NOTAS AL PIE SEGÚN TEMPORADA */}
       {temporada === '2023' && esAcumulado && fecha >= 38 && (
         <div className="text-[11px] text-left mx-[10px] my-[10px] p-[5px] bg-[#e5eee9] rounded-[4px] border border-[#d1e0d7]" style={{ color: '#6b7280' }}>
           <strong>Clasificación:</strong> Del 1° al 4° a Copa Libertadores. Del 5° al 8° a Copa Sudamericana. Descienden los 3 últimos (17°, 18° y 19°).<br/>
@@ -496,7 +497,6 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-[#f0f4f2] font-sans selection:bg-[#8cc63f] selection:text-black">
       
-      {/* ======================= ENCABEZADO CON LOGO ======================= */}
       <header className="w-full px-[30px] py-[15px] bg-[#e5eee9] flex items-center shadow-sm z-10 border-b border-[#d1e0d7]">
         <img 
           src="https://i.ibb.co/9kWMHzxY/Gemini-Generated-Image-oweh8loweh8loweh-removebg-preview.png" 
@@ -505,7 +505,6 @@ export default function Home() {
         />
       </header>
 
-      {/* ======================= TÍTULO PRINCIPAL ======================= */}
       <div className="pt-2 pb-2 relative mt-4">
         <h2 className="text-center text-[24px] font-bold m-0 flex flex-col items-center justify-center" style={{ color: '#000000' }}>
           LIGA PROFESIONAL PERUANA {temporada}
@@ -522,7 +521,7 @@ export default function Home() {
         )}
       </div>
 
-      {/* ======================= PORTADA RÁPIDA (Hoy/Mañana) - IDÉNTICO A IMAGEN ======================= */}
+      {/* PORTADA RÁPIDA (Hoy/Mañana) */}
       <main className="max-w-[1250px] mx-auto p-4 pt-0 mb-[-15px]">
         <div className="bg-white border border-[#d1e0d7] rounded-[8px] overflow-hidden shadow-lg mb-[20px] pb-1">
           <div className="bg-[#e5eee9] p-[10px] flex items-center gap-2 border-b border-[#d1e0d7]">
@@ -600,7 +599,7 @@ export default function Home() {
         </div>
       </main>
 
-      {/* ======================= MENÚ DE NAVEGACIÓN (TABS) ======================= */}
+      {/* MENÚ DE NAVEGACIÓN (TABS) */}
       <nav className="w-full mb-6 mt-4 border-b border-[#d1e0d7]">
         <div className="max-w-5xl mx-auto flex justify-center">
           {[
@@ -623,12 +622,11 @@ export default function Home() {
         </div>
       </nav>
 
-      {/* ======================= CONTENIDO ABAJO DE MENÚS (Fixture y Tablas) ======================= */}
+      {/* CONTENIDO ABAJO DE MENÚS */}
       {tab === 'fixture' && (
         <main style={{ display: 'grid', gridTemplateColumns: '64% 34%', gap: '2%', maxWidth: '1250px', margin: '0 auto', padding: '20px', alignItems: 'start' }}>
           
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-            {/* RENDERIZADO 2023 */}
             {temporada === '2023' && fecha <= 19 && (
               <TablaComponent titulo="TORNEO APERTURA 2023" zona="ZONA ÚNICA" datos={generarTabla(partidosValidos.filter(p => p.Torneo === 'Apertura'))} />
             )}
@@ -643,7 +641,6 @@ export default function Home() {
               />
             )}
 
-            {/* RENDERIZADO OTROS AÑOS */}
             {temporada === '2018' && fecha <= 14 && (
               <>
                 <TablaComponent titulo="TORNEO DE VERANO" zona="ZONA A" datos={generarTabla(partidosValidos.filter(p => p.Torneo === 'Verano'), equipo_A_2018)} />
@@ -657,7 +654,7 @@ export default function Home() {
               <TablaComponent titulo="TORNEO CLAUSURA" zona="ZONA ÚNICA" datos={generarTabla(partidosValidos.filter(p => p.Torneo === 'Clausura' && p.Fecha_Global >= 30))} />
             )}
             {temporada === '2026' && fecha <= 17 && (
-              <TablaComponent titulo="TORNEO APERTURA PE RÚ 2026" zona="ZONA ÚNICA" datos={generarTabla(partidosValidos.filter(p => p.Torneo === 'Apertura'))} />
+              <TablaComponent titulo="TORNEO APERTURA 2026" zona="ZONA ÚNICA" datos={generarTabla(partidosValidos.filter(p => p.Torneo === 'Apertura'))} />
             )}
 
             {temporada === '2013' && fecha > 30 && fecha <= 44 ? (
@@ -722,7 +719,6 @@ export default function Home() {
                 </button>
               </div>
 
-              {/* BANNER EXPLICATIVO 2023 */}
               {temporada === '2023' && [1, 8, 15].includes(fecha) && (
                 <div className="bg-[#fff3cd] border-l-[4px] border-[#fbbf24] text-[#854d0e] p-[10px] text-[11px] rounded shadow-sm font-medium leading-relaxed mt-2 mb-[-10px]">
                   {fecha === 1 && "🚨 Inicio cronológico del torneo. Marcado por varios Walkovers (derrotas 3-0 en mesa) por disputas de TV."}
@@ -739,7 +735,7 @@ export default function Home() {
                     const teamGanador = ganadorMesa(p);
 
                     return (
-                      <div key={idx} className={`flex justify-between items-center py-[8px] px-[10px] border-t border-[#d1e0d7] hover:bg-[#f8fbf9] transition-colors ${idx % 2 === 0 ? 'bg-transparent' : 'bg-[#fcfdfc]'}`}>
+                      <div key={idx} className={`flex justify-between items-center py-[8px] px-[10px] border-b border-[#d1e0d7] hover:bg-[#f8fbf9] transition-colors ${idx % 2 === 0 ? 'bg-transparent' : 'bg-[#fcfdfc]'}`}>
                         <div className="flex flex-col justify-center items-center w-[35px]">
                           <span className="text-[10px] font-bold" style={{ color: '#6b7280' }}>
                             {temporada === '2023' && (p.Torneo === 'Clausura' || p.Torneo === 'Final') 
@@ -781,7 +777,6 @@ export default function Home() {
         </main>
       )}
 
-      {/* ======================= EQUIPOS Y ESTADISTICAS ======================= */}
       {tab === 'equipos' && (
         <main className="max-w-[1250px] mx-auto p-4">
           {!equipoSeleccionado ? (
@@ -844,7 +839,6 @@ export default function Home() {
         </main>
       )}
 
-      {/* ======================= CAMPEONES ======================= */}
       {tab === 'campeones' && (
         <main style={{ display: 'grid', gridTemplateColumns: '60% 35%', gap: '5%', maxWidth: '1250px', margin: '0 auto', padding: '20px', alignItems: 'start' }}>
           <div className="bg-white border border-[#d1e0d7] rounded shadow-lg overflow-hidden">
