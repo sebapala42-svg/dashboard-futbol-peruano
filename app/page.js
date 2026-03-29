@@ -161,7 +161,7 @@ export default function Home() {
     'Jose Galvez': 'https://tmssl.akamaized.net//images/wappen/head/16700.png?lm=1699653454',
     'Juan Aurich': 'https://tmssl.akamaized.net//images/wappen/head/4576.png?lm=1435783099',
     'Cesar Vallejo': 'https://tmssl.akamaized.net//images/wappen/big/6889.png?lm=1435783460',
-    'Carlos Mannucci': 'https://tmssl.akamaized.net//images/wappen/head/35587.png',
+    'Carlos Mannucci': 'https://tmssl.akamaized.net//images/wappen/homepageWappen150x150/19520.png?lm=1545864399',
   };
 
   const info_clubes = {
