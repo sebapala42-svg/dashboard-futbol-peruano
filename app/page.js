@@ -43,34 +43,36 @@ const partidos2026JSON = [
 const listaPartidos2018 = Array.isArray(partidosJSON) ? partidosJSON : (partidosJSON.BaseDatos || Object.values(partidosJSON)[0] || []);
 
 // ==========================================
-// EL TRADUCTOR MAESTRO (ACTUALIZADO PARA LA NUEVA API)
+// EL SÚPER TRADUCTOR (A PRUEBA DE BALAS)
 // ==========================================
 const normalizarEquipo = (nombre) => {
   if (!nombre) return "Equipo";
   
-  // Limpiamos espacios extra por si acaso
-  const nombreLimpio = nombre.trim();
+  const n = nombre.toLowerCase();
   
-  const alias = {
-    'Melgar': 'FBC Melgar',
-    'César Vallejo': 'Cesar Vallejo',
-    'Cusco': 'Cusco FC',
-    'Comercio': 'Union Comercio',
-    // --- NUEVOS ALIAS POR LA API DE SPORTAPI ---
-    'Club Sporting Cristal': 'Sporting Cristal',
-    'Universitario de Deportes': 'Universitario',
-    'Alianza Atlético de Sullana': 'Alianza Atlético',
-    'Club Atlético Grau': 'Atlético Grau',
-    'Asociación Deportiva Tarma': 'ADT',
-    'Club Alianza Lima': 'Alianza Lima',
-    'Sport Boys Association': 'Sport Boys',
-    'Universidad César Vallejo': 'Cesar Vallejo',
-    'CD Unión Comercio': 'Union Comercio',
-    'CD Comerciantes Unidos': 'Comerciantes Unidos',
-    'CD Los Chankas': 'Los Chankas',
-    // ------------------------------------------
-  };
-  return alias[nombreLimpio] || nombreLimpio;
+  // Búsqueda inteligente por palabras clave (Así la API mande nombres larguísimos)
+  if (n.includes('cristal')) return 'Sporting Cristal';
+  if (n.includes('universitario')) return 'Universitario';
+  if (n.includes('alianza lima')) return 'Alianza Lima';
+  if (n.includes('sullana') || n.includes('alianza atlético')) return 'Alianza Atlético';
+  if (n.includes('grau')) return 'Atlético Grau';
+  if (n.includes('tarma') || n.includes('adt')) return 'ADT';
+  if (n.includes('sport boys') || n.includes('boys association')) return 'Sport Boys';
+  if (n.includes('vallejo')) return 'Cesar Vallejo';
+  if (n.includes('comercio')) return 'Union Comercio';
+  if (n.includes('comerciantes')) return 'Comerciantes Unidos';
+  if (n.includes('chankas')) return 'Los Chankas';
+  if (n.includes('melgar')) return 'FBC Melgar';
+  if (n.includes('cienciano')) return 'Cienciano';
+  if (n.includes('cusco')) return 'Cusco FC';
+  if (n.includes('huancayo')) return 'Sport Huancayo';
+  if (n.includes('garcilaso')) return 'Deportivo Garcilaso';
+  if (n.includes('moquegua')) return 'CD Moquegua';
+  if (n.includes('juan pablo ii')) return 'Juan Pablo II';
+  if (n.includes('cajamarca') || n.includes('utc')) return 'UTC';
+
+  // Si es un equipo antiguo o muy raro, devuelve el nombre original formateado
+  return nombre;
 };
 
 export default function Home() {
@@ -111,7 +113,7 @@ export default function Home() {
   const cambiarDiaRapido = (incremento) => { const nueva = new Date(fechaHoy); nueva.setDate(nueva.getDate() + incremento); setFechaHoy(nueva); setMesVisible(nueva); };
 
   // ==========================================
-  // EFECTO DE API: SPORTAPI (SOFASCORE)
+  // EFECTO API: SPORTAPI + MATA ZOMBIS (UTC -> PERÚ)
   // ==========================================
   useEffect(() => {
     if (vistaMenuLateral === 'PORTADA') {
@@ -139,9 +141,20 @@ export default function Home() {
           let todosLosPartidos = data.events || data.data || [];
 
           partidosFiltrados = todosLosPartidos.filter(partido => {
+            // 1. Que sea de Perú o Liga 1
             const nombreTorneo = partido.tournament?.name?.toLowerCase() || '';
             const paisTorneo = partido.tournament?.category?.name?.toLowerCase() || '';
-            return paisTorneo.includes('peru') || nombreTorneo.includes('liga 1');
+            const esPeru = paisTorneo.includes('peru') || nombreTorneo.includes('liga 1');
+
+            // 2. EL MATA-ZOMBIS: Comprobar que en HORA PERUANA el partido caiga exactamente en el día elegido
+            let esMismoDiaLocal = true;
+            if (partido.startTimestamp) {
+               // Convertimos el timestamp de la API a fecha YYYY-MM-DD usando la zona horaria de Lima
+               const fechaPartidoPeru = new Date(partido.startTimestamp * 1000).toLocaleDateString('en-CA', { timeZone: 'America/Lima' });
+               esMismoDiaLocal = (fechaPartidoPeru === fechaFormateadaAPI);
+            }
+
+            return esPeru && esMismoDiaLocal;
           });
 
           setPartidosEnVivo(partidosFiltrados); 
@@ -595,7 +608,7 @@ export default function Home() {
                      if (statusAPI === 'finished') estadoMock = 'Final';
                      else if (statusAPI === 'inprogress') estadoMock = 'EN VIVO';
                      else if (statusAPI === 'notstarted' && m.startTimestamp) {
-                        estadoMock = new Date(m.startTimestamp * 1000).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                        estadoMock = new Date(m.startTimestamp * 1000).toLocaleTimeString('es-PE', {timeZone: 'America/Lima', hour: '2-digit', minute:'2-digit'});
                      }
 
                      const ganador = (golesL !== null && golesV !== null) ? (golesL > golesV ? local : (golesL < golesV ? visita : null)) : null;
