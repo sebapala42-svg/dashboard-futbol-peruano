@@ -111,7 +111,7 @@ export default function Home() {
   const cambiarDiaRapido = (incremento) => { const nueva = new Date(fechaHoy); nueva.setDate(nueva.getDate() + incremento); setFechaHoy(nueva); setMesVisible(nueva); };
 
   // ==========================================
-  // EFECTO API: SPORTAPI + MATA ZOMBIS (Matemática pura UTC-5)
+  // EFECTO API: SPORTAPI CON FILTRO SEGURO
   // ==========================================
   useEffect(() => {
     if (vistaMenuLateral === 'PORTADA') {
@@ -135,36 +135,39 @@ export default function Home() {
       fetch(url, options) 
         .then(response => response.json())
         .then(data => {
-          let partidosFiltrados = [];
           let todosLosPartidos = data.events || data.data || [];
 
-          partidosFiltrados = todosLosPartidos.filter(partido => {
-            // 1. Que sea de Perú o Liga 1
+          // 1. Filtrar solo los que sean de Perú o Liga 1
+          let partidosPeru = todosLosPartidos.filter(partido => {
             const nombreTorneo = partido.tournament?.name?.toLowerCase() || '';
             const paisTorneo = partido.tournament?.category?.name?.toLowerCase() || '';
-            const esPeru = paisTorneo.includes('peru') || nombreTorneo.includes('liga 1');
-
-            // 2. EL MATA-ZOMBIS (Matemática pura, sin depender de navegadores)
-            let esMismoDiaLocal = true;
-            if (partido.startTimestamp) {
-               // Tomamos el timestamp (segundos) y le restamos 5 horas en segundos (5 * 3600)
-               // Esto nos da la hora exacta y universal en Perú
-               const limaTimeMs = (partido.startTimestamp - (5 * 3600)) * 1000;
-               const limaDate = new Date(limaTimeMs);
-               
-               // Extraemos la fecha usando los métodos UTC (para que el navegador del usuario no estorbe)
-               const pYear = limaDate.getUTCFullYear();
-               const pMonth = String(limaDate.getUTCMonth() + 1).padStart(2, '0');
-               const pDay = String(limaDate.getUTCDate()).padStart(2, '0');
-               
-               const fechaPartidoPeru = `${pYear}-${pMonth}-${pDay}`;
-               esMismoDiaLocal = (fechaPartidoPeru === fechaFormateadaAPI);
-            }
-
-            return esPeru && esMismoDiaLocal;
+            return paisTorneo.includes('peru') || nombreTorneo.includes('liga 1');
           });
 
-          setPartidosEnVivo(partidosFiltrados); 
+          // 2. Filtro Suave para separar los días (usando el motor nativo del navegador de forma segura)
+          let partidosMismoDia = partidosPeru.filter(partido => {
+            if (!partido.startTimestamp) return true;
+            
+            const dateObj = new Date(partido.startTimestamp * 1000);
+            const formatter = new Intl.DateTimeFormat('en-US', { timeZone: 'America/Lima', year: 'numeric', month: 'numeric', day: 'numeric' });
+            const parts = formatter.formatToParts(dateObj);
+            
+            const y = parts.find(p => p.type === 'year').value;
+            const m = parts.find(p => p.type === 'month').value.padStart(2, '0');
+            const d = parts.find(p => p.type === 'day').value.padStart(2, '0');
+            
+            const fechaPartidoPeru = `${y}-${m}-${d}`;
+            return fechaPartidoPeru === fechaFormateadaAPI;
+          });
+
+          // 🔥 EL SALVAVIDAS 🔥
+          // Si el filtro de día fue muy estricto y los borró todos, 
+          // mejor mostramos los partidos mezclados que mandó la API en vez de dejar la pantalla en blanco.
+          if (partidosMismoDia.length === 0 && partidosPeru.length > 0) {
+            partidosMismoDia = partidosPeru;
+          }
+
+          setPartidosEnVivo(partidosMismoDia); 
           setCargandoAPI(false);
         })
         .catch(error => {
@@ -615,7 +618,8 @@ export default function Home() {
                      if (statusAPI === 'finished') estadoMock = 'Final';
                      else if (statusAPI === 'inprogress') estadoMock = 'EN VIVO';
                      else if (statusAPI === 'notstarted' && m.startTimestamp) {
-                        estadoMock = new Date((m.startTimestamp - (5 * 3600)) * 1000).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', timeZone: 'UTC'});
+                        const dateObj = new Date(m.startTimestamp * 1000);
+                        estadoMock = new Intl.DateTimeFormat('en-US', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Lima' }).format(dateObj);
                      }
 
                      const ganador = (golesL !== null && golesV !== null) ? (golesL > golesV ? local : (golesL < golesV ? visita : null)) : null;
