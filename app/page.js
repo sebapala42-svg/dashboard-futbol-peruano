@@ -42,7 +42,7 @@ const partidos2026JSON = [
 
 const listaPartidos2018 = Array.isArray(partidosJSON) ? partidosJSON : (partidosJSON.BaseDatos || Object.values(partidosJSON)[0] || []);
 
-// EL TRADUCTOR DE EQUIPOS
+// EL TRADUCTOR DE EQUIPOS: Normaliza los nombres para que el código siempre use el mismo
 const normalizarEquipo = (nombre) => {
   const alias = {
     'Melgar': 'FBC Melgar',
@@ -55,17 +55,16 @@ const normalizarEquipo = (nombre) => {
 
 export default function Home() {
   
-  // ======================= ESTADOS MAESTROS DE NAVEGACIÓN =======================
-  const [vistaPrincipal, setVistaPrincipal] = useState('LIGA1'); // 'LIGA1' o 'CAMPEONES'
-  const [tabL1, setTabL1] = useState('fixture'); // 'vivo', 'fixture', 'equipos'
-  const [temporada, setTemporada] = useState('2026');
-  
-  // Estados de los menús desplegables del Sidebar
+  // ======================= ESTADOS DE NAVEGACIÓN (SIDEBAR Y TABS) =======================
+  const [vistaMenuLateral, setVistaMenuLateral] = useState('LIGA1'); // 'LIGA1' o 'CAMPEONES'
+  const [tabTop, setTabTop] = useState('fixture'); // 'vivo', 'fixture', 'equipos'
   const [menuPeruAbierto, setMenuPeruAbierto] = useState(true);
 
+  // Estados originales
+  const [temporada, setTemporada] = useState('2026');
   const [fecha, setFecha] = useState(8); 
   const [equipoSeleccionado, setEquipoSeleccionado] = useState(null);
-
+  
   // FUNCIONES PARA DETECTAR RESULTADOS DE MESA (2023)
   const esWalkover = (p) => {
     if (temporada === '2023' && p.Torneo === 'Apertura' && p.Jornada_Oficial === 3) {
@@ -88,8 +87,12 @@ export default function Home() {
   };
 
   const ganadorMesa = (p) => {
-    if (esWalkover(p)) return p.GL === 3 ? p.Local : p.Visitante;
-    if (esConcedido(p)) return p.Local === 'Municipal' ? p.Visitante : p.Local;
+    if (esWalkover(p)) {
+      return p.GL === 3 ? p.Local : p.Visitante;
+    }
+    if (esConcedido(p)) {
+      return p.Local === 'Municipal' ? p.Visitante : p.Local;
+    }
     return null;
   };
 
@@ -97,13 +100,33 @@ export default function Home() {
     if (temporada === '2018') return listaPartidos2018.map(p => ({ ...p, Jornada_Oficial: p.Fecha_Global, Local: normalizarEquipo(p.Local), Visitante: normalizarEquipo(p.Visitante) }));
     if (temporada === '2023') {
       const raw2023 = Array.isArray(partidos2023JSON) ? partidos2023JSON : [];
-      const ordenCronologicoApertura = { 3: 1, 4: 2, 5: 3, 6: 4, 7: 5, 8: 6, 9: 7, 1: 8, 10: 9, 11: 10, 12: 11, 13: 12, 14: 13, 15: 14, 2: 15, 16: 16, 17: 17, 18: 18, 19: 19 };
+      
+      const ordenCronologicoApertura = {
+        3: 1, 4: 2, 5: 3, 6: 4, 7: 5, 8: 6, 9: 7, 
+        1: 8,   
+        10: 9, 11: 10, 12: 11, 13: 12, 14: 13, 15: 14, 
+        2: 15,  
+        16: 16, 17: 17, 18: 18, 19: 19
+      };
+
       return raw2023.map(p => {
         let jornadaOficial = p[0];
         let torneo = p[5] || 'Apertura';
         let fechaCronologica = jornadaOficial;
-        if (torneo === 'Apertura' && ordenCronologicoApertura[jornadaOficial]) fechaCronologica = ordenCronologicoApertura[jornadaOficial];
-        return { Jornada_Oficial: jornadaOficial, Fecha_Global: fechaCronologica, Torneo: torneo, Local: normalizarEquipo(p[1]), Visitante: normalizarEquipo(p[2]), GL: p[3], GV: p[4] };
+
+        if (torneo === 'Apertura' && ordenCronologicoApertura[jornadaOficial]) {
+          fechaCronologica = ordenCronologicoApertura[jornadaOficial];
+        }
+
+        return {
+          Jornada_Oficial: jornadaOficial, 
+          Fecha_Global: fechaCronologica,  
+          Torneo: torneo,
+          Local: normalizarEquipo(p[1]), // APLICAMOS NORMALIZADOR
+          Visitante: normalizarEquipo(p[2]), // APLICAMOS NORMALIZADOR
+          GL: p[3],
+          GV: p[4]
+        };
       });
     }
     if (temporada === '2013') {
@@ -459,76 +482,84 @@ export default function Home() {
     </div>
   );
 
-  // ======================= RENDER PRINCIPAL =======================
+  // ======================= RENDER PRINCIPAL CON ESTRUCTURA SIDE-BY-SIDE =======================
   return (
-    <div className="flex h-screen bg-[#f0f4f2] font-sans selection:bg-[#8cc63f] selection:text-black overflow-hidden">
+    <div className="flex h-screen bg-[#f0f4f2] font-sans selection:bg-[#8cc63f] selection:text-black overflow-hidden w-full">
       
-      {/* SIDEBAR (Izquierda) */}
-      <aside className="w-[250px] bg-white border-r border-[#d1e0d7] hidden md:flex flex-col flex-shrink-0 z-20">
+      {/* ===== SIDEBAR IZQUIERDO (NUEVO) ===== */}
+      <aside className="w-[250px] bg-white border-r border-[#d1e0d7] hidden md:flex flex-col flex-shrink-0 z-20 shadow-sm">
         
-        {/* LOGO EN EL SIDEBAR */}
-        <div className="p-4 border-b border-[#d1e0d7] flex justify-center bg-[#e5eee9]">
+        {/* LOGO */}
+        <div className="p-4 border-b border-[#d1e0d7] flex items-center justify-center bg-[#e5eee9]">
           <img 
             src="https://i.ibb.co/9kWMHzxY/Gemini-Generated-Image-oweh8loweh8loweh-removebg-preview.png" 
             alt="Logo" 
-            className="h-[50px] object-contain" 
+            className="h-[45px] object-contain" 
           />
         </div>
-        
-        {/* MENÚ DE NAVEGACIÓN */}
-        <div className="flex-1 p-4">
-          <div className="text-[10px] font-black text-[#8cc63f] uppercase tracking-widest mb-3">Navegación</div>
-          
-          <div className="mb-2">
-            <div className="flex items-center gap-2 bg-[#f8fbf9] border border-[#d1e0d7] py-2 px-3 rounded text-[#112a1f] font-bold text-[13px]">
-              <img src="https://tmssl.akamaized.net//images/holding/head/pe.png" className="w-[16px]"/> PERÚ
-            </div>
-            
-            <div className="flex flex-col pl-4 mt-2 border-l-2 border-[#d1e0d7] ml-3 gap-2">
+
+        {/* NAVEGACIÓN SIDEBAR */}
+        <div className="flex-1 py-4 flex flex-col px-3">
+           <div className="text-[10px] font-black text-[#8cc63f] uppercase tracking-widest mb-3 pl-1">Menú Principal</div>
+           
+           <div className="flex flex-col">
               <button 
-                onClick={() => { setVistaPrincipal('LIGA1'); setTemporada('2026'); setTabL1('fixture'); }} 
-                className={`text-left text-[12px] font-bold transition-colors ${vistaPrincipal === 'LIGA1' ? 'text-[#8cc63f]' : 'text-[#6b7280] hover:text-black'}`}
+                onClick={() => setMenuPeruAbierto(!menuPeruAbierto)}
+                className="w-full flex items-center justify-between text-[#112a1f] font-bold text-[13px] bg-[#f8fbf9] border border-[#d1e0d7] px-3 py-2.5 rounded-md hover:bg-[#e5eee9] transition-colors outline-none shadow-sm"
               >
-                Liga 1 Te Apuesto
+                <div className="flex items-center gap-2">
+                  <img src="https://tmssl.akamaized.net//images/holding/head/pe.png" className="w-[16px] drop-shadow-sm" alt="Peru"/> PERÚ
+                </div>
+                <span className="text-[10px] text-[#6b7280]">{menuPeruAbierto ? '▲' : '▼'}</span>
               </button>
-              
-              <button 
-                onClick={() => { setVistaPrincipal('CAMPEONES'); }} 
-                className={`text-left text-[12px] font-bold transition-colors ${vistaPrincipal === 'CAMPEONES' ? 'text-[#8cc63f]' : 'text-[#6b7280] hover:text-black'}`}
-              >
-                Campeones Históricos
-              </button>
-            </div>
-          </div>
+
+              {menuPeruAbierto && (
+                <div className="flex flex-col pl-4 mt-2 border-l-2 border-[#d1e0d7] ml-3 gap-1">
+                  <button 
+                    onClick={() => { setVistaMenuLateral('LIGA1'); setTemporada('2026'); setTabTop('fixture'); setEquipoSeleccionado(null); }}
+                    className={`w-full text-left px-3 py-2 text-[12px] font-bold rounded-md transition-colors outline-none ${vistaMenuLateral === 'LIGA1' ? 'bg-[#e5eee9] text-[#112a1f] border-l-[3px] border-[#8cc63f]' : 'text-[#6b7280] hover:bg-[#f8fbf9] hover:text-[#112a1f] border-l-[3px] border-transparent'}`}
+                  >
+                    Liga 1 Te Apuesto
+                  </button>
+                  <button 
+                    onClick={() => { setVistaMenuLateral('CAMPEONES'); setTabTop('fixture'); setEquipoSeleccionado(null); }}
+                    className={`w-full text-left px-3 py-2 text-[12px] font-bold rounded-md transition-colors outline-none ${vistaMenuLateral === 'CAMPEONES' ? 'bg-[#e5eee9] text-[#112a1f] border-l-[3px] border-[#8cc63f]' : 'text-[#6b7280] hover:bg-[#f8fbf9] hover:text-[#112a1f] border-l-[3px] border-transparent'}`}
+                  >
+                    Campeones Históricos
+                  </button>
+                </div>
+              )}
+           </div>
         </div>
       </aside>
 
-      {/* ÁREA PRINCIPAL (Derecha) */}
-      <main className="flex-1 flex flex-col h-screen overflow-y-auto">
+      {/* ===== PANEL PRINCIPAL DERECHO ===== */}
+      <main className="flex-1 flex flex-col h-screen overflow-y-auto relative w-full">
         
-        {/* CABECERA Y SUB-NAVEGACIÓN (Arriba a la derecha) */}
-        <header className="bg-white shadow-sm border-b border-[#d1e0d7] px-6 py-4 flex items-center justify-between sticky top-0 z-10">
-          <h2 className="text-[20px] font-black uppercase text-[#112a1f] m-0">
-            {vistaPrincipal === 'LIGA1' ? `LIGA 1 - ${temporada}` : 'HISTORIAL DE CAMPEONES'}
+        {/* HEADER DE PESTAÑAS (EN VIVO / FIXTURE / EQUIPOS) */}
+        <header className="bg-white shadow-sm border-b border-[#d1e0d7] px-6 py-4 flex flex-col sm:flex-row items-center justify-between sticky top-0 z-10 gap-4">
+          <h2 className="text-[20px] font-black uppercase text-[#112a1f] m-0 flex items-center gap-2">
+            <span className="bg-[#8cc63f] w-[4px] h-[20px] rounded-full"></span>
+            {vistaMenuLateral === 'LIGA1' ? `LIGA 1 - ${temporada}` : 'ARCHIVO DE CAMPEONES'}
           </h2>
-          
-          {vistaPrincipal === 'LIGA1' && (
-            <div className="flex gap-2">
+
+          {vistaMenuLateral === 'LIGA1' && (
+            <div className="flex bg-[#f8fbf9] rounded-lg p-1 border border-[#d1e0d7] shadow-inner">
               <button 
-                onClick={() => setTabL1('vivo')} 
-                className={`px-3 py-1.5 text-[11px] font-bold rounded border ${tabL1 === 'vivo' ? 'bg-[#8cc63f] text-white border-[#8cc63f]' : 'bg-transparent text-[#6b7280] border-transparent hover:border-[#d1e0d7]'}`}
+                onClick={() => { setTabTop('vivo'); setEquipoSeleccionado(null); }}
+                className={`px-4 py-1.5 text-[11px] font-bold rounded-md transition-colors outline-none ${tabTop === 'vivo' ? 'bg-white text-[#112a1f] shadow-sm border border-[#d1e0d7]' : 'text-[#6b7280] hover:text-[#112a1f]'}`}
               >
                 EN VIVO
               </button>
               <button 
-                onClick={() => setTabL1('fixture')} 
-                className={`px-3 py-1.5 text-[11px] font-bold rounded border ${tabL1 === 'fixture' ? 'bg-[#8cc63f] text-white border-[#8cc63f]' : 'bg-transparent text-[#6b7280] border-transparent hover:border-[#d1e0d7]'}`}
+                onClick={() => { setTabTop('fixture'); setEquipoSeleccionado(null); }}
+                className={`px-4 py-1.5 text-[11px] font-bold rounded-md transition-colors outline-none ${tabTop === 'fixture' ? 'bg-white text-[#112a1f] shadow-sm border border-[#d1e0d7]' : 'text-[#6b7280] hover:text-[#112a1f]'}`}
               >
                 FIXTURE Y TABLAS
               </button>
               <button 
-                onClick={() => setTabL1('equipos')} 
-                className={`px-3 py-1.5 text-[11px] font-bold rounded border ${tabL1 === 'equipos' ? 'bg-[#8cc63f] text-white border-[#8cc63f]' : 'bg-transparent text-[#6b7280] border-transparent hover:border-[#d1e0d7]'}`}
+                onClick={() => { setTabTop('equipos'); setEquipoSeleccionado(null); }}
+                className={`px-4 py-1.5 text-[11px] font-bold rounded-md transition-colors outline-none ${tabTop === 'equipos' ? 'bg-white text-[#112a1f] shadow-sm border border-[#d1e0d7]' : 'text-[#6b7280] hover:text-[#112a1f]'}`}
               >
                 EQUIPOS
               </button>
@@ -536,59 +567,22 @@ export default function Home() {
           )}
         </header>
 
-        {/* CONTENIDO (El código original adaptado al nuevo contenedor) */}
-        <div className="p-6 max-w-[1250px] mx-auto w-full">
+        {/* ÁREA DE CONTENIDO (Aquí va el código intacto dependiendo de las pestañas) */}
+        <div className="p-4 md:p-6 w-full max-w-[1250px] mx-auto pb-20">
           
-          {/* --- VISTA: CAMPEONES --- */}
-          {vistaPrincipal === 'CAMPEONES' && (
-            <div style={{ display: 'grid', gridTemplateColumns: '60% 35%', gap: '5%', alignItems: 'start' }}>
-              <div className="bg-white border border-[#d1e0d7] rounded shadow-lg overflow-hidden">
-                <div className="bg-[#e5eee9] p-3 text-center border-b border-[#d1e0d7]"><h3 className="text-[14px] font-bold uppercase" style={{ color: '#000000' }}>Historial de Campeones</h3></div>
-                <table className="w-full text-[12px] border-collapse font-sans">
-                  <thead><tr><th className="bg-[#e5eee9] py-[8px] px-[10px] text-left border-b border-[#d1e0d7] font-normal w-[80px]" style={{ color: '#6b7280' }}>Torneo</th><th className="bg-[#e5eee9] py-[8px] px-[10px] text-left border-b border-[#d1e0d7] font-normal" style={{ color: '#6b7280' }}>Campeón</th></tr></thead>
-                  <tbody>{historial_datos.map((row, i) => (
-                    <tr key={i} className={`hover:bg-[#f8fbf9] border-b border-[#d1e0d7] ${i % 2 === 0 ? 'bg-transparent' : 'bg-[#fcfdfc]'}`}>
-                      <td className="py-[10px] px-[10px] font-black" style={{ color: '#000000' }}>{row.Año}</td>
-                      <td className="py-[10px] px-[10px] text-left flex items-center justify-between">
-                        <div className="flex items-center gap-2 font-bold">
-                          <img src={logos[row.Campeón] || 'https://cdn-icons-png.flaticon.com/128/33/33736.png'} style={{ width: '16px', height: '16px', objectFit: 'contain' }} />
-                          <span style={{ color: '#000000' }}>{row.Campeón}</span>
-                        </div>
-                        {['2018', '2013', '2023'].includes(row.Año) && (
-                          <button 
-                            onClick={() => { setVistaPrincipal('LIGA1'); setTemporada(row.Año); setFecha(row.Año === '2013' ? 48 : (row.Año === '2023' ? 1 : 44)); setTabL1('fixture'); setEquipoSeleccionado(null); window.scrollTo(0,0); }}
-                            className="bg-[#8cc63f] text-white font-bold text-[10px] px-3 py-1 rounded border-none outline-none cursor-pointer"
-                          >
-                            VER AÑO
-                          </button>
-                        )}
-                      </td>
-                    </tr>
-                  ))}</tbody>
-                </table>
-              </div>
-              <div className="bg-white border border-[#d1e0d7] rounded shadow-lg overflow-hidden sticky top-24">
-                <div className="bg-[#e5eee9] p-3 text-center border-b border-[#d1e0d7]"><h3 className="text-[14px] font-bold uppercase" style={{ color: '#000000' }}>Ranking de Ligas</h3></div>
-                <table className="w-full text-[12px] border-collapse font-sans">
-                  <thead><tr><th className="bg-[#e5eee9] py-[8px] px-[10px] text-left border-b border-[#d1e0d7] font-normal" style={{ color: '#6b7280' }}>Equipo</th><th className="bg-[#e5eee9] py-[8px] px-[10px] text-center border-b border-[#d1e0d7] font-normal w-[60px]" style={{ color: '#6b7280' }}>Títulos</th></tr></thead>
-                  <tbody>{ranking_datos.map((row, i) => (
-                    <tr key={i} className={`hover:bg-[#f8fbf9] border-b border-[#d1e0d7] ${i % 2 === 0 ? 'bg-transparent' : 'bg-[#fcfdfc]'}`}><td className="py-[10px] px-[10px] text-left flex items-center gap-2"><img src={logos[row.Equipo] || 'https://cdn-icons-png.flaticon.com/128/33/33736.png'} style={{ width: '16px', height: '16px', objectFit: 'contain' }} /><span style={{ color: '#000000' }}>{row.Equipo}</span></td><td className="py-[10px] px-[10px] text-center font-bold text-[#8cc63f] text-sm">{row.Títulos}</td></tr>
-                  ))}</tbody>
-                </table>
-              </div>
+          {/* ----- VISTA 1: EN VIVO (Placeholder) ----- */}
+          {vistaMenuLateral === 'LIGA1' && tabTop === 'vivo' && (
+            <div className="text-center p-12 border-2 border-dashed border-[#d1e0d7] rounded-xl bg-white text-[#6b7280] font-bold shadow-sm">
+              <span className="text-2xl mb-2 block">🚧</span>
+              Espacio reservado para los Partidos en Vivo de Hoy.<br/>(Lo construiremos en el siguiente paso)
             </div>
           )}
 
-          {/* --- VISTA: LIGA 1 -> EN VIVO --- */}
-          {vistaPrincipal === 'LIGA1' && tabL1 === 'vivo' && (
-            <div className="text-center p-10 border-2 border-dashed border-[#d1e0d7] rounded-xl text-gray-500 font-bold max-w-[800px] mx-auto">
-              En esta pestaña construiremos los Partidos de Hoy en vivo y el Calendario desplegable. 🚧
-            </div>
-          )}
-
-          {/* --- VISTA: LIGA 1 -> FIXTURE Y TABLAS --- */}
-          {vistaPrincipal === 'LIGA1' && tabL1 === 'fixture' && (
+          {/* ----- VISTA 2: FIXTURE Y TABLAS (Tu código original) ----- */}
+          {vistaMenuLateral === 'LIGA1' && tabTop === 'fixture' && (
             <div style={{ display: 'grid', gridTemplateColumns: '64% 34%', gap: '2%', alignItems: 'start' }}>
+              
+              {/* Columna Izquierda (Tablas de Posiciones) */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                 {temporada === '2023' && fecha <= 19 && (<TablaComponent titulo="TORNEO APERTURA 2023" zona="ZONA ÚNICA" datos={generarTabla(partidosValidos.filter(p => p.Torneo === 'Apertura'))} />)}
                 {temporada === '2023' && fecha > 19 && fecha <= 38 && (<TablaComponent titulo="TORNEO CLAUSURA 2023" zona="ZONA ÚNICA" datos={generarTabla(partidosValidos.filter(p => p.Torneo === 'Clausura'))} />)}
@@ -597,6 +591,7 @@ export default function Home() {
                 {temporada === '2018' && fecha <= 14 && (<><TablaComponent titulo="TORNEO DE VERANO" zona="ZONA A" datos={generarTabla(partidosValidos.filter(p => p.Torneo === 'Verano'), equipo_A_2018)} /><TablaComponent titulo="TORNEO DE VERANO" zona="ZONA B" datos={generarTabla(partidosValidos.filter(p => p.Torneo === 'Verano'), equipo_B_2018)} /></>)}
                 {temporada === '2018' && fecha > 14 && fecha <= 29 && (<TablaComponent titulo="TORNEO APERTURA" zona="ZONA ÚNICA" datos={generarTabla(partidosValidos.filter(p => p.Torneo === 'Apertura' && p.Fecha_Global >= 15))} />)}
                 {temporada === '2018' && fecha > 29 && (<TablaComponent titulo="TORNEO CLAUSURA" zona="ZONA ÚNICA" datos={generarTabla(partidosValidos.filter(p => p.Torneo === 'Clausura' && p.Fecha_Global >= 30))} />)}
+                
                 {temporada === '2026' && fecha <= 17 && (<TablaComponent titulo="TORNEO APERTURA 2026" zona="ZONA ÚNICA" datos={generarTabla(partidosValidos.filter(p => p.Torneo === 'Apertura'))} />)}
 
                 {temporada === '2013' && fecha > 30 && fecha <= 44 ? (
@@ -606,53 +601,62 @@ export default function Home() {
                 )}
               </div>
                                                                                
+              {/* Columna Derecha (Filtro de Fecha y Resultados) */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                 <div className="flex flex-col gap-[10px]">
-                  <div className="flex items-center justify-between bg-transparent border border-[#8cc63f] rounded-[4px] px-2">
-                    <button onClick={() => setFecha(prev => Math.max(1, prev - 1))} className="text-[#8cc63f] hover:text-[#000000] font-bold text-[14px] px-2 py-1 bg-transparent border-none outline-none cursor-pointer" disabled={fecha === 1}>◀</button>
-                    <select value={fecha} onChange={(e) => setFecha(Number(e.target.value))} className="w-full bg-transparent font-bold text-[13px] px-[10px] py-[8px] outline-none text-center cursor-pointer border-none">
+                  
+                  {/* Componente Select de Fechas */}
+                  <div className="flex items-center justify-between bg-white border border-[#d1e0d7] rounded-[8px] px-3 py-2 shadow-sm">
+                    <button onClick={() => setFecha(prev => Math.max(1, prev - 1))} className="text-[#8cc63f] hover:text-[#112a1f] font-black text-[18px] px-2 outline-none cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed" disabled={fecha === 1}>◀</button>
+                    <select value={fecha} onChange={(e) => setFecha(Number(e.target.value))} className="w-full bg-transparent font-bold text-[14px] text-[#112a1f] px-[10px] py-[4px] outline-none text-center cursor-pointer border-none uppercase tracking-wide">
                       {[...Array(temporada === '2023' ? 40 : (temporada === '2013' ? 48 : (temporada === '2018' ? 44 : 17)))].map((_, i) => {
                         let etiqueta = `FECHA ${i+1}`;
                         if (temporada === '2023') {
                             if (i < 19) {
-                              const nombresJornadas = { 1: 'Jornada 3', 2: 'Jornada 4', 3: 'Jornada 5', 4: 'Jornada 6', 5: 'Jornada 7', 6: 'Jornada 8', 7: 'Jornada 9', 8: 'Jornada 1 (Aplazada)', 9: 'Jornada 10', 10: 'Jornada 11', 11: 'Jornada 12', 12: 'Jornada 13', 13: 'Jornada 14', 14: 'Jornada 15', 15: 'Jornada 2 (Aplazada)', 16: 'Jornada 16', 17: 'Jornada 17', 18: 'Jornada 18', 19: 'Jornada 19' };
-                              etiqueta = `Semana ${i+1} (${nombresJornadas[i+1]})`;
+                              const nombres = {1:'J. 3', 2:'J. 4', 3:'J. 5', 4:'J. 6', 5:'J. 7', 6:'J. 8', 7:'J. 9', 8:'J. 1 (Aplaz)', 9:'J. 10', 10:'J. 11', 11:'J. 12', 12:'J. 13', 13:'J. 14', 14:'J. 15', 15:'J. 2 (Aplaz)', 16:'J. 16', 17:'J. 17', 18:'J. 18', 19:'J. 19'};
+                              etiqueta = `Semana ${i+1} (${nombres[i+1]})`;
                             } else if (i < 38) { etiqueta = `CLAUSURA F${i-18}`; } else if (i === 38) { etiqueta = `FINAL (IDA)`; } else if (i === 39) { etiqueta = `FINAL (VUELTA)`; }
                         }
                         return <option key={i+1} value={i+1} className="bg-white">{etiqueta}</option>
                       })}
                     </select>
-                    <button onClick={() => setFecha(prev => Math.min(temporada === '2023' ? 40 : (temporada === '2013' ? 48 : (temporada === '2018' ? 44 : 17)), prev + 1))} className="text-[#8cc63f] hover:text-[#000000] font-bold text-[14px] px-2 py-1 bg-transparent border-none outline-none cursor-pointer">▶</button>
+                    <button onClick={() => setFecha(prev => Math.min(temporada === '2023' ? 40 : (temporada === '2013' ? 48 : (temporada === '2018' ? 44 : 17)), prev + 1))} className="text-[#8cc63f] hover:text-[#112a1f] font-black text-[18px] px-2 outline-none cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed">▶</button>
                   </div>
 
                   {temporada === '2023' && [1, 8, 15].includes(fecha) && (
                     <div className="bg-[#fff3cd] border-l-[4px] border-[#fbbf24] text-[#854d0e] p-[10px] text-[11px] rounded shadow-sm font-medium leading-relaxed mt-2 mb-[-10px]">
-                      {fecha === 1 && "🚨 Inicio cronológico del torneo. Marcado por varios Walkovers (derrotas 3-0 en mesa) por disputas de TV."}
+                      {fecha === 1 && "🚨 Inicio cronológico del torneo. Marcado por varios Walkovers por disputas de TV."}
+                      {fecha === 8 && "⏳ La Jornada 1 original se jugó en esta fecha (fines de marzo)."}
+                      {fecha === 15 && "⏳ La Jornada 2 se recuperó finalmente en esta fecha (mediados de mayo)."}
                     </div>
                   )}
 
-                  <div className="bg-white border border-[#d1e0d7] rounded-lg overflow-hidden shadow-lg mt-4">
+                  {/* Resultados de la fecha */}
+                  <div className="bg-white border border-[#d1e0d7] rounded-lg overflow-hidden shadow-sm mt-4">
+                    <div className="text-center font-bold text-[13px] uppercase py-[12px] bg-[#f8fbf9] border-b border-[#d1e0d7] text-[#112a1f]">
+                      RESULTADOS DE LA FECHA
+                    </div>
                     <div className="flex flex-col max-h-[550px] overflow-y-auto custom-scrollbar">
                       {listaPartidos.filter(p => p.Fecha_Global === fecha).length === 0 ? (
-                        <div className="text-center text-[12px] p-[15px]" style={{ color: '#000000' }}>No hay partidos registrados para esta fecha.</div>
+                        <div className="text-center text-[12px] p-[20px] text-[#6b7280]">No hay partidos registrados.</div>
                       ) : (
                         listaPartidos.filter(p => p.Fecha_Global === fecha).map((p, idx) => {
                           const esWO = esWalkover(p); const esConc = esConcedido(p); const teamGanador = ganadorMesa(p);
                           return (
-                            <div key={idx} className={`flex justify-between items-center py-[8px] px-[10px] border-b border-[#d1e0d7] hover:bg-[#f8fbf9] ${idx % 2 === 0 ? 'bg-transparent' : 'bg-[#fcfdfc]'}`}>
+                            <div key={idx} className={`flex justify-between items-center py-[10px] px-[12px] border-b border-[#f0f4f2] hover:bg-[#f8fbf9] transition-colors ${idx % 2 === 0 ? 'bg-transparent' : 'bg-[#fdfdfd]'}`}>
                               <div className="flex flex-col justify-center items-center w-[35px]">
                                 <span className="text-[10px] font-bold text-[#6b7280]">{temporada === '2023' && (p.Torneo === 'Clausura' || p.Torneo === 'Final') ? (p.Torneo === 'Final' ? 'FINAL' : `F${p.Jornada_Oficial - 19}`) : (p.Jornada_Oficial ? `F${p.Jornada_Oficial}` : `F${p.Fecha_Global}`)}</span>
                               </div>
                               <div className="flex items-center w-[85%] justify-center">
-                                <span className={`text-right w-[40%] text-[12px] font-bold truncate ${teamGanador === p.Local ? 'underline decoration-2 underline-offset-2 text-[#8cc63f]' : ''}`}>{p.Local}</span>
-                                <img src={logos[p.Local]} style={{ width: '18px', height: '18px', minWidth: '18px', objectFit: 'contain', margin: '0 5px' }} />
+                                <span className={`text-right w-[40%] text-[11px] font-bold truncate ${teamGanador === p.Local ? 'text-[#8cc63f] underline decoration-2 underline-offset-2' : 'text-[#112a1f]'}`}>{p.Local}</span>
+                                <img src={logos[p.Local]} className="w-[18px] h-[18px] mx-1.5 object-contain" />
                                 
-                                <div className="flex items-center justify-center gap-[2px] mx-[5px] min-w-[65px]">
-                                  {esWO ? ( <div className="text-[#d32f2f] text-[9px] font-black w-[45px] text-center leading-[10px]">WALK<br/>OVER</div> ) : esConc ? ( <div className="text-[#d32f2f] text-[9px] font-black w-[45px] text-center leading-[10px]">CONCE<br/>DIDO</div> ) : p.GL !== null && p.GV !== null ? ( <><div className="bg-[#e5eee9] border border-[#d1e0d7] rounded-[4px] font-bold text-[14px] w-[25px] h-[25px] flex items-center justify-center">{p.GL}</div><div className="font-bold text-[14px] mx-[2px] text-[#8cc63f]">-</div><div className="bg-[#e5eee9] border border-[#d1e0d7] rounded-[4px] font-bold text-[14px] w-[25px] h-[25px] flex items-center justify-center">{p.GV}</div></> ) : ( <div className="font-bold text-[12px] mx-[2px] text-[#8cc63f]">VS</div> )}
+                                <div className="flex items-center justify-center gap-[2px] mx-[2px] min-w-[55px]">
+                                  {esWO ? ( <div className="text-[#ef4444] text-[8px] font-black w-full text-center leading-tight">WALK<br/>OVER</div> ) : esConc ? ( <div className="text-[#ef4444] text-[8px] font-black w-full text-center leading-tight">CONCE<br/>DIDO</div> ) : p.GL !== null && p.GV !== null ? ( <><div className="bg-[#f0f4f2] border border-[#d1e0d7] text-[#112a1f] rounded-[4px] font-bold text-[13px] w-[22px] h-[22px] flex items-center justify-center">{p.GL}</div><div className="font-black text-[13px] text-[#8cc63f] mx-[2px]">-</div><div className="bg-[#f0f4f2] border border-[#d1e0d7] text-[#112a1f] rounded-[4px] font-bold text-[13px] w-[22px] h-[22px] flex items-center justify-center">{p.GV}</div></> ) : ( <div className="font-bold text-[11px] text-[#8cc63f] bg-[#f0f4f2] px-2 py-0.5 rounded border border-[#d1e0d7]">VS</div> )}
                                 </div>
                                 
-                                <img src={logos[p.Visitante]} style={{ width: '18px', height: '18px', minWidth: '18px', objectFit: 'contain', margin: '0 5px' }} />
-                                <span className={`text-left w-[40%] text-[12px] font-bold truncate ${teamGanador === p.Visitante ? 'underline decoration-2 underline-offset-2 text-[#8cc63f]' : ''}`}>{p.Visitante}</span>
+                                <img src={logos[p.Visitante]} className="w-[18px] h-[18px] mx-1.5 object-contain" />
+                                <span className={`text-left w-[40%] text-[11px] font-bold truncate ${teamGanador === p.Visitante ? 'text-[#8cc63f] underline decoration-2 underline-offset-2' : 'text-[#112a1f]'}`}>{p.Visitante}</span>
                               </div>
                             </div>
                           );
@@ -665,13 +669,14 @@ export default function Home() {
             </div>
           )}
 
-          {/* --- VISTA: LIGA 1 -> EQUIPOS --- */}
-          {vistaPrincipal === 'LIGA1' && tabL1 === 'equipos' && (
+          {/* --- VISTA: LIGA 1 -> EQUIPOS (Tu código original) --- */}
+          {vistaMenuLateral === 'LIGA1' && tabTop === 'equipos' && (
             <div>
               {!equipoSeleccionado ? (
-                <div>
+                <div className="max-w-5xl mx-auto">
                   <p className="text-center text-[#6b7280] text-[13px] mb-8">Pulsar en el equipo para ver su info detallada</p>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+                  
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                     {Object.keys(logos).sort().filter(eq => {
                         if (temporada === '2026') return partidos2026JSON.some(p => p[1] === eq || p[2] === eq);
                         if (temporada === '2018') return equipo_A_2018.includes(eq) || equipo_B_2018.includes(eq);
@@ -679,19 +684,21 @@ export default function Home() {
                         if (temporada === '2023') return Array.isArray(partidos2023JSON) ? partidos2023JSON.some(p => normalizarEquipo(p[1]) === eq || normalizarEquipo(p[2]) === eq) : false;
                         return true; 
                       }).map(eq => (
-                        <button key={eq} onClick={() => setEquipoSeleccionado(eq)} className="p-4 flex flex-col items-center justify-center bg-white border border-[#d1e0d7] rounded-[8px] hover:bg-[#f8fbf9] transition-colors cursor-pointer group shadow-sm">
-                          <img src={logos[eq]} style={{ width: '40px', height: '40px', objectFit: 'contain', marginBottom: '10px' }} alt={eq} />
-                          <span className="font-bold text-[13px] text-center uppercase leading-tight group-hover:text-[#8cc63f]" style={{ color: '#000000' }}>{eq}</span>
+                        <button key={eq} onClick={() => setEquipoSeleccionado(eq)} className="p-5 flex flex-col items-center justify-center bg-white border border-[#d1e0d7] rounded-xl hover:bg-[#f8fbf9] hover:border-[#8cc63f] transition-all cursor-pointer shadow-sm outline-none group">
+                          <img src={logos[eq]} className="w-12 h-12 object-contain mb-3 group-hover:scale-110 transition-transform" alt={eq} />
+                          <span className="font-bold text-[12px] text-center uppercase leading-tight text-[#112a1f]">{eq}</span>
                         </button>
                       ))}
                   </div>
                 </div>
               ) : (
                 <div>
-                  <button onClick={() => setEquipoSeleccionado(null)} className="mb-4 bg-[#e5eee9] border border-[#d1e0d7] text-[11px] font-bold px-3 py-1.5 rounded hover:bg-[#d1e0d7] cursor-pointer" style={{ color: '#000000' }}>⬅️ VOLVER</button>
-                  <div className="text-center mb-6">
-                    <img src={logos[equipoSeleccionado]} style={{ width: '60px', height: '60px', objectFit: 'contain', margin: '0 auto 10px auto' }} />
-                    <h2 className="text-[20px] font-bold uppercase" style={{ color: '#000000' }}>{equipoSeleccionado}</h2>
+                  <button onClick={() => setEquipoSeleccionado(null)} className="mb-6 bg-white border border-[#d1e0d7] text-[#112a1f] text-[11px] font-bold px-4 py-2 rounded-md hover:bg-[#f8fbf9] hover:text-[#8cc63f] transition-colors flex items-center gap-2 shadow-sm outline-none">
+                    ◀ VOLVER AL LISTADO
+                  </button>
+                  <div className="text-center mb-8 bg-white p-6 rounded-xl shadow-sm border border-[#d1e0d7]">
+                    <img src={logos[equipoSeleccionado]} className="w-20 h-20 object-contain mx-auto mb-3" />
+                    <h2 className="text-[24px] font-black uppercase text-[#112a1f] m-0 tracking-wide">{equipoSeleccionado}</h2>
                   </div>
                   <div style={{ display: 'grid', gridTemplateColumns: '60% 35%', gap: '5%' }}>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
@@ -699,16 +706,62 @@ export default function Home() {
                       <ListaPartidosComponent titulo="Próximos Partidos" partidos={proximosPartidosEquipo} />
                     </div>
                     <div>
-                      <div className="bg-white border border-[#d1e0d7] rounded p-4 sticky top-24 shadow-lg">
-                        <div className="text-center font-bold text-[14px] uppercase mb-[15px]" style={{ color: '#000000' }}>INFO DEL CLUB</div>
-                        <div className="bg-[#e5eee9] border border-[#d1e0d7] rounded p-[10px] mb-[10px] flex justify-between text-[12px]"><span className="font-bold uppercase" style={{ color: '#6b7280' }}>Apodo</span><span className="font-bold" style={{ color: '#000000' }}>{info_clubes[equipoSeleccionado]?.Apodo || '-'}</span></div>
-                        <div className="bg-[#e5eee9] border border-[#d1e0d7] rounded p-[10px] mb-[10px] flex justify-between text-[12px]"><span className="font-bold uppercase" style={{ color: '#6b7280' }}>Fundación</span><span className="font-bold" style={{ color: '#000000' }}>{info_clubes[equipoSeleccionado]?.Fundación || '-'}</span></div>
-                        <div className="bg-[#e5eee9] border border-[#d1e0d7] rounded p-[10px] flex flex-col text-[12px] text-center"><span className="font-bold uppercase mb-1" style={{ color: '#6b7280' }}>Estadio</span><span className="text-[#8cc63f] font-bold text-xs leading-relaxed">{info_clubes[equipoSeleccionado]?.Estadio || 'Estadio Local'}</span></div>
+                      <div className="bg-white border border-[#d1e0d7] rounded-xl p-5 sticky top-24 shadow-sm">
+                        <div className="text-center font-bold text-[14px] uppercase mb-4 text-[#112a1f] border-b border-[#d1e0d7] pb-2">INFO DEL CLUB</div>
+                        <div className="bg-[#f8fbf9] border border-[#d1e0d7] rounded p-3 mb-2 flex justify-between text-[12px]"><span className="font-bold uppercase text-[#6b7280]">Apodo</span><span className="font-bold text-[#112a1f]">{info_clubes[equipoSeleccionado]?.Apodo || '-'}</span></div>
+                        <div className="bg-[#f8fbf9] border border-[#d1e0d7] rounded p-3 mb-2 flex justify-between text-[12px]"><span className="font-bold uppercase text-[#6b7280]">Fundación</span><span className="font-bold text-[#112a1f]">{info_clubes[equipoSeleccionado]?.Fundación || '-'}</span></div>
+                        <div className="bg-[#f8fbf9] border border-[#d1e0d7] rounded p-3 flex flex-col text-[12px] text-center"><span className="font-bold uppercase mb-1 text-[#6b7280]">Estadio</span><span className="text-[#8cc63f] font-bold text-xs leading-relaxed">{info_clubes[equipoSeleccionado]?.Estadio || 'Estadio Local'}</span></div>
                       </div>
                     </div>
                   </div>
                 </div>
               )}
+            </div>
+          )}
+
+          {/* --- VISTA: CAMPEONES HISTÓRICOS --- */}
+          {vistaMenuLateral === 'CAMPEONES' && (
+            <div style={{ display: 'grid', gridTemplateColumns: '60% 35%', gap: '5%', alignItems: 'start' }}>
+              <div className="bg-white border border-[#d1e0d7] rounded-xl shadow-sm overflow-hidden">
+                <div className="bg-[#f8fbf9] p-3 text-center border-b border-[#d1e0d7]"><h3 className="text-[14px] font-bold uppercase text-[#112a1f] m-0">Historial de Campeones</h3></div>
+                <table className="w-full text-[12px] border-collapse font-sans">
+                  <thead><tr><th className="bg-white py-2.5 px-4 text-left border-b border-[#d1e0d7] font-bold text-[#6b7280] w-[80px]">Torneo</th><th className="bg-white py-2.5 px-4 text-left border-b border-[#d1e0d7] font-bold text-[#6b7280]">Campeón</th></tr></thead>
+                  <tbody>{historial_datos.map((row, i) => (
+                    <tr key={i} className={`hover:bg-[#f8fbf9] border-b border-[#f0f4f2] ${i % 2 === 0 ? 'bg-transparent' : 'bg-[#fdfdfd]'}`}>
+                      <td className="py-3 px-4 font-black text-[#112a1f]">{row.Año}</td>
+                      <td className="py-3 px-4 text-left flex items-center justify-between">
+                        <div className="flex items-center gap-3 font-bold text-[#112a1f]">
+                          <img src={logos[row.Campeón] || 'https://cdn-icons-png.flaticon.com/128/33/33736.png'} className="w-[18px] h-[18px] object-contain" />
+                          <span>{row.Campeón}</span>
+                        </div>
+                        {['2018', '2013', '2023'].includes(row.Año) && (
+                          <button 
+                            onClick={() => { setVistaMenuLateral('LIGA1'); setTemporada(row.Año); setFecha(row.Año === '2013' ? 48 : (row.Año === '2023' ? 1 : 44)); setTabTop('fixture'); setEquipoSeleccionado(null); window.scrollTo(0,0); }}
+                            className="bg-[#f0f4f2] hover:bg-[#8cc63f] hover:text-white text-[#112a1f] font-bold text-[10px] px-3 py-1.5 rounded border border-[#d1e0d7] hover:border-[#8cc63f] outline-none transition-colors"
+                          >
+                            VER AÑO
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  ))}</tbody>
+                </table>
+              </div>
+              <div className="bg-white border border-[#d1e0d7] rounded-xl shadow-sm overflow-hidden sticky top-24">
+                <div className="bg-[#f8fbf9] p-3 text-center border-b border-[#d1e0d7]"><h3 className="text-[14px] font-bold uppercase text-[#112a1f] m-0">Ranking de Ligas</h3></div>
+                <table className="w-full text-[12px] border-collapse font-sans">
+                  <thead><tr><th className="bg-white py-2.5 px-4 text-left border-b border-[#d1e0d7] font-bold text-[#6b7280]">Equipo</th><th className="bg-white py-2.5 px-4 text-center border-b border-[#d1e0d7] font-bold text-[#6b7280] w-[60px]">Títulos</th></tr></thead>
+                  <tbody>{ranking_datos.map((row, i) => (
+                    <tr key={i} className={`hover:bg-[#f8fbf9] border-b border-[#f0f4f2] ${i % 2 === 0 ? 'bg-transparent' : 'bg-[#fdfdfd]'}`}>
+                      <td className="py-3 px-4 text-left flex items-center gap-3 font-bold text-[#112a1f]">
+                        <img src={logos[row.Equipo] || 'https://cdn-icons-png.flaticon.com/128/33/33736.png'} className="w-[18px] h-[18px] object-contain" />
+                        <span>{row.Equipo}</span>
+                      </td>
+                      <td className="py-3 px-4 text-center font-black text-[#8cc63f] text-sm bg-[#f8fbf9]">{row.Títulos}</td>
+                    </tr>
+                  ))}</tbody>
+                </table>
+              </div>
             </div>
           )}
 
