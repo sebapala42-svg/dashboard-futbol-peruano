@@ -4,7 +4,6 @@ import partidosJSON from './torneo_2018.json';
 import partidos2013JSON from './torneo_2013.json';
 import partidos2023JSON from './torneo_2023.json';
 
-// BASE RESTAURADA: LAS 17 FECHAS COMPLETAS DEL 2026 (NUNCA MÁS LA CORTO)
 const partidos2026JSON = [
   [1, 'Sport Huancayo', 'Alianza Lima', 1, 2], [1, 'UTC', 'Atlético Grau', 2, 0], [1, 'Comerciantes Unidos', 'CD Moquegua', 1, 0],
   [1, 'Sport Boys', 'Los Chankas', 1, 1], [1, 'Juan Pablo II', 'FC Cajamarca', 3, 3], [1, 'FBC Melgar', 'Cienciano', 2, 0],
@@ -41,11 +40,10 @@ const partidos2026JSON = [
   [17, 'ADT', 'Cusco FC', null, null], [17, 'FBC Melgar', 'Alianza Atlético', null, null], [17, 'Cienciano', 'Sporting Cristal', null, null], [17, 'Deportivo Garcilaso', 'Juan Pablo II', null, null], [17, 'Atlético Grau', 'CD Moquegua', null, null], [17, 'Universitario', 'Sport Huancayo', null, null], [17, 'FC Cajamarca', 'Alianza Lima', null, null], [17, 'Los Chankas', 'UTC', null, null], [17, 'Sport Boys', 'Comerciantes Unidos', null, null]
 ].map(p => ({ Fecha_Global: p[0], Torneo: 'Apertura', Local: p[1], Visitante: p[2], GL: p[3], GV: p[4] }));
 
-// BASE DE DATOS JSON RESTAURADA (Para que los años 2018, 2023, 2013 no salgan en blanco)
 const listaPartidos2018 = Array.isArray(partidosJSON) ? partidosJSON : (partidosJSON.BaseDatos || Object.values(partidosJSON)[0] || []);
 
-// TRADUCTOR DE EQUIPOS
 const normalizarEquipo = (nombre) => {
+  if (!nombre) return "Equipo";
   const alias = {
     'Melgar': 'FBC Melgar',
     'César Vallejo': 'Cesar Vallejo',
@@ -57,12 +55,12 @@ const normalizarEquipo = (nombre) => {
 
 export default function Home() {
   
-  // ESTADOS MAESTROS DE NAVEGACIÓN
+  // ESTADOS MAESTROS
   const [vistaMenuLateral, setVistaMenuLateral] = useState('PORTADA');
   const [tabTop, setTabTop] = useState('fixture');
   const [menuPeruAbierto, setMenuPeruAbierto] = useState(true);
 
-  // ESTADOS DE LA PORTADA EN VIVO Y CALENDARIO
+  // ESTADOS DE PORTADA
   const [portadaFiltro, setPortadaFiltro] = useState('TODOS');
   const [calendarioAbierto, setCalendarioAbierto] = useState(false);
   const [fechaHoy, setFechaHoy] = useState(new Date()); 
@@ -72,13 +70,10 @@ export default function Home() {
   const [fecha, setFecha] = useState(8); 
   const [equipoSeleccionado, setEquipoSeleccionado] = useState(null);
 
-  // ESTADOS PARA LA API
+  // ESTADOS API
   const [partidosEnVivo, setPartidosEnVivo] = useState([]);
   const [cargandoAPI, setCargandoAPI] = useState(false);
 
-  // ==========================================
-  // LÓGICA DEL CALENDARIO REAL
-  // ==========================================
   const diasSemana = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
   
   const generarDiasMes = (fechaReferencia) => {
@@ -86,43 +81,20 @@ export default function Home() {
     const month = fechaReferencia.getMonth();
     const diasEnElMes = new Date(year, month + 1, 0).getDate();
     const primerDiaSemana = new Date(year, month, 1).getDay(); 
-    
     const offset = primerDiaSemana === 0 ? 6 : primerDiaSemana - 1; 
-    
     let dias = [];
-    for (let i = 0; i < offset; i++) {
-      dias.push(null); 
-    }
-    for (let i = 1; i <= diasEnElMes; i++) {
-      dias.push(new Date(year, month, i));
-    }
+    for (let i = 0; i < offset; i++) dias.push(null); 
+    for (let i = 1; i <= diasEnElMes; i++) dias.push(new Date(year, month, i));
     return dias;
   };
 
-  const cambiarMes = (incremento) => {
-    setMesVisible(new Date(mesVisible.getFullYear(), mesVisible.getMonth() + incremento, 1));
-  };
-
-  const seleccionarFecha = (nuevaFecha) => {
-    setFechaHoy(nuevaFecha);
-    setMesVisible(nuevaFecha); 
-    setCalendarioAbierto(false); 
-  };
-
-  const formatearFecha = (fechaObj) => {
-    const opciones = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    return fechaObj.toLocaleDateString('es-ES', opciones).toUpperCase();
-  };
-
-  const cambiarDiaRapido = (incremento) => {
-    const nueva = new Date(fechaHoy);
-    nueva.setDate(nueva.getDate() + incremento);
-    setFechaHoy(nueva);
-    setMesVisible(nueva);
-  };
+  const cambiarMes = (incremento) => setMesVisible(new Date(mesVisible.getFullYear(), mesVisible.getMonth() + incremento, 1));
+  const seleccionarFecha = (nuevaFecha) => { setFechaHoy(nuevaFecha); setMesVisible(nuevaFecha); setCalendarioAbierto(false); };
+  const formatearFecha = (fechaObj) => fechaObj.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }).toUpperCase();
+  const cambiarDiaRapido = (incremento) => { const nueva = new Date(fechaHoy); nueva.setDate(nueva.getDate() + incremento); setFechaHoy(nueva); setMesVisible(nueva); };
 
   // ==========================================
-  // EFECTO DE API 
+  // EFECTO DE API BLINDADO (Con tus llaves y Traductor Universal)
   // ==========================================
   useEffect(() => {
     if (vistaMenuLateral === 'PORTADA') {
@@ -133,24 +105,38 @@ export default function Home() {
       const day = String(fechaHoy.getDate()).padStart(2, '0');
       const fechaFormateadaAPI = `${year}-${month}-${day}`;
 
-      // REEMPLAZA ESTE ENLACE POR TU API REAL
-      fetch(`c96c8805bbmsha31d2cee880d709p13e8c8jsn72808e880595`) 
-        .then(response => {
-          if (!response.ok) { throw new Error("Error en la API"); }
-          return response.json();
-        })
+      // 1. Usamos una ruta genérica de fixtures por fecha para esta API
+      const url = `https://free-api-live-football-data.p.rapidapi.com/football-fixtures-date?date=${fechaFormateadaAPI}`;
+      
+      // 2. Aquí están tus credenciales exactas de la imagen
+      const options = {
+        method: 'GET',
+        headers: {
+          'x-rapidapi-host': 'free-api-live-football-data.p.rapidapi.com',
+          'x-rapidapi-key': 'c96c8805bbmsha31d2cee880d709p13e8c8jsn72808e880595' 
+        }
+      };
+
+      fetch(url, options) 
+        .then(response => response.json())
         .then(data => {
-          setPartidosEnVivo(data); 
+          // Adaptador Universal: Buscamos dónde vienen los datos (Data, Response, o Array directo)
+          let partidosExtraidos = [];
+          if (Array.isArray(data)) partidosExtraidos = data;
+          else if (data.response && Array.isArray(data.response)) partidosExtraidos = data.response;
+          else if (data.data && Array.isArray(data.data)) partidosExtraidos = data.data;
+
+          setPartidosEnVivo(partidosExtraidos); 
           setCargandoAPI(false);
         })
         .catch(error => {
-          console.error("Error obteniendo datos:", error);
+          console.error("Error obteniendo datos API:", error);
+          setPartidosEnVivo([]);
           setCargandoAPI(false);
         });
     }
   }, [vistaMenuLateral, fechaHoy]);
 
-  // RESULTADOS DE MESA (2023)
   const esWalkover = (p) => {
     if (temporada === '2023' && p.Torneo === 'Apertura' && p.Jornada_Oficial === 3) {
       return (p.Local === 'Cusco FC' && p.Visitante === 'Sport Huancayo') ||
@@ -180,7 +166,6 @@ export default function Home() {
   const listaPartidos = useMemo(() => {
     if (temporada === '2018') return listaPartidos2018.map(p => ({ ...p, Jornada_Oficial: p.Fecha_Global, Local: normalizarEquipo(p.Local), Visitante: normalizarEquipo(p.Visitante) }));
     if (temporada === '2023') {
-      // AQUÍ ESTABA EL ERROR: DEVOLVÍ LA LÓGICA ROBUSTA PARA LEER TU JSON
       const raw2023 = Array.isArray(partidos2023JSON) ? partidos2023JSON : (partidos2023JSON.BaseDatos || Object.values(partidos2023JSON)[0] || []);
       const ordenCronologicoApertura = { 3: 1, 4: 2, 5: 3, 6: 4, 7: 5, 8: 6, 9: 7, 1: 8, 10: 9, 11: 10, 12: 11, 13: 12, 14: 13, 15: 14, 2: 15, 16: 16, 17: 17, 18: 18, 19: 19 };
       return raw2023.map(p => {
@@ -192,7 +177,6 @@ export default function Home() {
       });
     }
     if (temporada === '2013') {
-      // AQUÍ TAMBIÉN RESTAURÉ LA LÓGICA ROBUSTA PARA LEER TU JSON
       const raw2013 = Array.isArray(partidos2013JSON) ? partidos2013JSON : (partidos2013JSON.BaseDatos || Object.values(partidos2013JSON)[0] || []);
       return raw2013.map(p => {
         let gl = p[3]; let gv = p[4];
@@ -272,16 +256,11 @@ export default function Home() {
 
   const equiposDeLaTemporada = useMemo(() => {
     const equiposSet = new Set();
-    listaPartidos.forEach(p => {
-      equiposSet.add(p.Local);
-      equiposSet.add(p.Visitante);
-    });
+    listaPartidos.forEach(p => { equiposSet.add(p.Local); equiposSet.add(p.Visitante); });
     return Array.from(equiposSet).sort();
   }, [listaPartidos]);
 
-  const partidosValidos = useMemo(() => {
-    return listaPartidos.filter(p => p.Fecha_Global <= fecha && p.Torneo !== 'Final');
-  }, [listaPartidos, fecha]);
+  const partidosValidos = useMemo(() => { return listaPartidos.filter(p => p.Fecha_Global <= fecha && p.Torneo !== 'Final'); }, [listaPartidos, fecha]);
 
   const partidosJugadosEquipo = useMemo(() => {
     if (!equipoSeleccionado) return [];
@@ -354,14 +333,8 @@ export default function Home() {
 
   const TablaComponent = ({ titulo, zona, datos, esAcumulado, compactLogo = false }) => (
     <div className="bg-white border border-[#d1e0d7] rounded-[8px] overflow-hidden shadow-lg mb-[15px] pb-1">
-      <div className="text-center font-bold text-[14px] uppercase py-[10px]" style={{ color: '#000000' }}>
-        {titulo}
-      </div>
-      {zona && (
-        <div className="bg-[#e5eee9] px-[10px] py-[6px] font-bold text-[12px] border-b-[2px] border-[#d1e0d7] mx-[2px]" style={{ color: '#000000' }}>
-          {zona}
-        </div>
-      )}
+      <div className="text-center font-bold text-[14px] uppercase py-[10px]" style={{ color: '#000000' }}>{titulo}</div>
+      {zona && <div className="bg-[#e5eee9] px-[10px] py-[6px] font-bold text-[12px] border-b-[2px] border-[#d1e0d7] mx-[2px]" style={{ color: '#000000' }}>{zona}</div>}
       {datos.length === 0 ? <div className="text-center text-[#6b7280] p-3 text-[12px]">Sin datos para esta fecha o temporada.</div> : (
         <table className="w-full text-[12px] font-sans border-collapse mt-1">
           <thead>
@@ -381,37 +354,18 @@ export default function Home() {
           <tbody>
             {datos.map((eq, i) => {
               let bordeColor = 'transparent';
-              
-              if (temporada === '2018' && esAcumulado) {
-                if (i < 4) bordeColor = '#3db4dc'; 
-                else if (i < 8) bordeColor = '#e1c340'; 
-                else if (i >= datos.length - 2) bordeColor = '#d32f2f'; 
-              } 
-              else if (temporada === '2013' && esAcumulado && !zona) {
-                if (i < 3) bordeColor = '#3db4dc'; 
-                else if (i >= 3 && i < 7) bordeColor = '#e1c340'; 
-                else if (i >= datos.length - 2) bordeColor = '#d32f2f'; 
-              }
-              else if (temporada === '2013' && esAcumulado && zona) {
-                if (i === 0) bordeColor = '#3db4dc'; 
-              }
-              else if (temporada === '2023' && esAcumulado) {
-                if (i < 4) bordeColor = '#3db4dc'; // Libertadores
-                else if (i >= 4 && i < 8) bordeColor = '#e1c340'; // Sudamericana
-                else if (i >= datos.length - 3) bordeColor = '#d32f2f'; // Descenso
-              }
-              else if (i === 0) {
-                bordeColor = '#3db4dc';
-              }
+              if (temporada === '2018' && esAcumulado) { if (i < 4) bordeColor = '#3db4dc'; else if (i < 8) bordeColor = '#e1c340'; else if (i >= datos.length - 2) bordeColor = '#d32f2f'; } 
+              else if (temporada === '2013' && esAcumulado && !zona) { if (i < 3) bordeColor = '#3db4dc'; else if (i >= 3 && i < 7) bordeColor = '#e1c340'; else if (i >= datos.length - 2) bordeColor = '#d32f2f'; }
+              else if (temporada === '2013' && esAcumulado && zona) { if (i === 0) bordeColor = '#3db4dc'; }
+              else if (temporada === '2023' && esAcumulado) { if (i < 4) bordeColor = '#3db4dc'; else if (i >= 4 && i < 8) bordeColor = '#e1c340'; else if (i >= datos.length - 3) bordeColor = '#d32f2f'; }
+              else if (i === 0) { bordeColor = '#3db4dc'; }
 
               return (
                 <tr key={eq.equipo} className={`hover:bg-[#f8fbf9] transition-colors ${i % 2 === 0 ? 'bg-transparent' : 'bg-[#fcfdfc]'}`}>
                   <td className="py-[10px] px-[4px] font-bold border-l-[3px] text-center" style={{ borderLeftColor: bordeColor, color: '#000000' }}>{i + 1}</td>
                   <td className="py-[10px] px-[4px] border-r border-[#d1e0d7]">
                     <div className="flex items-center text-left font-bold" style={{ color: '#000000' }}>
-                      <img src={logos[eq.equipo] || 'https://cdn-icons-png.flaticon.com/128/33/33736.png'} 
-                           style={{ width: compactLogo ? '13px' : '15px', height: compactLogo ? '13px' : '15px', minWidth: compactLogo ? '13px' : '15px', objectFit: 'contain', marginRight: '6px' }} 
-                           alt={eq.equipo} />
+                      <img src={logos[eq.equipo] || 'https://cdn-icons-png.flaticon.com/128/33/33736.png'} style={{ width: compactLogo ? '13px' : '15px', height: compactLogo ? '13px' : '15px', minWidth: compactLogo ? '13px' : '15px', objectFit: 'contain', marginRight: '6px' }} alt={eq.equipo} />
                       <span>{eq.equipo}</span>
                     </div>
                   </td>
@@ -425,11 +379,7 @@ export default function Home() {
                   <td className="py-[10px] px-[4px] text-center">
                     <div className="flex gap-[2px] justify-center">
                       {eq.ultimas.map((r, idx) => (
-                        <span key={idx} 
-                              className="inline-flex items-center justify-center text-white text-[8.5px] font-bold rounded-[2px] px-[4px] py-[1px]"
-                              style={{ backgroundColor: r === 'V' ? '#8cc63f' : r === 'E' ? '#e1c340' : '#d32f2f' }}>
-                          {r}
-                        </span>
+                        <span key={idx} className="inline-flex items-center justify-center text-white text-[8.5px] font-bold rounded-[2px] px-[4px] py-[1px]" style={{ backgroundColor: r === 'V' ? '#8cc63f' : r === 'E' ? '#e1c340' : '#d32f2f' }}>{r}</span>
                       ))}
                     </div>
                   </td>
@@ -438,24 +388,6 @@ export default function Home() {
             })}
           </tbody>
         </table>
-      )}
-      
-      {temporada === '2023' && esAcumulado && fecha >= 38 && (
-        <div className="text-[11px] text-left mx-[10px] my-[10px] p-[5px] bg-[#e5eee9] rounded-[4px] border border-[#d1e0d7]" style={{ color: '#6b7280' }}>
-          <strong>Clasificación:</strong> Del 1° al 4° a Copa Libertadores. Del 5° al 8° a Copa Sudamericana. Descienden los 3 últimos (17°, 18° y 19°).<br/>
-          * Resoluciones FPF aplicadas en la Tabla Final Acumulada 2023: D. Municipal (-5), Sport Boys (-4), D. Garcilaso (-1). 
-        </div>
-      )}
-      {temporada === '2018' && esAcumulado && fecha >= 44 && (
-        <div className="text-[11px] text-left mx-[10px] my-[10px] p-[5px] bg-[#e5eee9] rounded-[4px] border border-[#d1e0d7]" style={{ color: '#6b7280' }}>
-          * Nota: Resoluciones FPF aplicadas en Acumulada 2018: Rosario (-7), Muni (-2), UTC (-2), Cantolao (-2), U (-1). Cristal (+2) por Reservas.
-        </div>
-      )}
-      {temporada === '2013' && esAcumulado && fecha >= 44 && !zona && (
-        <div className="text-[11px] text-left mx-[10px] my-[10px] p-[5px] bg-[#e5eee9] rounded-[4px] border border-[#d1e0d7]" style={{ color: '#6b7280' }}>
-          * Nota (2013): Garcilaso y Universitario a Libertadores. El 3° a Libertadores. Del 4° al 7° a Sudamericana. Los dos últimos descienden.<br/>
-          * Sanción: Cusco (Garcilaso) perdió 1 punto en la Fecha 5 ante León de Huánuco.
-        </div>
       )}
     </div>
   );
@@ -470,41 +402,22 @@ export default function Home() {
           <div className="text-center text-[12px] p-[15px]" style={{ color: '#000000' }}>No hay partidos registrados.</div>
         ) : (
           partidos.map((p, idx) => {
-            const esWO = esWalkover(p);
-            const esConc = esConcedido(p);
-            const teamGanador = ganadorMesa(p);
-
+            const esWO = esWalkover(p); const esConc = esConcedido(p); const teamGanador = ganadorMesa(p);
             return (
               <div key={idx} className={`flex justify-between items-center py-[8px] px-[10px] border-t border-[#d1e0d7] hover:bg-[#f8fbf9] transition-colors ${idx % 2 === 0 ? 'bg-transparent' : 'bg-[#fcfdfc]'}`}>
                 <div className="flex flex-col justify-center items-center w-[35px]">
                   <span className="text-[10px] font-bold" style={{ color: '#6b7280' }}>
-                    {temporada === '2023' && (p.Torneo === 'Clausura' || p.Torneo === 'Final') 
-                      ? (p.Torneo === 'Final' ? 'FINAL' : `F${p.Jornada_Oficial - 19}`)
-                      : (p.Jornada_Oficial ? `F${p.Jornada_Oficial}` : `F${p.Fecha_Global}`)}
+                    {temporada === '2023' && (p.Torneo === 'Clausura' || p.Torneo === 'Final') ? (p.Torneo === 'Final' ? 'FINAL' : `F${p.Jornada_Oficial - 19}`) : (p.Jornada_Oficial ? `F${p.Jornada_Oficial}` : `F${p.Fecha_Global}`)}
                   </span>
                 </div>
                 <div className="flex items-center w-[85%] justify-center">
-                  <span className={`text-right w-[40%] text-[12px] font-bold truncate ${teamGanador === p.Local ? 'underline decoration-2 underline-offset-2 text-[#8cc63f]' : ''}`} style={{ color: teamGanador === p.Local ? '#000000' : '#000000' }}>{p.Local}</span>
+                  <span className={`text-right w-[40%] text-[12px] font-bold truncate ${teamGanador === p.Local ? 'text-[#8cc63f] underline decoration-2' : 'text-[#112a1f]'}`}>{p.Local}</span>
                   <img src={logos[p.Local] || 'https://cdn-icons-png.flaticon.com/128/33/33736.png'} style={{ width: '18px', height: '18px', minWidth: '18px', objectFit: 'contain', margin: '0 5px' }} />
-                  
                   <div className="flex items-center justify-center gap-[2px] mx-[5px] min-w-[65px]">
-                    {esWO ? (
-                      <div className="text-[#d32f2f] text-[9px] font-black w-[45px] text-center leading-[10px]">WALK<br/>OVER</div>
-                    ) : esConc ? (
-                      <div className="text-[#d32f2f] text-[9px] font-black w-[45px] text-center leading-[10px]">CONCE<br/>DIDO</div>
-                    ) : p.GL !== null && p.GV !== null ? (
-                      <>
-                        <div className="bg-[#e5eee9] border border-[#d1e0d7] rounded-[4px] font-bold text-[14px] w-[25px] h-[25px] flex items-center justify-center" style={{ color: '#000000' }}>{p.GL}</div>
-                        <div className="font-bold text-[14px] mx-[2px]" style={{ color: '#8cc63f' }}>-</div>
-                        <div className="bg-[#e5eee9] border border-[#d1e0d7] rounded-[4px] font-bold text-[14px] w-[25px] h-[25px] flex items-center justify-center" style={{ color: '#000000' }}>{p.GV}</div>
-                      </>
-                    ) : (
-                      <div className="font-bold text-[12px] mx-[2px]" style={{ color: '#8cc63f' }}>VS</div>
-                    )}
+                    {esWO ? ( <div className="text-[#d32f2f] text-[9px] font-black w-[45px] text-center leading-[10px]">WALK<br/>OVER</div> ) : esConc ? ( <div className="text-[#d32f2f] text-[9px] font-black w-[45px] text-center leading-[10px]">CONCE<br/>DIDO</div> ) : p.GL !== null && p.GV !== null ? ( <><div className="bg-[#e5eee9] border border-[#d1e0d7] rounded-[4px] font-bold text-[14px] w-[25px] h-[25px] flex items-center justify-center" style={{ color: '#000000' }}>{p.GL}</div><div className="font-bold text-[14px] mx-[2px]" style={{ color: '#8cc63f' }}>-</div><div className="bg-[#e5eee9] border border-[#d1e0d7] rounded-[4px] font-bold text-[14px] w-[25px] h-[25px] flex items-center justify-center" style={{ color: '#000000' }}>{p.GV}</div></> ) : ( <div className="font-bold text-[12px] mx-[2px]" style={{ color: '#8cc63f' }}>VS</div> )}
                   </div>
-                  
                   <img src={logos[p.Visitante] || 'https://cdn-icons-png.flaticon.com/128/33/33736.png'} style={{ width: '18px', height: '18px', minWidth: '18px', objectFit: 'contain', margin: '0 5px' }} />
-                  <span className={`text-left w-[40%] text-[12px] font-bold truncate ${teamGanador === p.Visitante ? 'underline decoration-2 underline-offset-2 text-[#8cc63f]' : ''}`} style={{ color: teamGanador === p.Visitante ? '#000000' : '#000000' }}>{p.Visitante}</span>
+                  <span className={`text-left w-[40%] text-[12px] font-bold truncate ${teamGanador === p.Visitante ? 'text-[#8cc63f] underline decoration-2' : 'text-[#112a1f]'}`}>{p.Visitante}</span>
                 </div>
               </div>
             );
@@ -517,7 +430,7 @@ export default function Home() {
   return (
     <div style={{ display: 'flex', height: '100vh', width: '100%', backgroundColor: '#f0f4f2', fontFamily: 'sans-serif', color: '#112a1f', overflow: 'hidden' }}>
       
-      {/* SIDEBAR BLINDADO */}
+      {/* SIDEBAR */}
       <aside style={{ width: '250px', backgroundColor: '#ffffff', borderRight: '1px solid #d1e0d7', flexShrink: 0, display: 'flex', flexDirection: 'column', height: '100%', overflowY: 'auto' }}>
         <div 
           onClick={() => setVistaMenuLateral('PORTADA')}
@@ -585,9 +498,10 @@ export default function Home() {
         </div>
       </aside>
 
+      {/* CONTENIDO PRINCIPAL */}
       <main style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100%', backgroundColor: '#f0f4f2', overflowY: 'auto', position: 'relative' }}>
         
-        {/* VISTA PORTADA */}
+        {/* VISTA PORTADA BLINDADA */}
         {vistaMenuLateral === 'PORTADA' && (
           <div style={{ padding: '24px', width: '100%', maxWidth: '900px', margin: '0 auto', paddingBottom: '80px' }}>
             
@@ -602,7 +516,6 @@ export default function Home() {
                  
                  {calendarioAbierto && (
                    <div style={{ position: 'absolute', top: '100%', left: '50%', transform: 'translateX(-50%)', marginTop: '8px', width: '280px', backgroundColor: '#ffffff', border: '1px solid #d1e0d7', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)', borderRadius: '8px', zIndex: 1000, padding: '12px' }}>
-                     
                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
                        <button onClick={() => cambiarMes(-1)} style={{ background: 'transparent', border: 'none', cursor: 'pointer', fontWeight: 'bold', color: '#6b7280' }}>{'<'}</button>
                        <strong style={{ fontSize: '12px', color: '#112a1f', textTransform: 'uppercase' }}>
@@ -613,7 +526,6 @@ export default function Home() {
 
                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '4px', textAlign: 'center', fontSize: '12px' }}>
                         {diasSemana.map(d => <div key={d} style={{ fontWeight: 'bold', color: '#112a1f', paddingBottom: '4px' }}>{d}</div>)}
-                        
                         {generarDiasMes(mesVisible).map((diaObj, index) => {
                           if (!diaObj) return <div key={index} style={{ padding: '6px' }}></div>;
                           const esHoy = diaObj.getDate() === fechaHoy.getDate() && diaObj.getMonth() === fechaHoy.getMonth() && diaObj.getFullYear() === fechaHoy.getFullYear();
@@ -644,7 +556,7 @@ export default function Home() {
             {/* Bloque LIGA 1 */}
             <div style={{ backgroundColor: '#f8fbf9', padding: '8px 12px', marginTop: '16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', color: '#112a1f', fontSize: '11px', fontWeight: '900', textTransform: 'uppercase', borderTopLeftRadius: '6px', borderTopRightRadius: '6px', boxShadow: '0 1px 2px rgba(0,0,0,0.05)', border: '1px solid #d1e0d7' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', letterSpacing: '0.05em' }}>
-                    <img src="https://flagcdn.com/24x18/pe.png" alt="Peru" style={{ width: '16px', borderRadius: '2px' }}/> LIGA 1 TE APUESTO
+                    <img src="https://flagcdn.com/24x18/pe.png" alt="Peru" style={{ width: '16px', borderRadius: '2px' }}/> PARTIDOS DEL DÍA
                 </div>
             </div>
 
@@ -655,46 +567,58 @@ export default function Home() {
                 ) : partidosEnVivo.length === 0 ? (
                   <div style={{ textAlign: 'center', padding: '32px', fontWeight: 'bold', color: '#6b7280' }}>No hay partidos programados para {fechaHoy.toLocaleDateString('es-ES')}.</div>
                 ) : (
-                 {partidosEnVivo.map((m, idx) => {
-   // --- EL TRADUCTOR (Mapea los nombres de tu API) ---
-   const local = m.Local || m.home_team || m.team1 || m.homeTeam;
-   const visita = m.Visitante || m.away_team || m.team2 || m.awayTeam;
-   const golesL = m.GL !== undefined ? m.GL : (m.home_score || m.score1);
-   const golesV = m.GV !== undefined ? m.GV : (m.away_score || m.score2);
-   const estadoPartida = m.Estado || m.status || m.time;
-   // -------------------------------------------------
+                  partidosEnVivo.map((m, idx) => {
+                     // ==========================================
+                     // TRADUCTOR UNIVERSAL EN ACCIÓN
+                     // ==========================================
+                     const local = m.teams?.home?.name || m.homeTeam?.name || m.Local || m.home_team || "Local";
+                     const visita = m.teams?.away?.name || m.awayTeam?.name || m.Visitante || m.away_team || "Visita";
+                     
+                     const golesL = m.goals?.home ?? m.home_score ?? m.GL ?? null;
+                     const golesV = m.goals?.away ?? m.away_score ?? m.GV ?? null;
+                     
+                     // Definir Estado del partido
+                     const statusAPI = m.fixture?.status?.short || m.status || m.Estado;
+                     let estadoMock = statusAPI || '15:30';
+                     if (estadoMock === 'FT' || estadoMock === 'Finished') estadoMock = 'Final';
+                     if (estadoMock === '1H' || estadoMock === '2H' || estadoMock === 'HT') estadoMock = 'EN VIVO';
+                     if (golesL === null) estadoMock = m.fixture?.date ? new Date(m.fixture.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 'Por Jugar';
+                     
+                     const ganador = (golesL !== null && golesV !== null) ? (golesL > golesV ? local : (golesL < golesV ? visita : null)) : null;
+                     // ==========================================
 
-   const ganador = golesL > golesV ? local : (golesL < golesV ? visita : null);
-   const estadoMock = (idx === 0) ? 'EN VIVO' : (golesL !== null ? 'Final' : '15:30'); 
-   
-   return (
-     <div key={idx} style={{ display: 'flex', borderTop: idx === 0 ? 'none' : '1px solid #f0f4f2', color: '#112a1f' }}>
-        <div style={{ width: '60px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyCenter: 'center', borderRight: '1px solid #f0f4f2', padding: '12px 4px' }}>
-           <span style={{ fontSize: '10px', fontWeight: '900', color: estadoMock === 'EN VIVO' ? '#ef4444' : '#6b7280' }}>{estadoMock}</span>
-        </div>
-        
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '12px' }}>
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}>
-                <span style={{ textAlign: 'right', width: '35%', fontSize: '12px', fontWeight: 'bold', color: ganador === local ? '#8cc63f' : '#112a1f', textDecoration: ganador === local ? 'underline' : 'none' }}>{local}</span>
-                <img src={logos[local] || 'https://cdn-icons-png.flaticon.com/128/33/33736.png'} style={{ width: '20px', height: '20px', objectFit: 'contain' }} alt={local}/>
-                
-                {golesL !== null ? (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px', minWidth: '50px', justifyContent: 'center' }}>
-                    <span style={{ fontWeight: 'bold', fontSize: '14px', backgroundColor: '#f0f4f2', color: '#112a1f', width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '4px', border: '1px solid #d1e0d7' }}>{golesL}</span>
-                    <span style={{ fontWeight: '900', color: '#8cc63f' }}>-</span>
-                    <span style={{ fontWeight: 'bold', fontSize: '14px', backgroundColor: '#f0f4f2', color: '#112a1f', width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '4px', border: '1px solid #d1e0d7' }}>{golesV}</span>
-                  </div>
-                ) : (
-                  <span style={{ fontWeight: 'bold', fontSize: '11px', backgroundColor: '#f0f4f2', padding: '2px 8px', borderRadius: '4px', border: '1px solid #d1e0d7', minWidth: '50px', textAlign: 'center', color: '#8cc63f' }}>VS</span>
+                     return (
+                       <div key={idx} style={{ display: 'flex', borderTop: idx === 0 ? 'none' : '1px solid #f0f4f2', color: '#112a1f' }}>
+                          <div style={{ width: '60px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', borderRight: '1px solid #f0f4f2', padding: '12px 4px' }}>
+                             <span style={{ fontSize: '10px', fontWeight: '900', color: estadoMock === 'EN VIVO' ? '#ef4444' : '#6b7280' }}>{estadoMock}</span>
+                          </div>
+                          
+                          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '12px' }}>
+                              <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}>
+                                  <span style={{ textAlign: 'right', width: '35%', fontSize: '12px', fontWeight: 'bold', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', color: ganador === local ? '#8cc63f' : '#112a1f', textDecoration: ganador === local ? 'underline' : 'none' }}>{normalizarEquipo(local)}</span>
+                                  <img src={logos[normalizarEquipo(local)] || 'https://cdn-icons-png.flaticon.com/128/33/33736.png'} style={{ width: '20px', height: '20px', objectFit: 'contain' }} alt={local}/>
+                                  
+                                  {golesL !== null ? (
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px', minWidth: '50px', justifyContent: 'center' }}>
+                                      <span style={{ fontWeight: 'bold', fontSize: '14px', backgroundColor: '#f0f4f2', color: '#112a1f', width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '4px', border: '1px solid #d1e0d7' }}>{golesL}</span>
+                                      <span style={{ fontWeight: '900', color: '#8cc63f' }}>-</span>
+                                      <span style={{ fontWeight: 'bold', fontSize: '14px', backgroundColor: '#f0f4f2', color: '#112a1f', width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '4px', border: '1px solid #d1e0d7' }}>{golesV}</span>
+                                    </div>
+                                  ) : (
+                                    <span style={{ fontWeight: 'bold', fontSize: '11px', backgroundColor: '#f0f4f2', padding: '2px 8px', borderRadius: '4px', border: '1px solid #d1e0d7', minWidth: '50px', textAlign: 'center', color: '#8cc63f' }}>VS</span>
+                                  )}
+                                  
+                                  <img src={logos[normalizarEquipo(visita)] || 'https://cdn-icons-png.flaticon.com/128/33/33736.png'} style={{ width: '20px', height: '20px', objectFit: 'contain' }} alt={visita}/>
+                                  <span style={{ textAlign: 'left', width: '35%', fontSize: '12px', fontWeight: 'bold', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', color: ganador === visita ? '#8cc63f' : '#112a1f', textDecoration: ganador === visita ? 'underline' : 'none' }}>{normalizarEquipo(visita)}</span>
+                              </div>
+                          </div>
+                       </div>
+                     );
+                  })
                 )}
-                
-                <img src={logos[visita] || 'https://cdn-icons-png.flaticon.com/128/33/33736.png'} style={{ width: '20px', height: '20px', objectFit: 'contain' }} alt={visita}/>
-                <span style={{ textAlign: 'left', width: '35%', fontSize: '12px', fontWeight: 'bold', color: ganador === visita ? '#8cc63f' : '#112a1f', textDecoration: ganador === visita ? 'underline' : 'none' }}>{visita}</span>
             </div>
-        </div>
-     </div>
-   );
-})}
+          </div>
+        )}
 
         {/* VISTAS LIGA 1 Y CAMPEONES */}
         {vistaMenuLateral === 'LIGA1' && (
