@@ -4,6 +4,7 @@ import partidosJSON from './torneo_2018.json';
 import partidos2013JSON from './torneo_2013.json';
 import partidos2023JSON from './torneo_2023.json';
 
+// BASE RESTAURADA: LAS 17 FECHAS COMPLETAS DEL 2026
 const partidos2026JSON = [
   [1, 'Sport Huancayo', 'Alianza Lima', 1, 2], [1, 'UTC', 'Atlético Grau', 2, 0], [1, 'Comerciantes Unidos', 'CD Moquegua', 1, 0],
   [1, 'Sport Boys', 'Los Chankas', 1, 1], [1, 'Juan Pablo II', 'FC Cajamarca', 3, 3], [1, 'FBC Melgar', 'Cienciano', 2, 0],
@@ -94,7 +95,7 @@ export default function Home() {
   const cambiarDiaRapido = (incremento) => { const nueva = new Date(fechaHoy); nueva.setDate(nueva.getDate() + incremento); setFechaHoy(nueva); setMesVisible(nueva); };
 
   // ==========================================
-  // EFECTO DE API BLINDADO (Con tus llaves y Traductor Universal)
+  // EFECTO DE API BLINDADO (Filtro Liga 1 - ID 131)
   // ==========================================
   useEffect(() => {
     if (vistaMenuLateral === 'PORTADA') {
@@ -103,12 +104,11 @@ export default function Home() {
       const year = fechaHoy.getFullYear();
       const month = String(fechaHoy.getMonth() + 1).padStart(2, '0');
       const day = String(fechaHoy.getDate()).padStart(2, '0');
-      const fechaFormateadaAPI = `${year}-${month}-${day}`;
+      const fechaFormateadaAPI = `${year}${month}${day}`; // Formato comúnmente usado por APIs basadas en Fotmob (YYYYMMDD)
 
-      // 1. Usamos una ruta genérica de fixtures por fecha para esta API
-      const url = `https://free-api-live-football-data.p.rapidapi.com/football-fixtures-date?date=${fechaFormateadaAPI}`;
+      // URL actualizada para RapidAPI (Free API Live Football Data)
+      const url = `https://free-api-live-football-data.p.rapidapi.com/football-matches-by-date?date=${fechaFormateadaAPI}`;
       
-      // 2. Aquí están tus credenciales exactas de la imagen
       const options = {
         method: 'GET',
         headers: {
@@ -120,13 +120,31 @@ export default function Home() {
       fetch(url, options) 
         .then(response => response.json())
         .then(data => {
-          // Adaptador Universal: Buscamos dónde vienen los datos (Data, Response, o Array directo)
-          let partidosExtraidos = [];
-          if (Array.isArray(data)) partidosExtraidos = data;
-          else if (data.response && Array.isArray(data.response)) partidosExtraidos = data.response;
-          else if (data.data && Array.isArray(data.data)) partidosExtraidos = data.data;
+          let partidosFiltrados = [];
 
-          setPartidosEnVivo(partidosExtraidos); 
+          // Logica para APIs que agrupan por 'leagues' (como en tu captura)
+          if (data.leagues && Array.isArray(data.leagues)) {
+            // Buscamos específicamente la liga de Perú con ID 131
+            const ligaPeru = data.leagues.find(l => l.id === 131 || l.primaryId === 131);
+            if (ligaPeru && ligaPeru.matches) {
+              partidosFiltrados = ligaPeru.matches;
+            }
+          } 
+          // Lógica alternativa por si la API manda un Array directo
+          else {
+            let todosLosPartidos = [];
+            if (Array.isArray(data)) todosLosPartidos = data;
+            else if (data.response && Array.isArray(data.response)) todosLosPartidos = data.response;
+            else if (data.data && Array.isArray(data.data)) todosLosPartidos = data.data;
+
+            // Filtro estricto ID 131
+            partidosFiltrados = todosLosPartidos.filter(partido => {
+              const leagueId = partido.league?.id || partido.leagueId || partido.league_id || partido.id;
+              return leagueId === 131;
+            });
+          }
+
+          setPartidosEnVivo(partidosFiltrados); 
           setCargandoAPI(false);
         })
         .catch(error => {
@@ -136,6 +154,7 @@ export default function Home() {
         });
     }
   }, [vistaMenuLateral, fechaHoy]);
+  // ==========================================
 
   const esWalkover = (p) => {
     if (temporada === '2023' && p.Torneo === 'Apertura' && p.Jornada_Oficial === 3) {
@@ -556,7 +575,7 @@ export default function Home() {
             {/* Bloque LIGA 1 */}
             <div style={{ backgroundColor: '#f8fbf9', padding: '8px 12px', marginTop: '16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', color: '#112a1f', fontSize: '11px', fontWeight: '900', textTransform: 'uppercase', borderTopLeftRadius: '6px', borderTopRightRadius: '6px', boxShadow: '0 1px 2px rgba(0,0,0,0.05)', border: '1px solid #d1e0d7' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', letterSpacing: '0.05em' }}>
-                    <img src="https://flagcdn.com/24x18/pe.png" alt="Peru" style={{ width: '16px', borderRadius: '2px' }}/> PARTIDOS DEL DÍA
+                    <img src="https://flagcdn.com/24x18/pe.png" alt="Peru" style={{ width: '16px', borderRadius: '2px' }}/> LIGA 1 TE APUESTO
                 </div>
             </div>
 
@@ -568,16 +587,13 @@ export default function Home() {
                   <div style={{ textAlign: 'center', padding: '32px', fontWeight: 'bold', color: '#6b7280' }}>No hay partidos programados para {fechaHoy.toLocaleDateString('es-ES')}.</div>
                 ) : (
                   partidosEnVivo.map((m, idx) => {
-                     // ==========================================
-                     // TRADUCTOR UNIVERSAL EN ACCIÓN
-                     // ==========================================
+                     // Traductor adaptado
                      const local = m.teams?.home?.name || m.homeTeam?.name || m.Local || m.home_team || "Local";
                      const visita = m.teams?.away?.name || m.awayTeam?.name || m.Visitante || m.away_team || "Visita";
                      
                      const golesL = m.goals?.home ?? m.home_score ?? m.GL ?? null;
                      const golesV = m.goals?.away ?? m.away_score ?? m.GV ?? null;
                      
-                     // Definir Estado del partido
                      const statusAPI = m.fixture?.status?.short || m.status || m.Estado;
                      let estadoMock = statusAPI || '15:30';
                      if (estadoMock === 'FT' || estadoMock === 'Finished') estadoMock = 'Final';
@@ -585,7 +601,6 @@ export default function Home() {
                      if (golesL === null) estadoMock = m.fixture?.date ? new Date(m.fixture.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 'Por Jugar';
                      
                      const ganador = (golesL !== null && golesV !== null) ? (golesL > golesV ? local : (golesL < golesV ? visita : null)) : null;
-                     // ==========================================
 
                      return (
                        <div key={idx} style={{ display: 'flex', borderTop: idx === 0 ? 'none' : '1px solid #f0f4f2', color: '#112a1f' }}>
