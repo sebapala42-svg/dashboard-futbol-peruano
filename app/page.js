@@ -50,7 +50,6 @@ const normalizarEquipo = (nombre) => {
   
   const n = nombre.toLowerCase();
   
-  // Búsqueda inteligente por palabras clave (Así la API mande nombres larguísimos)
   if (n.includes('cristal')) return 'Sporting Cristal';
   if (n.includes('universitario')) return 'Universitario';
   if (n.includes('alianza lima')) return 'Alianza Lima';
@@ -71,7 +70,6 @@ const normalizarEquipo = (nombre) => {
   if (n.includes('juan pablo ii')) return 'Juan Pablo II';
   if (n.includes('cajamarca') || n.includes('utc')) return 'UTC';
 
-  // Si es un equipo antiguo o muy raro, devuelve el nombre original formateado
   return nombre;
 };
 
@@ -113,7 +111,7 @@ export default function Home() {
   const cambiarDiaRapido = (incremento) => { const nueva = new Date(fechaHoy); nueva.setDate(nueva.getDate() + incremento); setFechaHoy(nueva); setMesVisible(nueva); };
 
   // ==========================================
-  // EFECTO API: SPORTAPI + MATA ZOMBIS (UTC -> PERÚ)
+  // EFECTO API: SPORTAPI + MATA ZOMBIS (Matemática pura UTC-5)
   // ==========================================
   useEffect(() => {
     if (vistaMenuLateral === 'PORTADA') {
@@ -146,11 +144,20 @@ export default function Home() {
             const paisTorneo = partido.tournament?.category?.name?.toLowerCase() || '';
             const esPeru = paisTorneo.includes('peru') || nombreTorneo.includes('liga 1');
 
-            // 2. EL MATA-ZOMBIS: Comprobar que en HORA PERUANA el partido caiga exactamente en el día elegido
+            // 2. EL MATA-ZOMBIS (Matemática pura, sin depender de navegadores)
             let esMismoDiaLocal = true;
             if (partido.startTimestamp) {
-               // Convertimos el timestamp de la API a fecha YYYY-MM-DD usando la zona horaria de Lima
-               const fechaPartidoPeru = new Date(partido.startTimestamp * 1000).toLocaleDateString('en-CA', { timeZone: 'America/Lima' });
+               // Tomamos el timestamp (segundos) y le restamos 5 horas en segundos (5 * 3600)
+               // Esto nos da la hora exacta y universal en Perú
+               const limaTimeMs = (partido.startTimestamp - (5 * 3600)) * 1000;
+               const limaDate = new Date(limaTimeMs);
+               
+               // Extraemos la fecha usando los métodos UTC (para que el navegador del usuario no estorbe)
+               const pYear = limaDate.getUTCFullYear();
+               const pMonth = String(limaDate.getUTCMonth() + 1).padStart(2, '0');
+               const pDay = String(limaDate.getUTCDate()).padStart(2, '0');
+               
+               const fechaPartidoPeru = `${pYear}-${pMonth}-${pDay}`;
                esMismoDiaLocal = (fechaPartidoPeru === fechaFormateadaAPI);
             }
 
@@ -608,7 +615,7 @@ export default function Home() {
                      if (statusAPI === 'finished') estadoMock = 'Final';
                      else if (statusAPI === 'inprogress') estadoMock = 'EN VIVO';
                      else if (statusAPI === 'notstarted' && m.startTimestamp) {
-                        estadoMock = new Date(m.startTimestamp * 1000).toLocaleTimeString('es-PE', {timeZone: 'America/Lima', hour: '2-digit', minute:'2-digit'});
+                        estadoMock = new Date((m.startTimestamp - (5 * 3600)) * 1000).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', timeZone: 'UTC'});
                      }
 
                      const ganador = (golesL !== null && golesV !== null) ? (golesL > golesV ? local : (golesL < golesV ? visita : null)) : null;
