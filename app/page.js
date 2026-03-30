@@ -42,7 +42,7 @@ const partidos2026JSON = [
 
 const listaPartidos2018 = Array.isArray(partidosJSON) ? partidosJSON : (partidosJSON.BaseDatos || Object.values(partidosJSON)[0] || []);
 
-// TRADUCTOR DE EQUIPOS
+// TRADUCTOR DE EQUIPOS: Normaliza los nombres para que el código siempre use el mismo
 const normalizarEquipo = (nombre) => {
   const alias = {
     'Melgar': 'FBC Melgar',
@@ -57,7 +57,7 @@ export default function Home() {
   
   // ESTADOS MAESTROS DE NAVEGACIÓN
   const [vistaMenuLateral, setVistaMenuLateral] = useState('PORTADA'); // Inicia en PORTADA
-  const [tabTop, setTabTop] = useState('fixture');
+  const [tabTop, setTabTop] = useState('fixture'); // 'vivo', 'fixture', 'equipos'
   const [menuPeruAbierto, setMenuPeruAbierto] = useState(true);
 
   // Estados originales
@@ -65,7 +65,7 @@ export default function Home() {
   const [fecha, setFecha] = useState(8); 
   const [equipoSeleccionado, setEquipoSeleccionado] = useState(null);
   
-  // RESULTADOS DE MESA (2023)
+  // FUNCIONES PARA DETECTAR RESULTADOS DE MESA (2023)
   const esWalkover = (p) => {
     if (temporada === '2023' && p.Torneo === 'Apertura' && p.Jornada_Oficial === 3) {
       return (p.Local === 'Cusco FC' && p.Visitante === 'Sport Huancayo') ||
@@ -390,7 +390,7 @@ export default function Home() {
   return (
     <div className="flex h-screen w-full bg-[#f0f4f2] font-sans text-black overflow-hidden">
       
-      {/* 1. EL SIDEBAR (Izquierda) */}
+      {/* 1. EL SIDEBAR (Izquierda) - ESTÉTICA MEJORADA */}
       <aside className="w-[250px] bg-white border-r border-[#d1e0d7] flex-shrink-0 flex flex-col h-full shadow-sm overflow-y-auto">
         <div 
           onClick={() => setVistaMenuLateral('PORTADA')}
@@ -399,23 +399,19 @@ export default function Home() {
           <img src="https://i.ibb.co/9kWMHzxY/Gemini-Generated-Image-oweh8loweh8loweh-removebg-preview.png" alt="Logo" className="h-[45px] object-contain hover:scale-105 transition-transform" />
         </div>
 
-        <div className="flex-1 py-4 flex flex-col px-3">
-          <div className="text-[10px] font-black text-[#8cc63f] uppercase tracking-widest mb-2 pl-1 border-b border-[#f0f4f2] pb-1">Menú Principal</div>
+        <div className="flex-1 py-4 flex flex-col px-3 gap-2">
+          <div className="text-[10px] font-black text-[#8cc63f] uppercase tracking-widest pl-1 mb-1">Menú Principal</div>
           
-          {/* EL SIDEBAR - DISEÑO MEJORADO */}
-          <div className="flex flex-col gap-1 mt-2">
-            <button 
-              onClick={() => setMenuPeruAbierto(!menuPeruAbierto)} 
-              className="w-full flex items-center justify-between text-[#112a1f] font-bold text-[13px] bg-[#f8fbf9] border border-[#d1e0d7] px-3 py-2.5 rounded-md hover:bg-[#e5eee9] transition-colors outline-none shadow-sm"
-            >
+          <div className="flex flex-col gap-1.5">
+            <button onClick={() => setMenuPeruAbierto(!menuPeruAbierto)} className="w-full flex items-center justify-between text-[#112a1f] font-bold text-[13px] bg-[#f8fbf9] border border-[#d1e0d7] px-3 py-2.5 rounded-md hover:bg-[#e5eee9] hover:border-[#8cc63f]/50 transition-colors outline-none shadow-sm group">
               <div className="flex items-center gap-2">
                 <img src="https://tmssl.akamaized.net//images/holding/head/pe.png" className="w-[16px] drop-shadow-sm" alt="Peru"/> PERÚ
               </div>
-              <span className="text-[10px] text-[#6b7280]">{menuPeruAbierto ? '▲' : '▼'}</span>
+              <span className="text-[10px] text-[#6b7280] group-hover:text-[#112a1f]">{menuPeruAbierto ? '▲' : '▼'}</span>
             </button>
 
             {menuPeruAbierto && (
-              <div className="flex flex-col pl-4 mt-1 border-l-2 border-[#d1e0d7] ml-3 gap-1">
+              <div className="flex flex-col pl-4 mt-1 border-l-2 border-[#d1e0d7] ml-3 gap-1.5">
                 <button 
                   onClick={() => { setVistaMenuLateral('LIGA1'); setTabTop('fixture'); setTemporada('2026'); setEquipoSeleccionado(null); }}
                   className={`w-full text-left px-3 py-2 text-[12px] font-bold rounded-md transition-colors outline-none ${vistaMenuLateral === 'LIGA1' ? 'bg-[#e5eee9] text-[#112a1f] border-l-[3px] border-[#8cc63f] shadow-sm' : 'text-[#6b7280] hover:bg-[#f8fbf9] hover:text-[#112a1f] border-l-[3px] border-transparent'}`}
@@ -539,6 +535,7 @@ export default function Home() {
                       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                         {equiposDeLaTemporada.map(eq => (
                             <button key={eq} onClick={() => setEquipoSeleccionado(eq)} className="p-4 flex flex-col items-center justify-center bg-white border border-[#d1e0d7] rounded-xl hover:bg-[#f8fbf9] hover:border-[#8cc63f] transition-all cursor-pointer group shadow-sm outline-none">
+                              {/* CONTENEDOR FORZADO DE LOGO (55x55) */}
                               <div className="w-[55px] h-[55px] flex items-center justify-center mb-3">
                                 <img src={logos[eq] || 'https://cdn-icons-png.flaticon.com/128/33/33736.png'} className="max-w-full max-h-full object-contain group-hover:scale-110 transition-transform" alt={eq} />
                               </div>
