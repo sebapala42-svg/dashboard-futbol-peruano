@@ -4,7 +4,6 @@ import partidosJSON from './torneo_2018.json';
 import partidos2013JSON from './torneo_2013.json';
 import partidos2023JSON from './torneo_2023.json';
 
-// BASE RESTAURADA: LAS 17 FECHAS COMPLETAS DEL 2026
 const partidos2026JSON = [
   [1, 'Sport Huancayo', 'Alianza Lima', 1, 2], [1, 'UTC', 'Atlético Grau', 2, 0], [1, 'Comerciantes Unidos', 'CD Moquegua', 1, 0],
   [1, 'Sport Boys', 'Los Chankas', 1, 1], [1, 'Juan Pablo II', 'FC Cajamarca', 3, 3], [1, 'FBC Melgar', 'Cienciano', 2, 0],
@@ -56,12 +55,10 @@ const normalizarEquipo = (nombre) => {
 
 export default function Home() {
   
-  // ESTADOS MAESTROS
   const [vistaMenuLateral, setVistaMenuLateral] = useState('PORTADA');
   const [tabTop, setTabTop] = useState('fixture');
   const [menuPeruAbierto, setMenuPeruAbierto] = useState(true);
 
-  // ESTADOS DE PORTADA
   const [portadaFiltro, setPortadaFiltro] = useState('TODOS');
   const [calendarioAbierto, setCalendarioAbierto] = useState(false);
   const [fechaHoy, setFechaHoy] = useState(new Date()); 
@@ -71,7 +68,6 @@ export default function Home() {
   const [fecha, setFecha] = useState(8); 
   const [equipoSeleccionado, setEquipoSeleccionado] = useState(null);
 
-  // ESTADOS API
   const [partidosEnVivo, setPartidosEnVivo] = useState([]);
   const [cargandoAPI, setCargandoAPI] = useState(false);
 
@@ -95,7 +91,7 @@ export default function Home() {
   const cambiarDiaRapido = (incremento) => { const nueva = new Date(fechaHoy); nueva.setDate(nueva.getDate() + incremento); setFechaHoy(nueva); setMesVisible(nueva); };
 
   // ==========================================
-  // EFECTO DE API BLINDADO (Filtro Liga 1 - ID 131)
+  // EFECTO DE API: SPORTAPI (SOFASCORE)
   // ==========================================
   useEffect(() => {
     if (vistaMenuLateral === 'PORTADA') {
@@ -104,15 +100,15 @@ export default function Home() {
       const year = fechaHoy.getFullYear();
       const month = String(fechaHoy.getMonth() + 1).padStart(2, '0');
       const day = String(fechaHoy.getDate()).padStart(2, '0');
-      const fechaFormateadaAPI = `${year}${month}${day}`; // Formato comúnmente usado por APIs basadas en Fotmob (YYYYMMDD)
+      const fechaFormateadaAPI = `${year}-${month}-${day}`; // Formato que usa SportAPI
 
-      // URL actualizada para RapidAPI (Free API Live Football Data)
-      const url = `https://free-api-live-football-data.p.rapidapi.com/football-matches-by-date?date=${fechaFormateadaAPI}`;
+      // Usamos el endpoint de eventos por fecha de SportAPI
+      const url = `https://sportapi7.p.rapidapi.com/api/v1/sport/football/scheduled-events/${fechaFormateadaAPI}`;
       
       const options = {
         method: 'GET',
         headers: {
-          'x-rapidapi-host': 'free-api-live-football-data.p.rapidapi.com',
+          'x-rapidapi-host': 'sportapi7.p.rapidapi.com',
           'x-rapidapi-key': 'c96c8805bbmsha31d2cee880d709p13e8c8jsn72808e880595' 
         }
       };
@@ -121,34 +117,23 @@ export default function Home() {
         .then(response => response.json())
         .then(data => {
           let partidosFiltrados = [];
+          
+          // SportAPI devuelve los partidos dentro de data.events
+          let todosLosPartidos = data.events || data.data || [];
 
-          // Logica para APIs que agrupan por 'leagues' (como en tu captura)
-          if (data.leagues && Array.isArray(data.leagues)) {
-            // Buscamos específicamente la liga de Perú con ID 131
-            const ligaPeru = data.leagues.find(l => l.id === 131 || l.primaryId === 131);
-            if (ligaPeru && ligaPeru.matches) {
-              partidosFiltrados = ligaPeru.matches;
-            }
-          } 
-          // Lógica alternativa por si la API manda un Array directo
-          else {
-            let todosLosPartidos = [];
-            if (Array.isArray(data)) todosLosPartidos = data;
-            else if (data.response && Array.isArray(data.response)) todosLosPartidos = data.response;
-            else if (data.data && Array.isArray(data.data)) todosLosPartidos = data.data;
-
-            // Filtro estricto ID 131
-            partidosFiltrados = todosLosPartidos.filter(partido => {
-              const leagueId = partido.league?.id || partido.leagueId || partido.league_id || partido.id;
-              return leagueId === 131;
-            });
-          }
+          partidosFiltrados = todosLosPartidos.filter(partido => {
+            // Buscamos todo lo que huela a Perú o Liga 1
+            const nombreTorneo = partido.tournament?.name?.toLowerCase() || '';
+            const paisTorneo = partido.tournament?.category?.name?.toLowerCase() || '';
+            
+            return paisTorneo.includes('peru') || nombreTorneo.includes('liga 1');
+          });
 
           setPartidosEnVivo(partidosFiltrados); 
           setCargandoAPI(false);
         })
         .catch(error => {
-          console.error("Error obteniendo datos API:", error);
+          console.error("Error obteniendo datos SportAPI:", error);
           setPartidosEnVivo([]);
           setCargandoAPI(false);
         });
@@ -449,7 +434,7 @@ export default function Home() {
   return (
     <div style={{ display: 'flex', height: '100vh', width: '100%', backgroundColor: '#f0f4f2', fontFamily: 'sans-serif', color: '#112a1f', overflow: 'hidden' }}>
       
-      {/* SIDEBAR */}
+      {/* SIDEBAR BLINDADO */}
       <aside style={{ width: '250px', backgroundColor: '#ffffff', borderRight: '1px solid #d1e0d7', flexShrink: 0, display: 'flex', flexDirection: 'column', height: '100%', overflowY: 'auto' }}>
         <div 
           onClick={() => setVistaMenuLateral('PORTADA')}
@@ -517,14 +502,12 @@ export default function Home() {
         </div>
       </aside>
 
-      {/* CONTENIDO PRINCIPAL */}
       <main style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100%', backgroundColor: '#f0f4f2', overflowY: 'auto', position: 'relative' }}>
         
         {/* VISTA PORTADA BLINDADA */}
         {vistaMenuLateral === 'PORTADA' && (
           <div style={{ padding: '24px', width: '100%', maxWidth: '900px', margin: '0 auto', paddingBottom: '80px' }}>
             
-            {/* Header del Calendario */}
             <div style={{ backgroundColor: '#ffffff', borderTopLeftRadius: '8px', borderTopRightRadius: '8px', border: '1px solid #d1e0d7', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
                <button onClick={() => cambiarDiaRapido(-1)} style={{ color: '#6b7280', fontWeight: 'bold', padding: '0 12px', fontSize: '18px', background: 'transparent', border: 'none', cursor: 'pointer' }}>{'<'}</button>
                
@@ -564,7 +547,6 @@ export default function Home() {
                <button onClick={() => cambiarDiaRapido(1)} style={{ color: '#6b7280', fontWeight: 'bold', padding: '0 12px', fontSize: '18px', background: 'transparent', border: 'none', cursor: 'pointer' }}>{'>'}</button>
             </div>
 
-            {/* Filtros TODOS / VIVO */}
             <div style={{ backgroundColor: '#ffffff', padding: '0 16px', display: 'flex', alignItems: 'center', gap: '24px', borderBottom: '1px solid #d1e0d7', borderLeft: '1px solid #d1e0d7', borderRight: '1px solid #d1e0d7', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
                <button onClick={()=>setPortadaFiltro('TODOS')} style={{ padding: '12px 0', fontSize: '11px', fontWeight: 'bold', border: 'none', background: 'transparent', cursor: 'pointer', textTransform: 'uppercase', borderBottom: portadaFiltro === 'TODOS' ? '3px solid #8cc63f' : '3px solid transparent', color: portadaFiltro === 'TODOS' ? '#8cc63f' : '#6b7280' }}>TODOS</button>
                <button onClick={()=>setPortadaFiltro('VIVO')} style={{ padding: '12px 0', fontSize: '11px', fontWeight: 'bold', border: 'none', background: 'transparent', cursor: 'pointer', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: '4px', borderBottom: portadaFiltro === 'VIVO' ? '3px solid #8cc63f' : '3px solid transparent', color: portadaFiltro === 'VIVO' ? '#8cc63f' : '#6b7280' }}>
@@ -572,34 +554,39 @@ export default function Home() {
                </button>
             </div>
 
-            {/* Bloque LIGA 1 */}
-            <div style={{ backgroundColor: '#f8fbf9', padding: '8px 12px', marginTop: '16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', color: '#112a1f', fontSize: '11px', fontWeight: '900', textTransform: 'uppercase', borderTopLeftRadius: '6px', borderTopRightRadius: '6px', boxShadow: '0 1px 2px rgba(0,0,0,0.05)', border: '1px solid #d1e0d7' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', letterSpacing: '0.05em' }}>
-                    <img src="https://flagcdn.com/24x18/pe.png" alt="Peru" style={{ width: '16px', borderRadius: '2px' }}/> LIGA 1 TE APUESTO
-                </div>
-            </div>
+            {partidosEnVivo.length > 0 && (
+              <div style={{ backgroundColor: '#f8fbf9', padding: '8px 12px', marginTop: '16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', color: '#112a1f', fontSize: '11px', fontWeight: '900', textTransform: 'uppercase', borderTopLeftRadius: '6px', borderTopRightRadius: '6px', boxShadow: '0 1px 2px rgba(0,0,0,0.05)', border: '1px solid #d1e0d7' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', letterSpacing: '0.05em' }}>
+                      <img src="https://flagcdn.com/24x18/pe.png" alt="Peru" style={{ width: '16px', borderRadius: '2px' }}/> LIGA 1 TE APUESTO
+                  </div>
+              </div>
+            )}
 
-            {/* LISTA DE PARTIDOS CONECTADA A LA API */}
-            <div style={{ backgroundColor: '#ffffff', display: 'flex', flexDirection: 'column', borderBottomLeftRadius: '6px', borderBottomRightRadius: '6px', overflow: 'hidden', boxShadow: '0 1px 2px rgba(0,0,0,0.05)', border: '1px solid #d1e0d7', borderTop: 'none' }}>
+            <div style={{ backgroundColor: '#ffffff', display: 'flex', flexDirection: 'column', borderBottomLeftRadius: '6px', borderBottomRightRadius: '6px', overflow: 'hidden', boxShadow: '0 1px 2px rgba(0,0,0,0.05)', border: '1px solid #d1e0d7', borderTop: partidosEnVivo.length > 0 ? 'none' : '1px solid #d1e0d7', marginTop: partidosEnVivo.length === 0 ? '16px' : '0' }}>
                 {cargandoAPI ? (
                   <div style={{ textAlign: 'center', padding: '32px', fontWeight: 'bold', color: '#6b7280' }}>Cargando partidos de hoy... ⏳</div>
                 ) : partidosEnVivo.length === 0 ? (
-                  <div style={{ textAlign: 'center', padding: '32px', fontWeight: 'bold', color: '#6b7280' }}>No hay partidos programados para {fechaHoy.toLocaleDateString('es-ES')}.</div>
+                  <div style={{ textAlign: 'center', padding: '32px', fontWeight: 'bold', color: '#6b7280' }}>No hay partidos de Liga 1 programados para {fechaHoy.toLocaleDateString('es-ES')}.</div>
                 ) : (
                   partidosEnVivo.map((m, idx) => {
-                     // Traductor adaptado
-                     const local = m.teams?.home?.name || m.homeTeam?.name || m.Local || m.home_team || "Local";
-                     const visita = m.teams?.away?.name || m.awayTeam?.name || m.Visitante || m.away_team || "Visita";
+                     // ==========================================
+                     // TRADUCTOR SPORTAPI
+                     // ==========================================
+                     const local = m.homeTeam?.name || "Local";
+                     const visita = m.awayTeam?.name || "Visita";
                      
-                     const golesL = m.goals?.home ?? m.home_score ?? m.GL ?? null;
-                     const golesV = m.goals?.away ?? m.away_score ?? m.GV ?? null;
+                     const golesL = m.homeScore?.current ?? null;
+                     const golesV = m.awayScore?.current ?? null;
                      
-                     const statusAPI = m.fixture?.status?.short || m.status || m.Estado;
-                     let estadoMock = statusAPI || '15:30';
-                     if (estadoMock === 'FT' || estadoMock === 'Finished') estadoMock = 'Final';
-                     if (estadoMock === '1H' || estadoMock === '2H' || estadoMock === 'HT') estadoMock = 'EN VIVO';
-                     if (golesL === null) estadoMock = m.fixture?.date ? new Date(m.fixture.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 'Por Jugar';
+                     const statusAPI = m.status?.type || m.status?.description;
+                     let estadoMock = '15:30';
                      
+                     if (statusAPI === 'finished') estadoMock = 'Final';
+                     else if (statusAPI === 'inprogress') estadoMock = 'EN VIVO';
+                     else if (statusAPI === 'notstarted' && m.startTimestamp) {
+                        estadoMock = new Date(m.startTimestamp * 1000).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                     }
+
                      const ganador = (golesL !== null && golesV !== null) ? (golesL > golesV ? local : (golesL < golesV ? visita : null)) : null;
 
                      return (
