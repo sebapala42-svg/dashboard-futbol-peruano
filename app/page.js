@@ -134,7 +134,7 @@ export default function Home() {
       const fechaFormateadaAPI = `${year}-${month}-${day}`;
 
       // REEMPLAZA ESTE ENLACE POR TU API REAL
-      fetch(`PON_AQUI_LA_URL_DE_TU_API`) 
+      fetch(`c96c8805bbmsha31d2cee880d709p13e8c8jsn72808e880595`) 
         .then(response => {
           if (!response.ok) { throw new Error("Error en la API"); }
           return response.json();
