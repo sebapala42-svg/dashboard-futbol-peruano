@@ -79,7 +79,7 @@ export default function Home() {
       setCargandoAPI(true);
       
       // REEMPLAZA ESTE ENLACE POR LA URL DE TU API REAL
-      fetch('PON_AQUI_LA_URL_DE_TU_API')
+      fetch('c96c8805bbmsha31d2cee880d709p13e8c8jsn72808e880595')
         .then(response => {
           if (!response.ok) { throw new Error("Error en la red al llamar a la API"); }
           return response.json();
