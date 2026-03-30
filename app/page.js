@@ -477,7 +477,7 @@ export default function Home() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', paddingLeft: '16px', marginTop: '8px', borderLeft: '2px solid #e5eee9', marginLeft: '16px' }}>
                 {/* ESTILOS INLINE BLINDADOS PARA LOS ENLACES DE ABAJO */}
                 <button 
-                  onClick={() => { setVistaMenuLateral('LIGA1'); setTabTop('fixture'); setTemporada('2026'); setEquipoSeleccionado(null); }}
+                  onClick={() => { setVistaMenuLateral('LIGA1'); setTabTop('fixture'); setTemporada('2026'); setFecha(8); setEquipoSeleccionado(null); }}
                   style={{
                     textAlign: 'left',
                     width: '100%',
