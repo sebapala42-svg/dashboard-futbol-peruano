@@ -655,43 +655,46 @@ export default function Home() {
                 ) : partidosEnVivo.length === 0 ? (
                   <div style={{ textAlign: 'center', padding: '32px', fontWeight: 'bold', color: '#6b7280' }}>No hay partidos programados para {fechaHoy.toLocaleDateString('es-ES')}.</div>
                 ) : (
-                  partidosEnVivo.map((m, idx) => {
-                     const ganador = m.GL > m.GV ? m.Local : (m.GL < m.GV ? m.Visitante : null);
-                     const estadoMock = (idx === 0) ? 'EN VIVO' : (m.GL !== null ? 'Final' : '15:30'); 
-                     
-                     return (
-                       <div key={idx} style={{ display: 'flex', borderTop: idx === 0 ? 'none' : '1px solid #f0f4f2', color: '#112a1f' }}>
-                          <div style={{ width: '60px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', borderRight: '1px solid #f0f4f2', padding: '12px 4px' }}>
-                             <span style={{ fontSize: '10px', fontWeight: '900', color: estadoMock === 'EN VIVO' ? '#ef4444' : '#6b7280' }}>{estadoMock}</span>
-                             {estadoMock === 'EN VIVO' && <span style={{ color: '#ef4444', fontSize: '9px', fontWeight: 'bold', marginTop: '4px' }}>65'</span>}
-                          </div>
-                          
-                          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '12px' }}>
-                              <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}>
-                                  <span style={{ textAlign: 'right', width: '35%', fontSize: '12px', fontWeight: 'bold', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', color: ganador === m.Local ? '#8cc63f' : '#112a1f', textDecoration: ganador === m.Local ? 'underline' : 'none' }}>{m.Local}</span>
-                                  <img src={logos[m.Local] || 'https://cdn-icons-png.flaticon.com/128/33/33736.png'} style={{ width: '20px', height: '20px', objectFit: 'contain' }} alt={m.Local}/>
-                                  
-                                  {m.GL !== null ? (
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px', minWidth: '50px', justifyContent: 'center' }}>
-                                      <span style={{ fontWeight: 'bold', fontSize: '14px', backgroundColor: '#f0f4f2', color: '#112a1f', width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '4px', border: '1px solid #d1e0d7' }}>{estadoMock === 'EN VIVO' ? '1' : m.GL}</span>
-                                      <span style={{ fontWeight: '900', color: '#8cc63f' }}>-</span>
-                                      <span style={{ fontWeight: 'bold', fontSize: '14px', backgroundColor: '#f0f4f2', color: '#112a1f', width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '4px', border: '1px solid #d1e0d7' }}>{estadoMock === 'EN VIVO' ? '0' : m.GV}</span>
-                                    </div>
-                                  ) : (
-                                    <span style={{ fontWeight: 'bold', fontSize: '11px', backgroundColor: '#f0f4f2', padding: '2px 8px', borderRadius: '4px', border: '1px solid #d1e0d7', minWidth: '50px', textAlign: 'center', color: '#8cc63f' }}>VS</span>
-                                  )}
-                                  
-                                  <img src={logos[m.Visitante] || 'https://cdn-icons-png.flaticon.com/128/33/33736.png'} style={{ width: '20px', height: '20px', objectFit: 'contain' }} alt={m.Visitante}/>
-                                  <span style={{ textAlign: 'left', width: '35%', fontSize: '12px', fontWeight: 'bold', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', color: ganador === m.Visitante ? '#8cc63f' : '#112a1f', textDecoration: ganador === m.Visitante ? 'underline' : 'none' }}>{m.Visitante}</span>
-                              </div>
-                          </div>
-                       </div>
-                     );
-                  })
+                 {partidosEnVivo.map((m, idx) => {
+   // --- EL TRADUCTOR (Mapea los nombres de tu API) ---
+   const local = m.Local || m.home_team || m.team1 || m.homeTeam;
+   const visita = m.Visitante || m.away_team || m.team2 || m.awayTeam;
+   const golesL = m.GL !== undefined ? m.GL : (m.home_score || m.score1);
+   const golesV = m.GV !== undefined ? m.GV : (m.away_score || m.score2);
+   const estadoPartida = m.Estado || m.status || m.time;
+   // -------------------------------------------------
+
+   const ganador = golesL > golesV ? local : (golesL < golesV ? visita : null);
+   const estadoMock = (idx === 0) ? 'EN VIVO' : (golesL !== null ? 'Final' : '15:30'); 
+   
+   return (
+     <div key={idx} style={{ display: 'flex', borderTop: idx === 0 ? 'none' : '1px solid #f0f4f2', color: '#112a1f' }}>
+        <div style={{ width: '60px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyCenter: 'center', borderRight: '1px solid #f0f4f2', padding: '12px 4px' }}>
+           <span style={{ fontSize: '10px', fontWeight: '900', color: estadoMock === 'EN VIVO' ? '#ef4444' : '#6b7280' }}>{estadoMock}</span>
+        </div>
+        
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '12px' }}>
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}>
+                <span style={{ textAlign: 'right', width: '35%', fontSize: '12px', fontWeight: 'bold', color: ganador === local ? '#8cc63f' : '#112a1f', textDecoration: ganador === local ? 'underline' : 'none' }}>{local}</span>
+                <img src={logos[local] || 'https://cdn-icons-png.flaticon.com/128/33/33736.png'} style={{ width: '20px', height: '20px', objectFit: 'contain' }} alt={local}/>
+                
+                {golesL !== null ? (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px', minWidth: '50px', justifyContent: 'center' }}>
+                    <span style={{ fontWeight: 'bold', fontSize: '14px', backgroundColor: '#f0f4f2', color: '#112a1f', width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '4px', border: '1px solid #d1e0d7' }}>{golesL}</span>
+                    <span style={{ fontWeight: '900', color: '#8cc63f' }}>-</span>
+                    <span style={{ fontWeight: 'bold', fontSize: '14px', backgroundColor: '#f0f4f2', color: '#112a1f', width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '4px', border: '1px solid #d1e0d7' }}>{golesV}</span>
+                  </div>
+                ) : (
+                  <span style={{ fontWeight: 'bold', fontSize: '11px', backgroundColor: '#f0f4f2', padding: '2px 8px', borderRadius: '4px', border: '1px solid #d1e0d7', minWidth: '50px', textAlign: 'center', color: '#8cc63f' }}>VS</span>
                 )}
+                
+                <img src={logos[visita] || 'https://cdn-icons-png.flaticon.com/128/33/33736.png'} style={{ width: '20px', height: '20px', objectFit: 'contain' }} alt={visita}/>
+                <span style={{ textAlign: 'left', width: '35%', fontSize: '12px', fontWeight: 'bold', color: ganador === visita ? '#8cc63f' : '#112a1f', textDecoration: ganador === visita ? 'underline' : 'none' }}>{visita}</span>
             </div>
-          </div>
-        )}
+        </div>
+     </div>
+   );
+})}
 
         {/* VISTAS LIGA 1 Y CAMPEONES */}
         {vistaMenuLateral === 'LIGA1' && (
