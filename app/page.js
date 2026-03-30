@@ -671,62 +671,78 @@ export default function Home() {
           </>
         )}
 
-        {/* VISTA CAMPEONES */}
+{/* VISTA CAMPEONES */}
         {vistaMenuLateral === 'CAMPEONES' && (
-          <>
-            <header className="bg-white shadow-sm border-b border-[#d1e0d7] px-6 py-4 flex items-center justify-between sticky top-0 z-10">
-              <h2 className="text-[20px] font-black uppercase text-[#112a1f] m-0 flex items-center gap-2">
-                <span className="bg-[#8cc63f] w-[4px] h-[20px] rounded-full"></span>
-                HISTORIAL DE CAMPEONES
-              </h2>
-            </header>
-            <div className="p-6 max-w-[1250px] mx-auto w-full pb-20">
-              <div style={{ display: 'grid', gridTemplateColumns: '60% 35%', gap: '5%', alignItems: 'start' }}>
-                <div className="bg-white border border-[#d1e0d7] rounded-xl shadow-sm overflow-hidden">
-                  <div className="bg-[#f8fbf9] p-3 text-center border-b border-[#d1e0d7]"><h3 className="text-[14px] font-bold uppercase text-[#112a1f] m-0">Historial de Campeones</h3></div>
-                  <table className="w-full border-collapse font-sans">
-                    <thead><tr><th className="bg-white py-2.5 px-4 text-left border-b border-[#d1e0d7] font-bold text-[#6b7280] text-[12px] w-[80px]">Torneo</th><th className="bg-white py-2.5 px-4 text-left border-b border-[#d1e0d7] font-bold text-[#6b7280] text-[12px]">Campeón</th></tr></thead>
-                    <tbody>{historial_datos.map((row, i) => (
-                      <tr key={i} className={`hover:bg-[#f8fbf9] border-b border-[#f0f4f2] ${i % 2 === 0 ? 'bg-transparent' : 'bg-[#fdfdfd]'}`}>
-                        <td className="py-[18px] px-4 font-black text-[#112a1f] text-[13px]">{row.Año}</td>
-                        <td className="py-[18px] px-4 text-left flex items-center justify-between">
+          <div className="p-6 max-w-[1000px] mx-auto w-full pb-20"> {/* Reducido de 1250 a 1000px para compactar */}
+            <div style={{ display: 'grid', gridTemplateColumns: '60% 35%', gap: '5%', alignItems: 'start' }}>
+              
+              {/* Tabla de Historial */}
+              <div className="bg-white border border-[#d1e0d7] rounded-xl shadow-sm overflow-hidden mt-4">
+                <div className="bg-[#f8fbf9] p-4 text-center border-b border-[#d1e0d7]">
+                  <h3 className="text-[16px] font-black uppercase text-[#112a1f] m-0 tracking-wide">Historial de Campeones</h3>
+                </div>
+                <table className="w-full border-collapse font-sans">
+                  <thead>
+                    <tr>
+                      <th className="bg-white py-3 px-4 text-center border-b border-[#d1e0d7] font-bold text-[#6b7280] text-[12px] w-[100px]">Torneo</th>
+                      <th className="bg-white py-3 px-4 text-left border-b border-[#d1e0d7] font-bold text-[#6b7280] text-[12px]">Campeón</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {historial_datos.map((row, i) => (
+                      <tr key={i} className={`hover:bg-[#f8fbf9] border-b border-[#f0f4f2] transition-colors ${i % 2 === 0 ? 'bg-transparent' : 'bg-[#fdfdfd]'}`}>
+                        <td className="py-[16px] px-4 font-black text-[#112a1f] text-[13px] text-center border-r border-[#f0f4f2]">{row.Año}</td>
+                        <td className="py-[16px] px-6 text-left flex items-center justify-between">
                           <div className="flex items-center gap-3 font-bold text-[#112a1f] text-[13px]">
-                            <img src={logos[row.Campeón] || 'https://cdn-icons-png.flaticon.com/128/33/33736.png'} className="w-[18px] h-[18px] object-contain" />
+                            <img src={logos[row.Campeón] || 'https://cdn-icons-png.flaticon.com/128/33/33736.png'} className="w-[20px] h-[20px] object-contain drop-shadow-sm" />
                             <span>{row.Campeón}</span>
                           </div>
                           {['2018', '2013', '2023'].includes(row.Año) && (
                             <button 
                               onClick={() => { setVistaMenuLateral('LIGA1'); setTemporada(row.Año); setFecha(row.Año === '2013' ? 48 : (row.Año === '2023' ? 1 : 44)); setTabTop('fixture'); setEquipoSeleccionado(null); }}
-                              className="bg-[#f0f4f2] hover:bg-[#8cc63f] hover:text-white text-[#112a1f] font-bold text-[10px] px-3 py-1.5 rounded border border-[#d1e0d7] hover:border-[#8cc63f] outline-none transition-colors"
+                              className="bg-[#e5eee9] hover:bg-[#8cc63f] text-[#112a1f] hover:text-white font-bold text-[10px] px-4 py-1.5 rounded-md border border-[#8cc63f]/30 hover:border-[#8cc63f] shadow-sm outline-none transition-all flex items-center gap-1 cursor-pointer"
                             >
-                              VER AÑO
+                              <span>VER AÑO</span> <span className="text-[8px]">▶</span>
                             </button>
                           )}
                         </td>
                       </tr>
-                    ))}</tbody>
-                  </table>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Tabla de Ranking */}
+              <div className="bg-white border border-[#d1e0d7] rounded-xl shadow-sm overflow-hidden sticky top-24 mt-4">
+                <div className="bg-[#f8fbf9] p-4 text-center border-b border-[#d1e0d7]">
+                  <h3 className="text-[16px] font-black uppercase text-[#112a1f] m-0 tracking-wide">Ranking de Ligas</h3>
                 </div>
-                <div className="bg-white border border-[#d1e0d7] rounded-xl shadow-sm overflow-hidden sticky top-24">
-                  <div className="bg-[#f8fbf9] p-3 text-center border-b border-[#d1e0d7]"><h3 className="text-[14px] font-bold uppercase text-[#112a1f] m-0">Ranking de Ligas</h3></div>
-                  <table className="w-full border-collapse font-sans">
-                    <thead><tr><th className="bg-white py-2.5 px-4 text-left border-b border-[#d1e0d7] font-bold text-[#6b7280] text-[12px]">Equipo</th><th className="bg-white py-2.5 px-4 text-center border-b border-[#d1e0d7] font-bold text-[#6b7280] text-[12px] w-[60px]">Títulos</th></tr></thead>
-                    <tbody>{ranking_datos.map((row, i) => (
-                      <tr key={i} className={`hover:bg-[#f8fbf9] border-b border-[#f0f4f2] ${i % 2 === 0 ? 'bg-transparent' : 'bg-[#fdfdfd]'}`}>
-                        <td className="py-[18px] px-4 text-left flex items-center gap-3 font-bold text-[#112a1f] text-[13px]">
-                          <img src={logos[row.Equipo] || 'https://cdn-icons-png.flaticon.com/128/33/33736.png'} className="w-[18px] h-[18px] object-contain" />
+                <table className="w-full border-collapse font-sans">
+                  <thead>
+                    <tr>
+                      <th className="bg-white py-3 px-6 text-left border-b border-[#d1e0d7] font-bold text-[#6b7280] text-[12px]">Equipo</th>
+                      <th className="bg-white py-3 px-4 text-center border-b border-[#d1e0d7] font-bold text-[#6b7280] text-[12px] w-[80px]">Títulos</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {ranking_datos.map((row, i) => (
+                      <tr key={i} className={`hover:bg-[#f8fbf9] border-b border-[#f0f4f2] transition-colors ${i % 2 === 0 ? 'bg-transparent' : 'bg-[#fdfdfd]'}`}>
+                        <td className="py-[16px] px-6 text-left flex items-center gap-3 font-bold text-[#112a1f] text-[13px]">
+                          <img src={logos[row.Equipo] || 'https://cdn-icons-png.flaticon.com/128/33/33736.png'} className="w-[20px] h-[20px] object-contain drop-shadow-sm" />
                           <span>{row.Equipo}</span>
                         </td>
-                        <td className="py-[18px] px-4 text-center font-black text-[#112a1f] text-sm bg-[#f8fbf9]">{row.Títulos}</td>
+                        <td className="py-[16px] px-4 text-center font-black text-[#112a1f] text-[14px] bg-[#f8fbf9] border-l border-[#f0f4f2]">{row.Títulos}</td>
                       </tr>
-                    ))}</tbody>
-                  </table>
-                </div>
+                    ))}
+                  </tbody>
+                </table>
               </div>
+
             </div>
-          </>
+          </div>
         )}
       </main>
     </div>
   );
 }
+        
