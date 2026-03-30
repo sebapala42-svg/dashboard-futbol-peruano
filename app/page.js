@@ -268,6 +268,7 @@ export default function Home() {
           if (t.equipo === 'Deportivo Garcilaso') finalPts -= 1; if (t.equipo === 'Sport Boys') finalPts -= 4;
           if (t.equipo === 'Municipal' || t.equipo === 'Dep. Municipal') finalPts -= 5;
         }
+
         return { ...t, pts: finalPts, dif: t.gf - t.gc, ultimas: t.racha.slice(-5).reverse() };
       })
       .sort((a, b) => b.pts - a.pts || b.dif - a.dif || b.gf - a.gf);
@@ -317,16 +318,15 @@ export default function Home() {
                 if (i === 0) bordeColor = '#3db4dc'; 
               }
               else if (temporada === '2023' && esAcumulado) {
-                if (i < 4) bordeColor = '#3db4dc'; // Libertadores
-                else if (i >= 4 && i < 8) bordeColor = '#e1c340'; // Sudamericana
-                else if (i >= datos.length - 3) bordeColor = '#d32f2f'; // Descenso
+                if (i < 4) bordeColor = '#3db4dc'; 
+                else if (i >= 4 && i < 8) bordeColor = '#e1c340'; 
+                else if (i >= datos.length - 3) bordeColor = '#d32f2f'; 
               }
               else if (i === 0) {
                 bordeColor = '#3db4dc';
               }
 
               return (
-                // AJUSTE 3: py-[10px] para mayor espaciado en tablas generales
                 <tr key={eq.equipo} className={`hover:bg-[#f8fbf9] transition-colors ${i % 2 === 0 ? 'bg-transparent' : 'bg-[#fcfdfc]'}`}>
                   <td className="py-[10px] px-[4px] font-bold border-l-[3px] text-center" style={{ borderLeftColor: bordeColor, color: '#000000' }}>{i + 1}</td>
                   <td className="py-[10px] px-[4px] border-r border-[#d1e0d7]">
@@ -456,12 +456,13 @@ export default function Home() {
             ⚽ Partidos de Hoy
           </button>
 
-          {/* AJUSTE 2: Menú principal más oscuro, más grande y con más margen arriba */}
+          {/* Menú principal arreglado y más abajo */}
           <div className="text-[11px] font-black text-[#112a1f] uppercase tracking-widest mt-4 mb-3 pl-1">Menú Principal</div>
           
           <button onClick={() => setMenuPeruAbierto(!menuPeruAbierto)} className="w-full flex items-center justify-between text-[#112a1f] font-bold text-[13px] bg-[#f8fbf9] border border-[#d1e0d7] px-3 py-2.5 rounded-md hover:bg-[#e5eee9] transition-colors outline-none">
             <div className="flex items-center gap-2">
-              <img src="https://tmssl.akamaized.net//images/holding/head/pe.png" className="w-[16px] drop-shadow-sm" alt="Peru"/> PERÚ
+              {/* BANDERA DE PERÚ ARREGLADA CON FLAGCDN */}
+              <img src="https://flagcdn.com/24x18/pe.png" className="w-[18px] drop-shadow-sm rounded-sm" alt="Peru"/> PERÚ
             </div>
             <span className="text-[10px] text-[#6b7280]">{menuPeruAbierto ? '▲' : '▼'}</span>
           </button>
@@ -546,6 +547,15 @@ export default function Home() {
                       <button onClick={() => setFecha(prev => Math.min(temporada === '2023' ? 40 : (temporada === '2013' ? 48 : (temporada === '2018' ? 44 : 17)), prev + 1))} className="text-[#8cc63f] hover:text-[#112a1f] font-black text-[18px] px-2 outline-none cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed">▶</button>
                     </div>
 
+                    {/* RECUADROS AMARILLOS DE 2023 RESTAURADOS */}
+                    {temporada === '2023' && [1, 8, 15].includes(fecha) && (
+                      <div className="bg-[#fff3cd] border-l-[4px] border-[#fbbf24] text-[#854d0e] p-[10px] text-[12px] rounded-md shadow-sm font-medium leading-relaxed my-3">
+                        {fecha === 1 && "🚨 Inicio cronológico del torneo. Marcado por varios Walkovers por disputas de derechos de TV."}
+                        {fecha === 8 && "⏳ La Jornada 1 original se jugó en esta fecha (fines de marzo)."}
+                        {fecha === 15 && "⏳ La Jornada 2 se recuperó finalmente en esta fecha (mediados de mayo)."}
+                      </div>
+                    )}
+
                     <div className="bg-white border border-[#d1e0d7] rounded-lg overflow-hidden shadow-sm">
                       <div className="text-center font-bold text-[13px] uppercase py-[12px] bg-[#f8fbf9] border-b border-[#d1e0d7] text-[#112a1f]">RESULTADOS DE LA FECHA</div>
                       <div className="flex flex-col max-h-[550px] overflow-y-auto custom-scrollbar">
@@ -625,7 +635,6 @@ export default function Home() {
           </>
         )}
 
-        {/* VISTA CAMPEONES */}
         {vistaMenuLateral === 'CAMPEONES' && (
           <>
             <header className="bg-white shadow-sm border-b border-[#d1e0d7] px-6 py-4 flex items-center justify-between sticky top-0 z-10">
@@ -635,18 +644,18 @@ export default function Home() {
               </h2>
             </header>
             <div className="p-6 max-w-[1250px] mx-auto w-full pb-20">
-              {/* AJUSTE 4: Quitamos la línea vertical, dejamos solo el gap */}
+              {/* Sin línea divisoria, solo gap de 5% */}
               <div style={{ display: 'grid', gridTemplateColumns: '60% 35%', gap: '5%', alignItems: 'start' }}>
                 <div className="bg-white border border-[#d1e0d7] rounded-xl shadow-sm overflow-hidden">
                   <div className="bg-[#f8fbf9] p-3 text-center border-b border-[#d1e0d7]"><h3 className="text-[14px] font-bold uppercase text-[#112a1f] m-0">Historial de Campeones</h3></div>
-                  <table className="w-full text-[12px] border-collapse font-sans">
-                    <thead><tr><th className="bg-white py-2.5 px-4 text-left border-b border-[#d1e0d7] font-bold text-[#6b7280] w-[80px]">Torneo</th><th className="bg-white py-2.5 px-4 text-left border-b border-[#d1e0d7] font-bold text-[#6b7280]">Campeón</th></tr></thead>
+                  <table className="w-full border-collapse font-sans">
+                    <thead><tr><th className="bg-white py-2.5 px-4 text-left border-b border-[#d1e0d7] font-bold text-[#6b7280] text-[12px] w-[80px]">Torneo</th><th className="bg-white py-2.5 px-4 text-left border-b border-[#d1e0d7] font-bold text-[#6b7280] text-[12px]">Campeón</th></tr></thead>
                     <tbody>{historial_datos.map((row, i) => (
-                      // AJUSTE 3: py-[10px] y py-4 (equivalente a 16px) en Campeones
                       <tr key={i} className={`hover:bg-[#f8fbf9] border-b border-[#f0f4f2] ${i % 2 === 0 ? 'bg-transparent' : 'bg-[#fdfdfd]'}`}>
-                        <td className="py-4 px-4 font-black text-[#112a1f]">{row.Año}</td>
-                        <td className="py-4 px-4 text-left flex items-center justify-between">
-                          <div className="flex items-center gap-3 font-bold text-[#112a1f]">
+                        {/* AUMENTO DE ESPACIADO: py-[18px] y texto ligeramente mayor */}
+                        <td className="py-[18px] px-4 font-black text-[#112a1f] text-[13px]">{row.Año}</td>
+                        <td className="py-[18px] px-4 text-left flex items-center justify-between">
+                          <div className="flex items-center gap-3 font-bold text-[#112a1f] text-[13px]">
                             <img src={logos[row.Campeón] || 'https://cdn-icons-png.flaticon.com/128/33/33736.png'} className="w-[18px] h-[18px] object-contain" />
                             <span>{row.Campeón}</span>
                           </div>
@@ -665,16 +674,16 @@ export default function Home() {
                 </div>
                 <div className="bg-white border border-[#d1e0d7] rounded-xl shadow-sm overflow-hidden sticky top-24">
                   <div className="bg-[#f8fbf9] p-3 text-center border-b border-[#d1e0d7]"><h3 className="text-[14px] font-bold uppercase text-[#112a1f] m-0">Ranking de Ligas</h3></div>
-                  <table className="w-full text-[12px] border-collapse font-sans">
-                    <thead><tr><th className="bg-white py-2.5 px-4 text-left border-b border-[#d1e0d7] font-bold text-[#6b7280]">Equipo</th><th className="bg-white py-2.5 px-4 text-center border-b border-[#d1e0d7] font-bold text-[#6b7280] w-[60px]">Títulos</th></tr></thead>
+                  <table className="w-full border-collapse font-sans">
+                    <thead><tr><th className="bg-white py-2.5 px-4 text-left border-b border-[#d1e0d7] font-bold text-[#6b7280] text-[12px]">Equipo</th><th className="bg-white py-2.5 px-4 text-center border-b border-[#d1e0d7] font-bold text-[#6b7280] text-[12px] w-[60px]">Títulos</th></tr></thead>
                     <tbody>{ranking_datos.map((row, i) => (
                       <tr key={i} className={`hover:bg-[#f8fbf9] border-b border-[#f0f4f2] ${i % 2 === 0 ? 'bg-transparent' : 'bg-[#fdfdfd]'}`}>
-                        <td className="py-4 px-4 text-left flex items-center gap-3 font-bold text-[#112a1f]">
+                        <td className="py-[18px] px-4 text-left flex items-center gap-3 font-bold text-[#112a1f] text-[13px]">
                           <img src={logos[row.Equipo] || 'https://cdn-icons-png.flaticon.com/128/33/33736.png'} className="w-[18px] h-[18px] object-contain" />
                           <span>{row.Equipo}</span>
                         </td>
-                        {/* AJUSTE 1: text-[#112a1f] (oscuro) en lugar de verde */}
-                        <td className="py-4 px-4 text-center font-black text-[#112a1f] text-sm bg-[#f8fbf9]">{row.Títulos}</td>
+                        {/* NÚMERO DE TÍTULOS EN OSCURO, NO VERDE */}
+                        <td className="py-[18px] px-4 text-center font-black text-[#112a1f] text-sm bg-[#f8fbf9]">{row.Títulos}</td>
                       </tr>
                     ))}</tbody>
                   </table>
