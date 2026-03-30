@@ -56,7 +56,7 @@ const normalizarEquipo = (nombre) => {
 export default function Home() {
   
   // ======================= ESTADOS MAESTROS DE NAVEGACIÓN =======================
-  const [vistaMenuLateral, setVistaMenuLateral] = useState('LIGA1'); // 'LIGA1' o 'CAMPEONES' o 'PORTADA'
+  const [vistaMenuLateral, setVistaMenuLateral] = useState('PORTADA'); // 'LIGA1' o 'CAMPEONES' o 'PORTADA' (AHORA INICIA EN PORTADA)
   const [tabTop, setTabTop] = useState('fixture'); // 'vivo', 'fixture', 'equipos'
   const [menuPeruAbierto, setMenuPeruAbierto] = useState(true);
 
@@ -491,9 +491,13 @@ export default function Home() {
       {/* 1. EL SIDEBAR FIJO E INAMOVIBLE (Izquierda) */}
       <aside className="w-[250px] bg-white border-r border-[#d1e0d7] flex-shrink-0 flex flex-col h-full shadow-sm overflow-y-auto">
         
-        {/* Encabezado del Menú */}
-        <div className="p-4 border-b border-[#d1e0d7] bg-[#e5eee9] flex flex-col items-center justify-center">
-          <img src="https://i.ibb.co/9kWMHzxY/Gemini-Generated-Image-oweh8loweh8loweh-removebg-preview.png" alt="Logo" className="h-[45px] object-contain" />
+        {/* Encabezado del Menú CON EL ONCLICK EN EL LOGO */}
+        <div 
+          onClick={() => setVistaMenuLateral('PORTADA')}
+          className="p-4 border-b border-[#d1e0d7] bg-[#e5eee9] flex flex-col items-center justify-center cursor-pointer hover:bg-[#d1e0d7] transition-colors"
+          title="Ir al inicio"
+        >
+          <img src="https://i.ibb.co/9kWMHzxY/Gemini-Generated-Image-oweh8loweh8loweh-removebg-preview.png" alt="Logo" className="h-[45px] object-contain hover:scale-105 transition-transform" />
         </div>
 
         <div className="flex-1 py-4 flex flex-col px-3">
