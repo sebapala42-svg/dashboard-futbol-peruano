@@ -111,7 +111,7 @@ export default function Home() {
   const cambiarDiaRapido = (incremento) => { const nueva = new Date(fechaHoy); nueva.setDate(nueva.getDate() + incremento); setFechaHoy(nueva); setMesVisible(nueva); };
 
   // ==========================================
-  // EFECTO API: SPORTAPI CON FILTRO SEGURO
+  // EFECTO API: SPORTAPI (Filtro Suave para evitar bloqueos)
   // ==========================================
   useEffect(() => {
     if (vistaMenuLateral === 'PORTADA') {
@@ -137,37 +137,15 @@ export default function Home() {
         .then(data => {
           let todosLosPartidos = data.events || data.data || [];
 
-          // 1. Filtrar solo los que sean de Perú o Liga 1
+          // SOLO FILTRAMOS POR PAÍS. Dejamos que la API mande lo que tiene agendado para ese día.
+          // Eliminamos el filtro estricto de hora que causaba que todo desapareciera.
           let partidosPeru = todosLosPartidos.filter(partido => {
             const nombreTorneo = partido.tournament?.name?.toLowerCase() || '';
             const paisTorneo = partido.tournament?.category?.name?.toLowerCase() || '';
             return paisTorneo.includes('peru') || nombreTorneo.includes('liga 1');
           });
 
-          // 2. Filtro Suave para separar los días (usando el motor nativo del navegador de forma segura)
-          let partidosMismoDia = partidosPeru.filter(partido => {
-            if (!partido.startTimestamp) return true;
-            
-            const dateObj = new Date(partido.startTimestamp * 1000);
-            const formatter = new Intl.DateTimeFormat('en-US', { timeZone: 'America/Lima', year: 'numeric', month: 'numeric', day: 'numeric' });
-            const parts = formatter.formatToParts(dateObj);
-            
-            const y = parts.find(p => p.type === 'year').value;
-            const m = parts.find(p => p.type === 'month').value.padStart(2, '0');
-            const d = parts.find(p => p.type === 'day').value.padStart(2, '0');
-            
-            const fechaPartidoPeru = `${y}-${m}-${d}`;
-            return fechaPartidoPeru === fechaFormateadaAPI;
-          });
-
-          // 🔥 EL SALVAVIDAS 🔥
-          // Si el filtro de día fue muy estricto y los borró todos, 
-          // mejor mostramos los partidos mezclados que mandó la API en vez de dejar la pantalla en blanco.
-          if (partidosMismoDia.length === 0 && partidosPeru.length > 0) {
-            partidosMismoDia = partidosPeru;
-          }
-
-          setPartidosEnVivo(partidosMismoDia); 
+          setPartidosEnVivo(partidosPeru); 
           setCargandoAPI(false);
         })
         .catch(error => {
@@ -619,6 +597,7 @@ export default function Home() {
                      else if (statusAPI === 'inprogress') estadoMock = 'EN VIVO';
                      else if (statusAPI === 'notstarted' && m.startTimestamp) {
                         const dateObj = new Date(m.startTimestamp * 1000);
+                        // Aseguramos que muestre la hora correcta para Lima sin romper fechas
                         estadoMock = new Intl.DateTimeFormat('en-US', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Lima' }).format(dateObj);
                      }
 
