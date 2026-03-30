@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import partidosJSON from './torneo_2018.json';
 import partidos2013JSON from './torneo_2013.json';
 import partidos2023JSON from './torneo_2023.json';
@@ -60,13 +60,42 @@ export default function Home() {
   const [tabTop, setTabTop] = useState('fixture');
   const [menuPeruAbierto, setMenuPeruAbierto] = useState(true);
 
-  // NUEVOS ESTADOS PARA LA PORTADA EN VIVO
   const [portadaFiltro, setPortadaFiltro] = useState('TODOS');
   const [calendarioAbierto, setCalendarioAbierto] = useState(false);
 
   const [temporada, setTemporada] = useState('2026');
   const [fecha, setFecha] = useState(8); 
   const [equipoSeleccionado, setEquipoSeleccionado] = useState(null);
+
+  // ==========================================
+  // NUEVOS ESTADOS PARA LA API EN VIVO
+  // ==========================================
+  const [partidosEnVivo, setPartidosEnVivo] = useState([]);
+  const [cargandoAPI, setCargandoAPI] = useState(false);
+
+  // EFECTO PARA LLAMAR A LA API CUANDO SE ABRE LA PORTADA
+  useEffect(() => {
+    if (vistaMenuLateral === 'PORTADA') {
+      setCargandoAPI(true);
+      
+      // REEMPLAZA ESTE ENLACE POR LA URL DE TU API REAL
+      fetch('PON_AQUI_LA_URL_DE_TU_API')
+        .then(response => {
+          if (!response.ok) { throw new Error("Error en la red al llamar a la API"); }
+          return response.json();
+        })
+        .then(data => {
+          // Ajusta esto según cómo devuelva los datos tu API (por ejemplo si es data.partidos, etc)
+          setPartidosEnVivo(data); 
+          setCargandoAPI(false);
+        })
+        .catch(error => {
+          console.error("Error obteniendo datos en vivo:", error);
+          setCargandoAPI(false);
+        });
+    }
+  }, [vistaMenuLateral]); // Se ejecuta cada vez que entras a la vista PORTADA
+  // ==========================================
   
   // RESULTADOS DE MESA (2023)
   const esWalkover = (p) => {
@@ -307,18 +336,37 @@ export default function Home() {
           <tbody>
             {datos.map((eq, i) => {
               let bordeColor = 'transparent';
-              if (temporada === '2018' && esAcumulado) { if (i < 4) bordeColor = '#3db4dc'; else if (i < 8) bordeColor = '#e1c340'; else if (i >= datos.length - 2) bordeColor = '#d32f2f'; } 
-              else if (temporada === '2013' && esAcumulado && !zona) { if (i < 3) bordeColor = '#3db4dc'; else if (i >= 3 && i < 7) bordeColor = '#e1c340'; else if (i >= datos.length - 2) bordeColor = '#d32f2f'; }
-              else if (temporada === '2013' && esAcumulado && zona) { if (i === 0) bordeColor = '#3db4dc'; }
-              else if (temporada === '2023' && esAcumulado) { if (i < 4) bordeColor = '#3db4dc'; else if (i >= 4 && i < 8) bordeColor = '#e1c340'; else if (i >= datos.length - 3) bordeColor = '#d32f2f'; }
-              else if (i === 0) { bordeColor = '#3db4dc'; }
+              
+              if (temporada === '2018' && esAcumulado) {
+                if (i < 4) bordeColor = '#3db4dc'; 
+                else if (i < 8) bordeColor = '#e1c340'; 
+                else if (i >= datos.length - 2) bordeColor = '#d32f2f'; 
+              } 
+              else if (temporada === '2013' && esAcumulado && !zona) {
+                if (i < 3) bordeColor = '#3db4dc'; 
+                else if (i >= 3 && i < 7) bordeColor = '#e1c340'; 
+                else if (i >= datos.length - 2) bordeColor = '#d32f2f'; 
+              }
+              else if (temporada === '2013' && esAcumulado && zona) {
+                if (i === 0) bordeColor = '#3db4dc'; 
+              }
+              else if (temporada === '2023' && esAcumulado) {
+                if (i < 4) bordeColor = '#3db4dc'; // Libertadores
+                else if (i >= 4 && i < 8) bordeColor = '#e1c340'; // Sudamericana
+                else if (i >= datos.length - 3) bordeColor = '#d32f2f'; // Descenso
+              }
+              else if (i === 0) {
+                bordeColor = '#3db4dc';
+              }
 
               return (
                 <tr key={eq.equipo} className={`hover:bg-[#f8fbf9] transition-colors ${i % 2 === 0 ? 'bg-transparent' : 'bg-[#fcfdfc]'}`}>
                   <td className="py-[10px] px-[4px] font-bold border-l-[3px] text-center" style={{ borderLeftColor: bordeColor, color: '#000000' }}>{i + 1}</td>
                   <td className="py-[10px] px-[4px] border-r border-[#d1e0d7]">
                     <div className="flex items-center text-left font-bold" style={{ color: '#000000' }}>
-                      <img src={logos[eq.equipo] || 'https://cdn-icons-png.flaticon.com/128/33/33736.png'} style={{ width: compactLogo ? '13px' : '15px', height: compactLogo ? '13px' : '15px', minWidth: compactLogo ? '13px' : '15px', objectFit: 'contain', marginRight: '6px' }} alt={eq.equipo} />
+                      <img src={logos[eq.equipo] || 'https://cdn-icons-png.flaticon.com/128/33/33736.png'} 
+                           style={{ width: compactLogo ? '13px' : '15px', height: compactLogo ? '13px' : '15px', minWidth: compactLogo ? '13px' : '15px', objectFit: 'contain', marginRight: '6px' }} 
+                           alt={eq.equipo} />
                       <span>{eq.equipo}</span>
                     </div>
                   </td>
@@ -332,7 +380,11 @@ export default function Home() {
                   <td className="py-[10px] px-[4px] text-center">
                     <div className="flex gap-[2px] justify-center">
                       {eq.ultimas.map((r, idx) => (
-                        <span key={idx} className="inline-flex items-center justify-center text-white text-[8.5px] font-bold rounded-[2px] px-[4px] py-[1px]" style={{ backgroundColor: r === 'V' ? '#8cc63f' : r === 'E' ? '#e1c340' : '#d32f2f' }}>{r}</span>
+                        <span key={idx} 
+                              className="inline-flex items-center justify-center text-white text-[8.5px] font-bold rounded-[2px] px-[4px] py-[1px]"
+                              style={{ backgroundColor: r === 'V' ? '#8cc63f' : r === 'E' ? '#e1c340' : '#d32f2f' }}>
+                          {r}
+                        </span>
                       ))}
                     </div>
                   </td>
@@ -423,7 +475,17 @@ export default function Home() {
       <aside className="w-[250px] bg-white border-r border-[#d1e0d7] flex-shrink-0 flex flex-col h-full shadow-sm overflow-y-auto">
         <div 
           onClick={() => setVistaMenuLateral('PORTADA')}
-          className="p-4 border-b border-[#d1e0d7] bg-[#e5eee9] flex flex-col items-center justify-center cursor-pointer hover:bg-[#d1e0d7] transition-colors"
+          style={{
+            padding: '16px',
+            borderBottom: '1px solid #d1e0d7',
+            backgroundColor: '#e5eee9',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            transition: 'background-color 0.3s'
+          }}
           title="Ir al inicio"
         >
           <img src="https://i.ibb.co/9kWMHzxY/Gemini-Generated-Image-oweh8loweh8loweh-removebg-preview.png" alt="Logo" className="h-[45px] object-contain hover:scale-105 transition-transform" />
@@ -543,7 +605,6 @@ export default function Home() {
 
       <main className="flex-1 flex flex-col h-full bg-[#f0f4f2] overflow-y-auto relative">
         
-        {/* VISTA PORTADA - AHORA CON EL DISEÑO DE PARTIDOS DE HOY */}
         {vistaMenuLateral === 'PORTADA' && (
           <div className="p-4 md:p-6 w-full max-w-[900px] mx-auto pb-20">
             {/* Header del Calendario */}
@@ -582,46 +643,56 @@ export default function Home() {
                 </div>
             </div>
 
-            {/* Lista de partidos (Usamos Fecha 8 de 2026 para maquetar) */}
+            {/* LISTA DE PARTIDOS CONECTADA A LA API */}
             <div className="bg-white flex flex-col rounded-b-md overflow-hidden shadow-sm border border-[#d1e0d7] border-t-0">
-                {listaPartidos.filter(p => p.Fecha_Global === 8).map((m, idx) => {
-                   const ganador = m.GL > m.GV ? m.Local : (m.GL < m.GV ? m.Visitante : null);
-                   // Mock para status (el primero lo forzamos a EN VIVO para el efecto visual)
-                   const estadoMock = (idx === 0) ? 'EN VIVO' : (m.GL !== null ? 'Final' : '15:30'); 
-                   
-                   return (
-                     <div key={idx} className={`flex border-t border-[#f0f4f2] text-[#112a1f] hover:bg-[#f8fbf9] transition-colors cursor-default ${idx===0 ? 'border-t-0' : ''}`}>
-                        <div className="w-[60px] flex flex-col items-center justify-center border-r border-[#f0f4f2] py-3 px-1">
-                           <span className={`text-[10px] font-black ${estadoMock === 'EN VIVO' ? 'text-[#ef4444] animate-pulse' : 'text-[#6b7280]'}`}>{estadoMock}</span>
-                           {estadoMock === 'EN VIVO' && <span className="text-[#ef4444] text-[9px] font-bold mt-1">65'</span>}
-                        </div>
-                        <div className="flex-1 flex flex-col justify-center p-3">
-                            <div className="flex justify-center items-center gap-2 sm:gap-6">
-                                <span className={`text-right w-[35%] text-[12px] font-bold truncate ${ganador === m.Local ? 'text-[#8cc63f] underline decoration-2 underline-offset-2' : 'text-[#112a1f]'}`}>{m.Local}</span>
-                                <img src={logos[m.Local]} className="w-[20px] h-[20px] object-contain drop-shadow-sm" alt={m.Local}/>
-                                
-                                {m.GL !== null ? (
-                                  <div className="flex items-center gap-1 min-w-[50px] justify-center">
-                                    <span className="font-bold text-[14px] bg-[#f0f4f2] text-[#112a1f] w-[24px] h-[24px] flex items-center justify-center rounded border border-[#d1e0d7] shadow-inner">{estadoMock === 'EN VIVO' ? '1' : m.GL}</span>
-                                    <span className="font-black text-[#8cc63f]">-</span>
-                                    <span className="font-bold text-[14px] bg-[#f0f4f2] text-[#112a1f] w-[24px] h-[24px] flex items-center justify-center rounded border border-[#d1e0d7] shadow-inner">{estadoMock === 'EN VIVO' ? '0' : m.GV}</span>
-                                  </div>
-                                ) : (
-                                  <span className="font-bold text-[11px] bg-[#f0f4f2] px-2 py-[2px] rounded border border-[#d1e0d7] min-w-[50px] text-center text-[#8cc63f]">VS</span>
-                                )}
-                                
-                                <img src={logos[m.Visitante]} className="w-[20px] h-[20px] object-contain drop-shadow-sm" alt={m.Visitante}/>
-                                <span className={`text-left w-[35%] text-[12px] font-bold truncate ${ganador === m.Visitante ? 'text-[#8cc63f] underline decoration-2 underline-offset-2' : 'text-[#112a1f]'}`}>{m.Visitante}</span>
-                            </div>
-                        </div>
-                     </div>
-                   );
-                })}
+                {cargandoAPI ? (
+                  <div className="text-center p-8 font-bold text-[#6b7280]">
+                     Cargando partidos en vivo... ⏳
+                  </div>
+                ) : partidosEnVivo.length === 0 ? (
+                  <div className="text-center p-8 font-bold text-[#6b7280]">
+                     No hay partidos programados en tu API para mostrar hoy.
+                  </div>
+                ) : (
+                  partidosEnVivo.map((m, idx) => {
+                     // Ajusta m.GL, m.GV, m.Local, m.Visitante según cómo los llame tu API
+                     const ganador = m.GL > m.GV ? m.Local : (m.GL < m.GV ? m.Visitante : null);
+                     // Puedes cambiar 'EN VIVO' basado en algún campo de tu API (ej: m.status === 'live')
+                     const estadoMock = (idx === 0) ? 'EN VIVO' : (m.GL !== null ? 'Final' : '15:30'); 
+                     
+                     return (
+                       <div key={idx} className={`flex border-t border-[#f0f4f2] text-[#112a1f] hover:bg-[#f8fbf9] transition-colors cursor-default ${idx===0 ? 'border-t-0' : ''}`}>
+                          <div className="w-[60px] flex flex-col items-center justify-center border-r border-[#f0f4f2] py-3 px-1">
+                             <span className={`text-[10px] font-black ${estadoMock === 'EN VIVO' ? 'text-[#ef4444] animate-pulse' : 'text-[#6b7280]'}`}>{estadoMock}</span>
+                             {estadoMock === 'EN VIVO' && <span className="text-[#ef4444] text-[9px] font-bold mt-1">65'</span>}
+                          </div>
+                          <div className="flex-1 flex flex-col justify-center p-3">
+                              <div className="flex justify-center items-center gap-2 sm:gap-6">
+                                  <span className={`text-right w-[35%] text-[12px] font-bold truncate ${ganador === m.Local ? 'text-[#8cc63f] underline decoration-2 underline-offset-2' : 'text-[#112a1f]'}`}>{m.Local}</span>
+                                  <img src={logos[m.Local] || 'https://cdn-icons-png.flaticon.com/128/33/33736.png'} className="w-[20px] h-[20px] object-contain drop-shadow-sm" alt={m.Local}/>
+                                  
+                                  {m.GL !== null ? (
+                                    <div className="flex items-center gap-1 min-w-[50px] justify-center">
+                                      <span className="font-bold text-[14px] bg-[#f0f4f2] text-[#112a1f] w-[24px] h-[24px] flex items-center justify-center rounded border border-[#d1e0d7] shadow-inner">{estadoMock === 'EN VIVO' ? '1' : m.GL}</span>
+                                      <span className="font-black text-[#8cc63f]">-</span>
+                                      <span className="font-bold text-[14px] bg-[#f0f4f2] text-[#112a1f] w-[24px] h-[24px] flex items-center justify-center rounded border border-[#d1e0d7] shadow-inner">{estadoMock === 'EN VIVO' ? '0' : m.GV}</span>
+                                    </div>
+                                  ) : (
+                                    <span className="font-bold text-[11px] bg-[#f0f4f2] px-2 py-[2px] rounded border border-[#d1e0d7] min-w-[50px] text-center text-[#8cc63f]">VS</span>
+                                  )}
+                                  
+                                  <img src={logos[m.Visitante] || 'https://cdn-icons-png.flaticon.com/128/33/33736.png'} className="w-[20px] h-[20px] object-contain drop-shadow-sm" alt={m.Visitante}/>
+                                  <span className={`text-left w-[35%] text-[12px] font-bold truncate ${ganador === m.Visitante ? 'text-[#8cc63f] underline decoration-2 underline-offset-2' : 'text-[#112a1f]'}`}>{m.Visitante}</span>
+                              </div>
+                          </div>
+                       </div>
+                     );
+                  })
+                )}
             </div>
           </div>
         )}
 
-        {/* VISTA LIGA 1 */}
         {vistaMenuLateral === 'LIGA1' && (
           <>
             <header className="bg-white shadow-sm border-b border-[#d1e0d7] px-6 py-4 flex items-center justify-between sticky top-0 z-10">
