@@ -42,15 +42,35 @@ const partidos2026JSON = [
 
 const listaPartidos2018 = Array.isArray(partidosJSON) ? partidosJSON : (partidosJSON.BaseDatos || Object.values(partidosJSON)[0] || []);
 
+// ==========================================
+// EL TRADUCTOR MAESTRO (ACTUALIZADO PARA LA NUEVA API)
+// ==========================================
 const normalizarEquipo = (nombre) => {
   if (!nombre) return "Equipo";
+  
+  // Limpiamos espacios extra por si acaso
+  const nombreLimpio = nombre.trim();
+  
   const alias = {
     'Melgar': 'FBC Melgar',
     'César Vallejo': 'Cesar Vallejo',
     'Cusco': 'Cusco FC',
-    'Comercio': 'Union Comercio'
+    'Comercio': 'Union Comercio',
+    // --- NUEVOS ALIAS POR LA API DE SPORTAPI ---
+    'Club Sporting Cristal': 'Sporting Cristal',
+    'Universitario de Deportes': 'Universitario',
+    'Alianza Atlético de Sullana': 'Alianza Atlético',
+    'Club Atlético Grau': 'Atlético Grau',
+    'Asociación Deportiva Tarma': 'ADT',
+    'Club Alianza Lima': 'Alianza Lima',
+    'Sport Boys Association': 'Sport Boys',
+    'Universidad César Vallejo': 'Cesar Vallejo',
+    'CD Unión Comercio': 'Union Comercio',
+    'CD Comerciantes Unidos': 'Comerciantes Unidos',
+    'CD Los Chankas': 'Los Chankas',
+    // ------------------------------------------
   };
-  return alias[nombre] || nombre;
+  return alias[nombreLimpio] || nombreLimpio;
 };
 
 export default function Home() {
@@ -100,9 +120,8 @@ export default function Home() {
       const year = fechaHoy.getFullYear();
       const month = String(fechaHoy.getMonth() + 1).padStart(2, '0');
       const day = String(fechaHoy.getDate()).padStart(2, '0');
-      const fechaFormateadaAPI = `${year}-${month}-${day}`; // Formato que usa SportAPI
+      const fechaFormateadaAPI = `${year}-${month}-${day}`; 
 
-      // Usamos el endpoint de eventos por fecha de SportAPI
       const url = `https://sportapi7.p.rapidapi.com/api/v1/sport/football/scheduled-events/${fechaFormateadaAPI}`;
       
       const options = {
@@ -117,15 +136,11 @@ export default function Home() {
         .then(response => response.json())
         .then(data => {
           let partidosFiltrados = [];
-          
-          // SportAPI devuelve los partidos dentro de data.events
           let todosLosPartidos = data.events || data.data || [];
 
           partidosFiltrados = todosLosPartidos.filter(partido => {
-            // Buscamos todo lo que huela a Perú o Liga 1
             const nombreTorneo = partido.tournament?.name?.toLowerCase() || '';
             const paisTorneo = partido.tournament?.category?.name?.toLowerCase() || '';
-            
             return paisTorneo.includes('peru') || nombreTorneo.includes('liga 1');
           });
 
@@ -139,7 +154,6 @@ export default function Home() {
         });
     }
   }, [vistaMenuLateral, fechaHoy]);
-  // ==========================================
 
   const esWalkover = (p) => {
     if (temporada === '2023' && p.Torneo === 'Apertura' && p.Jornada_Oficial === 3) {
@@ -569,9 +583,6 @@ export default function Home() {
                   <div style={{ textAlign: 'center', padding: '32px', fontWeight: 'bold', color: '#6b7280' }}>No hay partidos de Liga 1 programados para {fechaHoy.toLocaleDateString('es-ES')}.</div>
                 ) : (
                   partidosEnVivo.map((m, idx) => {
-                     // ==========================================
-                     // TRADUCTOR SPORTAPI
-                     // ==========================================
                      const local = m.homeTeam?.name || "Local";
                      const visita = m.awayTeam?.name || "Visita";
                      
